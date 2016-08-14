@@ -51,6 +51,29 @@ ob_start();
 require __DIR__ . '/index.php';
 $index = ob_get_clean();
 
+$index = preg_replace('/\s+/', ' ', $index);
+$index = str_replace('> <', '><', $index);
+
+$tokens = [
+    'boat' => $getToken(),
+    'boatWrapper' => $getToken(),
+    'dropShadow' => $getToken(),
+    'water' => $getToken(),
+    'lightingPointLight' => $getToken(),
+    'sun' => $getToken(),
+    'ripples' => $getToken(),
+    'rippleBlur' => $getToken(),
+    'rippleLighting' => $getToken(),
+    'blur' => $getToken(),
+    'offsetBlur' => $getToken(),
+    'shadow' => $getToken(),
+];
+
+foreach ($tokens as $find => $replace) {
+    $find = preg_quote($find, '/');
+    $index = preg_replace("/([^a-zA-Z0-9])({$find})([^a-zA-Z0-9])/", '$1' . $replace . '$3', $index);
+}
+
 echo 'Uncompressed length: ' . strlen($index) . PHP_EOL . PHP_EOL;
 
 echo 'Creating index.min.html' . PHP_EOL . PHP_EOL;

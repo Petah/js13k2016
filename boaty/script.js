@@ -57,11 +57,13 @@ svgNode.onmouseup = (e) => {
     mouseDown = false;
 };
 
+svgNode.oncontextmenu = (e) => {
+    e.preventDefault();
+};
+
 sun = 0;
 
 main = () => {
-//    console.log('main');
-    
     if (mouseDown) {
         player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
         directionDelta = (player.direction - pointDirection(player.x, player.y, mouseX, mouseY) + 360) % 360;
@@ -97,11 +99,11 @@ main = () => {
     move(player.translate, player.x, player.y);
     rotate(player.rotate, player.direction);
     
-    lighting.x.baseVal = Math.sin(sun) * 2000;
-    lighting.z.baseVal = Math.sin(sun) * 100;
+    lightingPointLight.x.baseVal = Math.sin(sun) * 2000;
+    lightingPointLight.z.baseVal = Math.sin(sun) * 100;
     sun += 0.001;
-
-    window.requestAnimationFrame(main);
+    
+    requestAnimationFrame(main);
 };
 
 main();
