@@ -1,0 +1,13 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #306bdc;
+}
+svg {
+    width: 100vw;
+    height: 100vh;
+}
+path {
+    stroke: #797979;
+    fill: #888;
+}
