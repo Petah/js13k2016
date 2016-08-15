@@ -2,7 +2,7 @@
     <filter id="water">
         <feTurbulence baseFrequency="0.2" result="ripples"/>
         <feGaussianBlur in="ripples" stdDeviation="4" result="rippleBlur"/>
-        <feSpecularLighting result="rippleLighting" in="rippleBlur" specularExponent="4" lighting-color="#306bdc">
+        <feSpecularLighting result="rippleLighting" in="rippleBlur" specularExponent="1" lighting-color="#306bdc">
             <fePointLight x="-200" y="-200" z="100" id="lightingPointLight"/>
         </feSpecularLighting>
         <feComposite in="rippleLighting" operator="arithmetic" k1="0" k2="2" k3="2" k4="0"/>
