@@ -4,6 +4,20 @@
 <circle id="bubbleParticle" class="bubbleParticle" transform="translate(0 0)" r="2" style="opacity:.4"/>
 <path id="bullet" class="bullet" transform="translate(0 0) rotate(0)" d="M-10 0L10 0"/>
 <rect width="100%" height="100%" filter="url(#water)"/>
+<g id="landWrapper">
+    <path id="land" class="land" d="
+        M0 0 
+        L0 100 
+        L10 50 
+        L20 40 
+        L30 50 
+        L40 20 
+        L50 53 
+        L60 50 
+        L70 60 
+        L70 00 
+    "/>
+</g>
 <g id="bottomLayer"></g>
 <g id="topLayer">
     <g id="boatWrapper" transform="translate(0 0)" filter="url(#dropShadow)">

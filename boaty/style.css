@@ -21,3 +21,8 @@ path {
 .bubbleParticle {
     fill: #fff;
 }
+
+.land {
+    fill: green;
+    stroke: green;
+}

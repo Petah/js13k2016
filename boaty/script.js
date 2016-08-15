@@ -10,11 +10,12 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 player = {
     translate: boatWrapper,
     rotate: boat,
+    boundingBox: svgNode.createSVGRect(),
     rotationPointX: 16,
     rotationPointY: 4,
     
-    x: 100,
-    y: 100,
+    x: 500,
+    y: 500,
     direction: 0,
     speed: 0,
     
@@ -168,6 +169,7 @@ main = () => {
         rotate(gameObjects[i].rotate, gameObjects[i].direction, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
     }
     
+    
     for (i = 0; i < particles.length; i++) {
         particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
         particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
@@ -190,3 +192,32 @@ main = () => {
 };
 
 main();
+
+setInterval(() => {
+//    boundingClientRect = player.translate.getBoundingClientRect()
+//    player.boundingBox.x = boundingClientRect.left;
+//    player.boundingBox.y = boundingClientRect.top;
+//    player.boundingBox.width = boundingClientRect.right - boundingClientRect.left;
+//    player.boundingBox.height = boundingClientRect.bottom - boundingClientRect.top;
+//    player.boundingBox.x = mouseX;
+//    player.boundingBox.y = mouseY;
+//    player.boundingBox.width = 1;
+//    player.boundingBox.height = 1;
+//    intersectionList = svgNode.getIntersectionList(player.boundingBox, landWrapper);
+//    console.log(player.boundingBox, intersectionList);
+//    if (intersectionList.length) {
+//        console.log('Collision');
+//    }
+//    console.log(document.elementFromPoint(mouseX, mouseY));
+}, 100);
+
+path = 'M0 0';
+currentX = 0;
+currentY = 100;
+while (currentX < 2000) {
+    currentY += ((Math.random() * 10) - 5);
+    path += 'L' + currentX + ' ' + currentY;
+    currentX += 10;
+}
+path += 'L' + (currentX - 10) + ' 0Z';
+land.setAttribute('d', path);
