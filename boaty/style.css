@@ -9,13 +9,13 @@ svg {
     height: 100vh;
 }
 
-path {
-    stroke: #797979;
-    fill: #888;
+.boat {
+    stroke: #444;
+    fill: #333;
 }
 
 .bullet {
-    stroke: #333;
+    stroke: #555;
 }
 
 .bubbleParticle {
@@ -23,6 +23,5 @@ path {
 }
 
 .land {
-    fill: green;
-    stroke: green;
+    fill: #38941a;
 }

@@ -1,6 +1,7 @@
 <style><?php
 if (isDebug()) {
     require __DIR__ . '/style.css';
-    return;
+} else {
+    require __DIR__ . '/style.min.css';
 }
-require __DIR__ . '/style.min.css';
+?></style>

@@ -5,7 +5,9 @@ echo 'Minifying style.css' . PHP_EOL . PHP_EOL;
 exec('node_modules\.bin\cleancss -o style.min.css style.css');
 
 echo 'Replacing tokens in script.js' . PHP_EOL . PHP_EOL;
-$script = PHP_EOL . file_get_contents(__DIR__ . '/script.js');
+$script = PHP_EOL . file_get_contents(__DIR__ . '/scripts/math.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/scripts/collision.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/script.js');
 
 $token = 'a';
 $getToken = function() use(&$token) {
@@ -33,6 +35,31 @@ $tokens = [
     'directionDelta' => $getToken(),
     'mouseDown' => $getToken(),
     'player' => $getToken(),
+    'boundingBox' => $getToken(),
+    'rotationPointX' => $getToken(),
+    'rotationPointY' => $getToken(),
+    'gameObjects' => $getToken(),
+    'particles' => $getToken(),
+    'emitter' => $getToken(),
+    'particle' => $getToken(),
+//    'bubbleParticle' => $getToken(),
+    'reloading' => $getToken(),
+    'reloadTime' => $getToken(),
+    'amount' => $getToken(),
+    'mouseMoveDown' => $getToken(),
+    'mouseShootDown' => $getToken(),
+    'particleClone' => $getToken(),
+    'mouseShootDown' => $getToken(),
+    'bulletClone' => $getToken(),
+    'intersectLineLine' => $getToken(),
+    'intersectLinePolygon' => $getToken(),
+    'intersectPolygonPolygon' => $getToken(),
+    'calculateRealPosition' => $getToken(),
+    'currentTransformMatrix' => $getToken(),
+    'transformedPoints' => $getToken(),
+    'currentX' => $getToken(),
+    'currentY' => $getToken(),
+    'randomLandPoints' => $getToken(),
 ];
 
 foreach ($tokens as $find => $replace) {

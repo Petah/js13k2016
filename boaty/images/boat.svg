@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg">
     <style>
-        path {
+        path,
+        polygon {
             stroke: red;
             fill: none;
         }
@@ -92,6 +93,19 @@
         L28 6
         
         Z
+    " />
+    <polygon id="p" transform="translate(2, 30)" points="
+        32 4 
+        28 2 
+        21 0
+        5 1 
+        0 2 
+        
+        0 6
+        
+        5 7
+        21 8
+        28 6
     " />
 </svg>
     

@@ -1,3 +1,8 @@
+//debug
+updatedPerSecond = 0;
+updatedPerSecondTimer = performance.now();
+///debug
+
 move = (element, x, y) => {
     element.transform.baseVal[0].matrix.e = x;
     element.transform.baseVal[0].matrix.f = y;
@@ -10,7 +15,6 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 player = {
     translate: boatWrapper,
     rotate: boat,
-    boundingBox: svgNode.createSVGRect(),
     rotationPointX: 16,
     rotationPointY: 4,
     
@@ -30,7 +34,7 @@ player = {
     reloadTime: 50,
 };
 
-gameObjects = [player];
+bullets = [];
 particles = [];
 
 emitter = {
@@ -40,20 +44,8 @@ emitter = {
     amount: 1,
 };
 
-pointDirection = (x1, y1, x2, y2) => {
-    return Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-};
-
-pointDistance = (x1, y1, x2, y2) => {
-    return Math.sqrt((x2 -= x1) * x2 + (y2 -= y1) * y2);
-};
-
-lengthDirX = (length, direction) => {
-    return Math.cos(direction * Math.PI / 180) * length;
-};
-
-lengthDirY = (length, direction) => {
-    return Math.sin(direction * Math.PI / 180) * length;
+bubbleParticleAnimation = (particle) => {
+    particle.translate.style.opacity -= 0.01;
 };
 
 mouseX = 0;
@@ -92,7 +84,55 @@ svgNode.oncontextmenu = (e) => {
 
 sun = 0;
 
+moveGameObjects = (gameObjects) => {
+    for (let i = 0; i < gameObjects.length; i++) {
+        gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
+        gameObjects[i].y += lengthDirY(gameObjects[i].speed, gameObjects[i].direction);
+
+        move(gameObjects[i].translate, gameObjects[i].x, gameObjects[i].y);
+        rotate(gameObjects[i].rotate, gameObjects[i].direction, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
+    }
+};
+
+createExplosion = (x, y) => {
+    for (let i = 0; i < 16; i++) {
+        explosionClone = explosion.cloneNode(true);
+        explosionClone.id = '';
+        console.log(explosionClone.style.fill);
+        explosionClone.style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 4)];
+        topLayer.appendChild(explosionClone);
+        particles.push({
+            x: x + ((Math.random() * 10) - 5),
+            y: y + ((Math.random() * 10) - 5),
+            translate: explosionClone,
+            life: 5000,
+            speed: Math.random() / 2,
+            direction: Math.random() * 360,
+            animationState: 0,
+            animationSpeed: Math.random() * 2 + 5,
+            animate: (particle) => {
+                particle.animationState += particle.animationSpeed;
+                particle.translate.r.baseVal.value = -(Math.cos(particle.animationState * (Math.PI / 100)) - 1) * 5;
+                particle.translate.style.opacity -= 0.02;
+                if (particle.animationState > 200) {
+                    particle.life = 0;
+                }
+            },
+        });
+    }
+};
+
 main = () => {
+    //debug
+//    console.log(updatedPerSecond);
+    updatedPerSecond++;
+    if (updatedPerSecondTimer < performance.now()) {
+        ups.innerHTML = 'UPS: ' + updatedPerSecond;
+        updatedPerSecondTimer = performance.now() + 1000;
+        updatedPerSecond = 0;
+    }
+    ///debug
+    
     if (mouseMoveDown) {
         player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
         directionDelta = (player.direction - pointDirection(player.x, player.y, mouseX, mouseY) + 360) % 360;
@@ -127,7 +167,7 @@ main = () => {
     if (emitter.reloading < 0 && player.speed > 0.1) {
         emitter.reloading = emitter.reloadTime;
         
-        for (i = 0; i < emitter.amount; i++) {
+        for (let i = 0; i < emitter.amount; i++) {
             particleClone = emitter.particle.cloneNode(true);
             particleClone.id = '';
             bottomLayer.appendChild(particleClone);
@@ -138,6 +178,7 @@ main = () => {
                 life: 30,
                 speed: player.speed / 10,
                 direction: (player.direction - 180) + ((Math.random() * 30) - 15),
+                animate: bubbleParticleAnimation,
             });
         }
     }
@@ -149,7 +190,7 @@ main = () => {
         bulletClone = bullet.cloneNode(true);
         bulletClone.id = '';
         topLayer.appendChild(bulletClone);
-        gameObjects.push({
+        bullets.push({
             translate: bulletClone,
             rotate: bulletClone,
             rotationPointX: 0,
@@ -161,19 +202,24 @@ main = () => {
         });
     }
     
-    for (i = 0; i < gameObjects.length; i++) {
-        gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
-        gameObjects[i].y += lengthDirY(gameObjects[i].speed, gameObjects[i].direction);
-
-        move(gameObjects[i].translate, gameObjects[i].x, gameObjects[i].y);
-        rotate(gameObjects[i].rotate, gameObjects[i].direction, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
+    moveGameObjects([player]);
+    moveGameObjects(bullets);
+    for (let i = 0; i < bullets.length; i++) {
+//        console.log(bullets[i]);
+        collision = intersectPolygonPolygon(calculateRealPosition(bullets[i].rotate), land.points);
+        if (collision.length) {
+            createExplosion(collision[0][0], collision[0][1]);
+            
+            bullets[i].translate.remove();
+            bullets.splice(i, 1);
+        }
+//        console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
     }
     
-    
-    for (i = 0; i < particles.length; i++) {
+    for (let i = 0; i < particles.length; i++) {
         particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
         particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
-        particles[i].translate.style.opacity -= 0.01;
+        particles[i].animate(particles[i]);
 
         move(particles[i].translate, particles[i].x, particles[i].y);
 //        rotate(particles[i].rotate, particles[i].direction, particles[i].rotationPointX, particles[i].rotationPointY);
@@ -193,31 +239,21 @@ main = () => {
 
 main();
 
+go = () => {
+    console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
+};
+
 setInterval(() => {
-//    boundingClientRect = player.translate.getBoundingClientRect()
-//    player.boundingBox.x = boundingClientRect.left;
-//    player.boundingBox.y = boundingClientRect.top;
-//    player.boundingBox.width = boundingClientRect.right - boundingClientRect.left;
-//    player.boundingBox.height = boundingClientRect.bottom - boundingClientRect.top;
-//    player.boundingBox.x = mouseX;
-//    player.boundingBox.y = mouseY;
-//    player.boundingBox.width = 1;
-//    player.boundingBox.height = 1;
-//    intersectionList = svgNode.getIntersectionList(player.boundingBox, landWrapper);
-//    console.log(player.boundingBox, intersectionList);
-//    if (intersectionList.length) {
-//        console.log('Collision');
-//    }
-//    console.log(document.elementFromPoint(mouseX, mouseY));
+    
 }, 100);
 
-path = 'M0 0';
+randomLandPoints = '0 0 ';
 currentX = 0;
 currentY = 100;
 while (currentX < 2000) {
     currentY += ((Math.random() * 10) - 5);
-    path += 'L' + currentX + ' ' + currentY;
+    randomLandPoints += ' ' + currentX + ' ' + currentY;
     currentX += 10;
 }
-path += 'L' + (currentX - 10) + ' 0Z';
-land.setAttribute('d', path);
+randomLandPoints += ' ' + (currentX - 10) + ' 0';
+land.setAttribute('points', randomLandPoints);
