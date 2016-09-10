@@ -343,8 +343,7 @@ main = () => {
         planets[i].y = lengthDirY(planets[i].distance, planets[i].angle);
         move(planets[i].element, planets[i].x, planets[i].y);
 		// planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
-		if (planets[i].element.children[7])
-	        planets[i].element.children[7].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
+        planets[i].element.children[planets[i].element.children.length - 1].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
     }
 
     for (let i = 0; i < players.length; i++) {
