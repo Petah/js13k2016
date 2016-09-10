@@ -7,7 +7,7 @@ if (isDebug()) {
 //    require __DIR__ . '/scripts/control-mouse.js';
     require __DIR__ . '/script.js';
 } else {
-    require __DIR__ . '/script.replace.min.js';
+    require __DIR__ . '/../build/script.replace.min.js';
 }
 ?></script><?php if (isDebug()): ?>
 <script src="debug.js"></script>
