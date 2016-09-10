@@ -76,17 +76,18 @@ createSolarSystem = (data) => {
     planetLayer.appendChild(sunG);
 
     // Append Planets
-    data.members.planets.map((planet, i) => {
-        let planetClone = planet.asset.cloneNode(true);
+    data.members.planets.map((planetDef, i) => {
+        let planetClone = planetDef.asset.cloneNode(true);
         planetClone.id = '';
-        let scale = Math.random() + 0.2;
-        planetClone.transform.baseVal[1].setScale(scale, scale); 
-        planets.push({
+        let planet = {
             element: planetClone,
             distance: data.members.sun.radius * 2 * (i + 1),
             angle: Math.random() * 360,
-            orbitSpeed: planet.orbitSpeed,
-        });
+            scale: Math.random() + 0.2,
+            orbitSpeed: planetDef.orbitSpeed,
+        };
+        planets.push(planet);
+        planetClone.transform.baseVal[1].setScale(planet.scale, planet.scale); 
         planetLayer.appendChild(planetClone);
     });
 
@@ -397,11 +398,14 @@ if (planets[i].element.children[7])
     moveGameObjects(bullets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < planets.length; j++) {
-            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
-            bullets[i].speed = ttt[0];
-            bullets[i].direction = ttt[1];
+            let planetDistance = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            if (planetDistance < 100 * planets[j].scale) {
+                bullets[i].life = 0;
+            }
+            let planetDirection = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let newPlanetMotion = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (planetDistance * planetDistance), planetDirection);
+            bullets[i].speed = newPlanetMotion[0];
+            bullets[i].direction = newPlanetMotion[1];
         }
 
         // Collide with ships
