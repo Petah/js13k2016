@@ -33,20 +33,18 @@ document.body.onkeyup = (e) => {
     }
 };
 
-controlUpdate = () => {   
+controlUpdate = (playerIndex) => {
     if (buttonMoveDown) {
-        player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
+        players[playerIndex].speed = Math.min(players[playerIndex].speed + players[playerIndex].acceleration, players[playerIndex].maxSpeed);
     } else {
-        player.speed /= player.friction;
+        players[playerIndex].speed /= players[playerIndex].friction;
     }
 
     if (buttonTurnLeftDown) {
-        player.turnSpeed = Math.max(player.turnSpeed - player.turnAcceleration, -player.maxTurnSpeed);
+        players[playerIndex].turnSpeed = Math.max(players[playerIndex].turnSpeed - players[playerIndex].turnAcceleration, -players[playerIndex].maxTurnSpeed);
     } else if (buttonTurnRightDown) {
-        player.turnSpeed = Math.min(player.turnSpeed + player.turnAcceleration, player.maxTurnSpeed);
+        players[playerIndex].turnSpeed = Math.min(players[playerIndex].turnSpeed + players[playerIndex].turnAcceleration, players[playerIndex].maxTurnSpeed);
     } else {
-        player.turnSpeed /= player.turnFriction;
+        players[playerIndex].turnSpeed /= players[playerIndex].turnFriction;
     }
 };
-           
-       
