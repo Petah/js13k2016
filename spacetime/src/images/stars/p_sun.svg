@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="680.5 290.5 603 603" style="enable-background:new 680.5 290.5 603 603;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#XMLID_2_);}
+	.st1{fill:#F78118;}
+	.st2{opacity:0.3;fill:none;stroke:#F78118;stroke-width:8;stroke-miterlimit:10;enable-background:new    ;}
+	.st3{opacity:0.15;}
+	.st4{fill:none;stroke:#F78118;stroke-width:6;stroke-miterlimit:10;stroke-dasharray:52.7219,52.7219;}
+	.st5{opacity:0.1;}
+	.st6{fill:none;stroke:#F78118;stroke-width:3;stroke-miterlimit:10;stroke-dasharray:30.4037,30.4037;}
+</style>
+<g id="XMLID_187_">
+	
+		<radialGradient id="XMLID_2_" cx="982" cy="488" r="199.3" gradientTransform="matrix(1 0 0 -1 0 1080)" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#F7C000"/>
+		<stop  offset="0.3137" style="stop-color:#F7BD01"/>
+		<stop  offset="0.5387" style="stop-color:#F7B405"/>
+		<stop  offset="0.7359" style="stop-color:#F7A40B"/>
+		<stop  offset="0.9162" style="stop-color:#F78E13"/>
+		<stop  offset="1" style="stop-color:#F78118"/>
+	</radialGradient>
+	<path id="XMLID_210_" class="st0" d="M982,791.3c-109.9,0-199.3-89.4-199.3-199.3S872.1,392.7,982,392.7s199.3,89.4,199.3,199.3
+		S1091.9,791.3,982,791.3z"/>
+	<path id="XMLID_207_" class="st1" d="M982,396.7c26.4,0,51.9,5.2,76,15.3c23.3,9.8,44.1,23.9,62.1,41.9
+		c17.9,17.9,32,38.8,41.9,62.1c10.2,24.1,15.3,49.6,15.3,76s-5.2,51.9-15.3,76c-9.8,23.3-23.9,44.1-41.9,62.1
+		c-17.9,17.9-38.8,32-62.1,41.9c-24.1,10.2-49.6,15.3-76,15.3s-51.9-5.2-76-15.3c-23.3-9.8-44.1-23.9-62.1-41.9
+		c-17.9-17.9-32-38.8-41.9-62.1c-10.2-24.1-15.3-49.6-15.3-76s5.2-51.9,15.3-76c9.8-23.3,23.9-44.1,41.9-62.1
+		c17.9-17.9,38.8-32,62.1-41.9C930.1,401.9,955.6,396.7,982,396.7 M982,388.7c-112.3,0-203.3,91-203.3,203.3s91,203.3,203.3,203.3
+		s203.3-91,203.3-203.3S1094.3,388.7,982,388.7L982,388.7z"/>
+</g>
+<circle id="XMLID_188_" class="st2" cx="982" cy="593" r="235"/>
+<g id="XMLID_189_" class="st3">
+	<circle id="XMLID_200_" class="st4" cx="982" cy="592" r="268.5"/>
+</g>
+<g id="XMLID_190_" class="st5">
+	<circle id="XMLID_199_" class="st6" cx="982" cy="592" r="300"/>
+</g>
+</svg>
