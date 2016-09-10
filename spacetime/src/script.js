@@ -71,7 +71,7 @@ createSolarSystem = (data) => {
             distance: data.members.sun.radius * 2 * (i + 1),
             angle: Math.random() * 360,
             scale: Math.random() + 0.2,
-            orbitSpeed: planetDef.orbitSpeed,
+            orbitSpeed: Math.random() * 0.5 + 0.2,
         };
         planets.push(planet);
         planetClone.transform.baseVal[1].setScale(planet.scale, planet.scale); 
@@ -99,33 +99,21 @@ solarSystemData = {
         planets: [
             {
                 asset: planetOrange,
-                orbitSpeed: 0.02,
-                radius: 140,
             },
             {
                 asset: planetBlue,
-                orbitSpeed: 0.02,
-                radius: 180,
             },
             {
                 asset: planetGrey,
-                orbitSpeed: 0.02,
-                radius: 140,
             },
             {
                 asset: planetOrange,
-                orbitSpeed: 0.05,
-                radius: 140,
             },
             {
                 asset: planetBlue,
-                orbitSpeed: 0.01,
-                radius: 180,
             },
             {
                 asset: planetGrey,
-                orbitSpeed: 0.01,
-                radius: 140,
             },
         ],
     },
@@ -174,6 +162,13 @@ createPlayer = () => {
         glitch: 0,
         glitchTime: 30,
         glitchLog: [],
+        
+        emitter: {
+            particle: bubbleParticle,
+            reloading: 0,
+            reloadTime: 1,
+            amount: 1,
+        },
     });
 };
 
@@ -186,42 +181,8 @@ createPlayer();
 //createPlayer();
 createCpu();
 
-//planets = [];
-//createPlanet = () => {
-//    let planetNode = planet.cloneNode(true);
-//    planetNode.id = '';
-//    topLayer.appendChild(planetNode);
-//    planets.push({
-//        id: Math.floor(Math.random() * 1000000),
-//        translate: planetNode,
-//        rotate: planetNode,
-//        rotationPointX: 0,
-//        rotationPointY: 0,
-//
-//        x: Math.random() * 2000 - 1000,
-//        y: Math.random() * 2000 - 1000,
-//        direction: 0,
-//        speed: 0,
-//    });
-//};
-//
-// createPlanet();
-// createPlanet();
-// createPlanet();
-// createPlanet();
-// createPlanet();
-// createPlanet();
-// createPlanet();
-
 bullets = [];
 particles = [];
-
-emitter = {
-    particle: bubbleParticle,
-    reloading: 0,
-    reloadTime: 1,
-    amount: 1,
-};
 
 bubbleParticleAnimation = (particle) => {
     particle.translate.style.opacity -= 0.01;
@@ -264,6 +225,28 @@ createExplosion = (x, y) => {
     }
 };
 
+emit = (emitter, x, y, speed, direction) => {
+    emitter.reloading--;
+    if (emitter.reloading < 0) {
+        emitter.reloading = emitter.reloadTime;
+
+        for (let i = 0; i < emitter.amount; i++) {
+            particleClone = emitter.particle.cloneNode(true);
+            particleClone.id = '';
+            bottomLayer.appendChild(particleClone);
+            particles.push({
+                x: x + ((Math.random() * 4) - 2),
+                y: y + ((Math.random() * 4) - 2),
+                translate: particleClone,
+                life: 30,
+                speed: speed / 10,
+                direction: (direction - 180) + ((Math.random() * 30) - 15),
+                animate: bubbleParticleAnimation,
+            });
+        }
+    }
+};
+
 updatePlayer = (player) => {
     player.direction += player.turnSpeed;
 
@@ -274,33 +257,18 @@ updatePlayer = (player) => {
         player.direction += 360;
     }
 
-    emitter.reloading--;
-    if (emitter.reloading < 0 && player.speed > 0.1) {
-        emitter.reloading = emitter.reloadTime;
-
-        for (let i = 0; i < emitter.amount; i++) {
-            particleClone = emitter.particle.cloneNode(true);
-            particleClone.id = '';
-            bottomLayer.appendChild(particleClone);
-            particles.push({
-                x: player.x + ((Math.random() * 4) - 2),
-                y: player.y + ((Math.random() * 4) - 2),
-                translate: particleClone,
-                life: 30,
-                speed: player.speed / 10,
-                direction: (player.direction - 180) + ((Math.random() * 30) - 15),
-                animate: bubbleParticleAnimation,
-            });
-        }
+    player.emitter.reloading--;
+    if (player.speed > 0.1) {
+        emit(player.emitter, player.x, player.y, player.speed, player.direction);
     }
-
+    
     player.reloading--;
     if (player.shoot && player.reloading < 0) {
         player.reloading = player.reloadTime;
 
         bulletClone = bullet.cloneNode(true);
         bulletClone.id = '';
-        topLayer.appendChild(bulletClone);
+        bottomLayer.appendChild(bulletClone);
         bullets.push({
             owner: player,
             translate: bulletClone,
@@ -314,6 +282,12 @@ updatePlayer = (player) => {
             speed: 20,
             life: 200,
             mass: 0.8,
+            emitter: {
+                particle: bubbleParticle,
+                reloading: 0,
+                reloadTime: 1,
+                amount: 1,
+            },
         });
         
         player.gunMount++;
@@ -389,6 +363,8 @@ main = () => {
     moveGameObjects(cpus);
     moveGameObjects(bullets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
+        emit(bullets[i].emitter, bullets[i].x, bullets[i].y, bullets[i].speed, bullets[i].direction);
+    
         for (let j = 0; j < planets.length; j++) {
             let planetDistance = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
             if (planetDistance < 100 * planets[j].scale) {

@@ -4,12 +4,6 @@
     <circle id="bubbleParticle" class="bubbleParticle" transform="translate(-100000 -100000)" r="2" style="opacity:.4"/>
     <circle id="explosion" class="explosion" transform="translate(-100000 -100000)" r="10" style="opacity:1"/>
     <polygon id="bullet" class="bullet" transform="translate(-100000 -100000) rotate(0)" points="-10 0 10 0"/>
-    <g id="sunStar" transform="translate(0 0) scale(1)">
-        <circle class="sunMain" cx="0" cy="0" r="200" fill="url(#sungrad)"/>
-        <circle class="sunRing sunRing1" cx="0" cy="0" r="235"/>
-        <circle class="sunRing sunRing2" cx="0" cy="0" r="268.5"/>
-        <circle class="sunRing sunRing3" cx="0" cy="0" r="300"/>
-    </g>
     <g id="planetBlue" transform="translate(-100000 -100000) scale(1)">
         <path class="planetBlue1" transform="rotate(0)" d="M227.3,21.4c29.8,27.4,48.4,66.7,48.4,110.4c0,82.8-67.2,150-150,150 c-28.3,0-54.7-7.8-77.3-21.4C75.1,285,110.8,300,150,300c82.8,0,150-67.2,150-150C300,95.4,270.9,47.7,227.3,21.4z"/>
         <path class="planetBlue2" d="M275.7,131.8c0-43.7-18.7-82.9-48.4-110.4C204.7,7.8,178.3,0,150,0C67.2,0,0,67.2,0,150 c0,43.7,18.7,82.9,48.4,110.4c22.6,13.6,49,21.4,77.3,21.4C208.6,281.8,275.7,214.6,275.7,131.8z"/>
@@ -43,7 +37,14 @@
         <circle r="100" class="planetOrange4" mask="url(#planetShadowClip)" transform="rotate(0)"/>
     </g>
     <g id="gridLayer"></g>
-    <g id="bottomLayer">
+    <g id="bottomLayer"></g>
+    <g id="sunStar" transform="translate(0 0) scale(1)">
+        <circle class="sunMain" cx="0" cy="0" r="200" fill="url(#sungrad)"/>
+        <circle class="sunRing sunRing1" cx="0" cy="0" r="235"/>
+        <circle class="sunRing sunRing2" cx="0" cy="0" r="268.5"/>
+        <circle class="sunRing sunRing3" cx="0" cy="0" r="300"/>
+    </g>
+    <g id="solarSystemLayer">
         <g id="stars"></g>
         <g id="solarSystem">
             <g id="planetLayer"></g>            
