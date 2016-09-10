@@ -33,7 +33,7 @@ player = {
     turnFriction: 1.2,
     
     reloading: 0,
-    reloadTime: 50,
+    reloadTime: 10,
 };
 
 bullets = [];
@@ -50,41 +50,10 @@ bubbleParticleAnimation = (particle) => {
     particle.translate.style.opacity -= 0.01;
 };
 
-mouseX = 0;
-mouseY = 0;
 buttonMoveDown = false;
 buttonShootDown = false;
 buttonTurnLeftDown = false;
 buttonTurnRightDown = false;
-
-svgNode.onmousemove = (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-};
-
-svgNode.onmousedown = (e) => {
-    if (e.which == 1) {
-        buttonMoveDown = true;
-    }
-    if (e.which == 3) {
-        buttonShootDown = true;
-    }
-    e.preventDefault();
-};
-
-svgNode.onmouseup = (e) => {
-    if (e.which == 1) {
-        buttonMoveDown = false;
-    }
-    if (e.which == 3) {
-        buttonShootDown = false;
-    }
-    e.preventDefault();
-};
-
-svgNode.oncontextmenu = (e) => {
-    e.preventDefault();
-};
 
 document.body.onkeydown = (e) => {
     if (e.which == 38) {
@@ -95,6 +64,9 @@ document.body.onkeydown = (e) => {
     }
     if (e.which == 39) {
         buttonTurnRightDown = true;
+    }
+    if (e.which == 32) {
+        buttonShootDown = true;
     }
 };
 
@@ -107,6 +79,9 @@ document.body.onkeyup = (e) => {
     }
     if (e.which == 39) {
         buttonTurnRightDown = false;
+    }
+    if (e.which == 32) {
+        buttonShootDown = false;
     }
 };
 
@@ -157,36 +132,7 @@ main = () => {
     }
     ///debug
     
-    if (buttonMoveDown) {
-        player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
-       
-//        // Move towards mouse position
-//        directionDelta = (player.direction - pointDirection(player.x, player.y, mouseX, mouseY) + 360) % 360;
-//        if (directionDelta < 180) {
-//            if (directionDelta > 10) {
-//                player.turnSpeed = Math.max(player.turnSpeed - player.turnAcceleration, -player.maxTurnSpeed);
-//            } else {
-//                player.turnSpeed /= 1.2;
-//            }
-//        } else if (directionDelta > 180) {
-//            if (directionDelta < 350) {
-//                player.turnSpeed = Math.min(player.turnSpeed + player.turnAcceleration, player.maxTurnSpeed);
-//            } else {
-//                player.turnSpeed /= 1.2;
-//            }
-//        }
-    } else {
-        player.speed /= player.friction;
-    }
-
-    if (buttonTurnLeftDown) {
-        player.turnSpeed = Math.max(player.turnSpeed - player.turnAcceleration, -player.maxTurnSpeed);
-    } else if (buttonTurnRightDown) {
-        player.turnSpeed = Math.min(player.turnSpeed + player.turnAcceleration, player.maxTurnSpeed);
-    } else {
-        player.turnSpeed /= player.turnFriction;
-    }
-
+    controlUpdate();
     
     player.direction += player.turnSpeed;
     
@@ -231,8 +177,9 @@ main = () => {
             rotationPointY: 0,
             x: player.x,
             y: player.y,
-            direction: pointDirection(player.x, player.y, mouseX, mouseY),
-            speed: 10,
+//            direction: pointDirection(player.x, player.y, mouseX, mouseY),
+            direction: player.direction,
+            speed: 20,
         });
     }
     
@@ -281,3 +228,10 @@ go = () => {
 setInterval(() => {
     
 }, 100);
+
+window.addEventListener('gamepadconnected', (e) => { 
+    controllers = navigator.getGamepads();
+}, false);
+window.addEventListener('gamepaddisconnected', (e) => { 
+    controllers = navigator.getGamepads();
+}, false);
