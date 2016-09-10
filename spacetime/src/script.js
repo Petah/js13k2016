@@ -228,14 +228,14 @@ createPlanet = () => {
         speed: 0,
     });
 };
-
-createPlanet();
-createPlanet();
-createPlanet();
-createPlanet();
-createPlanet();
-createPlanet();
-createPlanet();
+//
+// createPlanet();
+// createPlanet();
+// createPlanet();
+// createPlanet();
+// createPlanet();
+// createPlanet();
+// createPlanet();
 
 bullets = [];
 particles = [];
@@ -404,7 +404,7 @@ main = () => {
     moveGameObjects(players);
     moveGameObjects(cpus);
     moveGameObjects(bullets);
-    moveGameObjects(planets);
+    // moveGameObjects(planets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < planets.length; j++) {
             let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
