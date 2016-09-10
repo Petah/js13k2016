@@ -138,6 +138,8 @@ createPlayer = () => {
         rotate: playerNode.children[0],
         rotationPointX: 16,
         rotationPointY: 4,
+        
+        health: 10,
 
         x: Math.random() * 2000 - 1000,
         y: Math.random() * 2000 - 1000,
@@ -199,6 +201,7 @@ moveGameObjects = (gameObjects) => {
 };
 
 createExplosion = (x, y) => {
+    playSound([3,,0.3708,0.5822,0.3851,0.0584,,-0.0268,,,,-0.0749,0.7624,,,,,,1,,,,,0.5])
     for (let i = 0; i < 16; i++) {
         explosionClone = explosion.cloneNode(true);
         explosionClone.id = '';
@@ -224,6 +227,7 @@ createExplosion = (x, y) => {
         });
     }
 };
+    
 
 emit = (emitter, x, y, speed, direction) => {
     emitter.reloading--;
@@ -264,6 +268,8 @@ updatePlayer = (player) => {
     
     player.reloading--;
     if (player.shoot && player.reloading < 0) {
+        playSound([1,,0.2126,,0.2145,0.8144,0.4185,-0.1908,,,,,,0.4178,0.0931,,,,1,,,0.1469,,0.5]);
+        
         player.reloading = player.reloadTime;
 
         bulletClone = bullet.cloneNode(true);
@@ -306,6 +312,8 @@ col = (bullet, ships) => {
         collisionDistance = pointDistance(bullet.x, bullet.y, ships[j].x, ships[j].y);
         if (collisionDistance < 20) {
             createExplosion(bullet.x, bullet.y);
+            ships[j].health -= 1;
+            console.log(ships[j].health);
 
             bullet.life = 0;
             break;
@@ -340,12 +348,20 @@ main = () => {
     }
 
     for (let i = 0; i < players.length; i++) {
-        controlUpdate(i);
-        updatePlayer(players[i]);
+        if (players[i].health > 0) {
+            controlUpdate(i);
+            updatePlayer(players[i]);
+        } else {
+            players[i].speed = 0;
+        }
     }
     for (let i = 0; i < cpus.length; i++) {
-        ai(cpus[i]);
-        updatePlayer(cpus[i]);
+        if (cpus[i].health > 0) {
+            ai(cpus[i]);
+            updatePlayer(cpus[i]);
+        } else {
+            cpus[i].speed = 0;
+        }
     }
 
     for (let i = 0; i < glitches.length; i++) {
