@@ -73,35 +73,22 @@ createSolarSystem = (data) => {
         }
     });
     sunG.appendChild(sunSvg);
-    data.element.appendChild(sunG);
+    planetLayer.appendChild(sunG);
 
     // Append Planets
-    let planetG = document.createElementNS(svgNs, 'g');
-    let pRadOffset = data.members.sun.radius * 2;
     data.members.planets.map((planet, i) => {
-        let offset = pRadOffset * (i + 1);
-        let angle = randomBetween(0, 2 * Math.PI);
-        let pSvg = {
-            asset: planet.asset,
-            angle: {
-                start: angle,
-                relative: 0
-            },
-            dims: {
-                height: planet.radius,
-                width: planet.radius
-            },
+        let planetClone = planet.asset.cloneNode(true);
+        planetClone.id = '';
+        let scale = Math.random() * 0.2 + 0.2;
+        planetClone.transform.baseVal[1].setScale(scale, scale); 
+        planets.push({
+            element: planetClone,
+            distance: data.members.sun.radius * 2 * (i + 1),
+            angle: Math.random() * 360,
             orbitSpeed: planet.orbitSpeed,
-            origin: {
-                x: ((data.origin.x + (offset * Math.sin(angle))) - (planet.radius / 2)),
-                y: ((data.origin.y + (offset * Math.cos(angle))) - (planet.radius / 2))
-            }
-        };
-        pSvg['element'] = createSvg(pSvg);
-        planets.push(pSvg);
-        planetG.appendChild(pSvg.element);
+        });
+        planetLayer.appendChild(planetClone);
     });
-    data.element.appendChild(planetG);
 
     // Append stars
     for (let i = 0; i < data.stars.count; i++) {
@@ -109,58 +96,58 @@ createSolarSystem = (data) => {
     }
 };
 
-let solarSystemData = {
+solarSystemData = {
     origin: {
         x: 0,
         y: 0
     },
-    element: document.getElementById('solar-system'),
+    element: solarSystem,
     members: {
         sun: {
-            asset: '/images/stars/p_sun.svg',
-            radius: 300
+            asset: 'images/stars/p_sun.svg',
+            radius: 300,
         },
         planets: [
+//            {
+//                asset: 'images/planets/p_orange.svg',
+//                orbitSpeed: 0.02,
+//                radius: 140,
+//            },
             {
-                asset: '/images/planets/p_orange.svg',
+                asset: planetBlue,
                 orbitSpeed: 0.02,
-                radius: 140
+                radius: 180,
             },
+//            {
+//                asset: 'images/planets/p_grey.svg',
+//                orbitSpeed: 0.02,
+//                radius: 140,
+//            },
+//            {
+//                asset: 'images/planets/p_orange.svg',
+//                orbitSpeed: 0.05,
+//                radius: 140,
+//            },
             {
-                asset: '/images/planets/p_blue.svg',
-                orbitSpeed: 0.02,
-                radius: 180
-            },
-            {
-                asset: '/images/planets/p_grey.svg',
-                orbitSpeed: 0.02,
-                radius: 140
-            },
-            {
-                asset: '/images/planets/p_orange.svg',
-                orbitSpeed: 0.05,
-                radius: 140
-            },
-            {
-                asset: '/images/planets/p_blue.svg',
+                asset: planetBlue,
                 orbitSpeed: 0.01,
-                radius: 180
+                radius: 180,
             },
-            {
-                asset: '/images/planets/p_grey.svg',
-                orbitSpeed: 0.01,
-                radius: 140
-            }
-        ]
+//            {
+//                asset: 'images/planets/p_grey.svg',
+//                orbitSpeed: 0.01,
+//                radius: 140,
+//            },
+        ],
     },
     stars: {
         count: 10000,
         field: {
-            element: document.getElementById('stars'),
+            element: stars,
             width: window.innerWidth * 15,
-            height: window.innerHeight * 15
+            height: window.innerHeight * 15,
         },
-        radius: 5
+        radius: 5,
     }
 };
 
@@ -210,24 +197,24 @@ createPlayer();
 //createPlayer();
 createCpu();
 
-planets = [];
-createPlanet = () => {
-    let planetNode = planet.cloneNode(true);
-    planetNode.id = '';
-    topLayer.appendChild(planetNode);
-    planets.push({
-        id: Math.floor(Math.random() * 1000000),
-        translate: planetNode,
-        rotate: planetNode,
-        rotationPointX: 0,
-        rotationPointY: 0,
-
-        x: Math.random() * 2000 - 1000,
-        y: Math.random() * 2000 - 1000,
-        direction: 0,
-        speed: 0,
-    });
-};
+//planets = [];
+//createPlanet = () => {
+//    let planetNode = planet.cloneNode(true);
+//    planetNode.id = '';
+//    topLayer.appendChild(planetNode);
+//    planets.push({
+//        id: Math.floor(Math.random() * 1000000),
+//        translate: planetNode,
+//        rotate: planetNode,
+//        rotationPointX: 0,
+//        rotationPointY: 0,
+//
+//        x: Math.random() * 2000 - 1000,
+//        y: Math.random() * 2000 - 1000,
+//        direction: 0,
+//        speed: 0,
+//    });
+//};
 //
 // createPlanet();
 // createPlanet();
@@ -375,10 +362,10 @@ main = () => {
     ///debug
     
     // move planets
-    planets.map((planet, i) => {
-        planet.angle.relative += planet.orbitSpeed;
-        planet.element.setAttributeNS(null, 'transform', `rotate(${planet.angle.relative} ${solarSystemData.origin.x} ${solarSystemData.origin.y})`);
-    });
+    for (let i = 0; i < planets.length; i++) {
+        planets[i].angle += planets[i].orbitSpeed;
+        move(planets[i].element, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle));
+    }
 
     for (let i = 0; i < players.length; i++) {
         controlUpdate(i);
@@ -406,13 +393,13 @@ main = () => {
     moveGameObjects(bullets);
     // moveGameObjects(planets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
-        for (let j = 0; j < planets.length; j++) {
-            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
-            bullets[i].speed = ttt[0];
-            bullets[i].direction = ttt[1];
-        }
+//        for (let j = 0; j < planets.length; j++) {
+//            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+//            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+//            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
+//            bullets[i].speed = ttt[0];
+//            bullets[i].direction = ttt[1];
+//        }
 
         // Collide with ships
         col(bullets[i], players);
