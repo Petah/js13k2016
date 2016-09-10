@@ -12,6 +12,10 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
     element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY)
 };
 
+planetMass = 1;
+gravityPower = 25000;
+cpus = [];
+glitches = [];
 players = [];
 planets = [];
 
@@ -165,13 +169,14 @@ createPlayer = () => {
     playerNode.id = '';
     topLayer.appendChild(playerNode);
     players.push({
+        id: Math.floor(Math.random() * 1000000),
         translate: playerNode,
         rotate: playerNode.children[0],
         rotationPointX: 16,
         rotationPointY: 4,
 
-        x: 500,
-        y: 500,
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
         direction: 0,
         speed: 0,
 
@@ -184,13 +189,53 @@ createPlayer = () => {
         turnAcceleration: 0.5,
         turnFriction: 1.2,
 
+        shoot: false,
         reloading: 0,
         reloadTime: 10,
+        gunMount: 0,
+        gunMounts: [10, -10],
+        
+        glitch: 0,
+        glitchTime: 30,
+        glitchLog: [],
     });
 };
 
+createCpu = () => {
+    createPlayer();
+    cpus.push(players.pop());
+};
+
 createPlayer();
-createPlayer();
+//createPlayer();
+createCpu();
+
+planets = [];
+createPlanet = () => {
+    let planetNode = planet.cloneNode(true);
+    planetNode.id = '';
+    topLayer.appendChild(planetNode);
+    planets.push({
+        id: Math.floor(Math.random() * 1000000),
+        translate: planetNode,
+        rotate: planetNode,
+        rotationPointX: 0,
+        rotationPointY: 0,
+
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
+        direction: 0,
+        speed: 0,
+    });
+};
+
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
 
 bullets = [];
 particles = [];
@@ -206,41 +251,6 @@ bubbleParticleAnimation = (particle) => {
     particle.translate.style.opacity -= 0.01;
 };
 
-buttonMoveDown = false;
-buttonShootDown = false;
-buttonTurnLeftDown = false;
-buttonTurnRightDown = false;
-
-document.body.onkeydown = (e) => {
-    if (e.which == 38) {
-        buttonMoveDown = true;
-    }
-    if (e.which == 37) {
-        buttonTurnLeftDown = true;
-    }
-    if (e.which == 39) {
-        buttonTurnRightDown = true;
-    }
-    if (e.which == 32) {
-        buttonShootDown = true;
-    }
-};
-
-document.body.onkeyup = (e) => {
-    if (e.which == 38) {
-        buttonMoveDown = false;
-    }
-    if (e.which == 37) {
-        buttonTurnLeftDown = false;
-    }
-    if (e.which == 39) {
-        buttonTurnRightDown = false;
-    }
-    if (e.which == 32) {
-        buttonShootDown = false;
-    }
-};
-
 moveGameObjects = (gameObjects) => {
     for (let i = 0; i < gameObjects.length; i++) {
         gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
@@ -252,7 +262,6 @@ moveGameObjects = (gameObjects) => {
 };
 
 createExplosion = (x, y) => {
-    console.log(x, y);
     for (let i = 0; i < 16; i++) {
         explosionClone = explosion.cloneNode(true);
         explosionClone.id = '';
@@ -279,6 +288,81 @@ createExplosion = (x, y) => {
     }
 };
 
+updatePlayer = (player) => {
+    player.direction += player.turnSpeed;
+
+    while (player.direction > 360) {
+        player.direction -= 360;
+    }
+    while (player.direction < 0) {
+        player.direction += 360;
+    }
+
+    emitter.reloading--;
+    if (emitter.reloading < 0 && player.speed > 0.1) {
+        emitter.reloading = emitter.reloadTime;
+
+        for (let i = 0; i < emitter.amount; i++) {
+            particleClone = emitter.particle.cloneNode(true);
+            particleClone.id = '';
+            bottomLayer.appendChild(particleClone);
+            particles.push({
+                x: player.x + ((Math.random() * 4) - 2),
+                y: player.y + ((Math.random() * 4) - 2),
+                translate: particleClone,
+                life: 30,
+                speed: player.speed / 10,
+                direction: (player.direction - 180) + ((Math.random() * 30) - 15),
+                animate: bubbleParticleAnimation,
+            });
+        }
+    }
+
+    player.reloading--;
+    if (player.shoot && player.reloading < 0) {
+        player.reloading = player.reloadTime;
+
+        bulletClone = bullet.cloneNode(true);
+        bulletClone.id = '';
+        topLayer.appendChild(bulletClone);
+        bullets.push({
+            owner: player,
+            translate: bulletClone,
+            rotate: bulletClone,
+            rotationPointX: 0,
+            rotationPointY: 0,
+            x: player.x + lengthDirX(player.gunMounts[player.gunMount], player.direction + 90),
+            y: player.y + lengthDirY(player.gunMounts[player.gunMount], player.direction + 90),
+//            direction: pointDirection(player.x, player.y, mouseX, mouseY),
+            direction: player.direction,
+            speed: 20,
+            life: 200,
+            mass: 0.8,
+        });
+        
+        player.gunMount++;
+        if (player.gunMount >= player.gunMounts.length) {
+            player.gunMount = 0;
+        }
+    }
+    player.shoot = false;
+};
+
+col = (bullet, ships) => {
+    for (let j = 0; j < ships.length; j++) {
+        if (bullet.owner.id == ships[j].id) {
+            continue;
+        }
+        collisionDistance = pointDistance(bullet.x, bullet.y, ships[j].x, ships[j].y);
+        if (collisionDistance < 20) {
+            createExplosion(bullet.x, bullet.y);
+
+            bullet.life = 0;
+            break;
+        }
+    }
+};
+
 main = () => {
     //debug
     updatedPerSecond++;
@@ -298,80 +382,50 @@ main = () => {
 
     for (let i = 0; i < players.length; i++) {
         controlUpdate(i);
-        
-        players[i].direction += players[i].turnSpeed;
+        updatePlayer(players[i]);
+    }
+    for (let i = 0; i < cpus.length; i++) {
+        ai(cpus[i]);
+        updatePlayer(cpus[i]);
+    }
 
-        while (players[i].direction > 360) {
-            players[i].direction -= 360;
+    for (let i = 0; i < glitches.length; i++) {
+        if (glitches[i].glitchLog[0]) {
+            move(glitches[i].translate, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
+            rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
         }
-        while (players[i].direction < 0) {
-            players[i].direction += 360;
-        }
-
-        emitter.reloading--;
-        if (emitter.reloading < 0 && players[i].speed > 0.1) {
-            emitter.reloading = emitter.reloadTime;
-
-            for (let i = 0; i < emitter.amount; i++) {
-                particleClone = emitter.particle.cloneNode(true);
-                particleClone.id = '';
-                bottomLayer.appendChild(particleClone);
-                particles.push({
-                    x: players[i].x + ((Math.random() * 4) - 2),
-                    y: players[i].y + ((Math.random() * 4) - 2),
-                    translate: particleClone,
-                    life: 30,
-                    speed: players[i].speed / 10,
-                    direction: (players[i].direction - 180) + ((Math.random() * 30) - 15),
-                    animate: bubbleParticleAnimation,
-                });
-            }
-        }
-
-        players[i].reloading--;
-        if (buttonShootDown && players[i].reloading < 0) {
-            players[i].reloading = players[i].reloadTime;
-
-            bulletClone = bullet.cloneNode(true);
-            bulletClone.id = '';
-            topLayer.appendChild(bulletClone);
-            bullets.push({
-                owner: i,
-                translate: bulletClone,
-                rotate: bulletClone,
-                rotationPointX: 0,
-                rotationPointY: 0,
-                x: players[i].x,
-                y: players[i].y,
-    //            direction: pointDirection(players[i].x, players[i].y, mouseX, mouseY),
-                direction: players[i].direction,
-                speed: 20,
-            });
+        if (!glitches[i].glitchLog.shift()) {
+            glitches[i].translate.remove();
+            glitches.splice(i, 1);
         }
     }
 
     // console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
     moveGameObjects(players);
+    moveGameObjects(cpus);
     moveGameObjects(bullets);
-    for (let i = 0; i < bullets.length; i++) {
-//        console.log(bullets[i]);
-
-        for (let j = 0; j < players.length; j++) {
-            if (bullets[i].owner == j) {
-                continue;
-            }
-            //console.log(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
-            collision = intersectPolygonPolygon(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
-            if (collision.length) {
-                console.log(collision);
-                createExplosion(collision[0][0], collision[0][1]);
-
-                bullets[i].translate.remove();
-                bullets.splice(i, 1);
-                j = players.length;
-            }
+    moveGameObjects(planets);
+    bulletLoop: for (let i = 0; i < bullets.length; i++) {
+        for (let j = 0; j < planets.length; j++) {
+            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
+            bullets[i].speed = ttt[0];
+            bullets[i].direction = ttt[1];
         }
-//        console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
+
+        // Collide with ships
+        col(bullets[i], players);
+        col(bullets[i], cpus);
+        
+        // Bullet life
+        bullets[i].life--;
+        if (bullets[i].life <= 0) {
+            createExplosion(bullets[i].x, bullets[i].y);
+
+            bullets[i].translate.remove();
+            bullets.splice(i, 1);
+        }
     }
     
     for (let i = 0; i < particles.length; i++) {
@@ -399,19 +453,3 @@ main = () => {
 createSolarSystem(solarSystemData);
 
 main();
-
-go = () => {
-    console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
-};
-
-setInterval(() => {
-
-}, 100);
-
-
-window.addEventListener('gamepadconnected', (e) => {
-    controllers = navigator.getGamepads();
-}, false);
-window.addEventListener('gamepaddisconnected', (e) => {
-    controllers = navigator.getGamepads();
-}, false);

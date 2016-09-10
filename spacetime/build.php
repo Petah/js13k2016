@@ -2,15 +2,20 @@
 define('DEBUG', false);
 
 echo 'Minifying style.css' . PHP_EOL . PHP_EOL;
-exec('node_modules\.bin\cleancss -o style.min.css style.css');
+exec('node_modules\.bin\cleancss -o build/style.min.css src/style.css');
 
 echo 'Replacing tokens in script.js' . PHP_EOL . PHP_EOL;
-$script = PHP_EOL . file_get_contents(__DIR__ . '/scripts/math.js');
-$script .= PHP_EOL . file_get_contents(__DIR__ . '/scripts/collision.js');
-$script .= PHP_EOL . file_get_contents(__DIR__ . '/script.js');
+$script = PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/math.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/collision.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/control-gamepad.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/script.js');
+$script = preg_replace('~//debug.*?///debug~s', '', $script);
 
 $token = 'a';
 $getToken = function() use(&$token) {
+    while ($token == 'i' || $token == 'j' || $token == 'x' || $token == 'y') {
+        $token++;
+    }
     return $token++;
 };
 
@@ -67,15 +72,15 @@ foreach ($tokens as $find => $replace) {
     $script = preg_replace("/([^a-zA-Z0-9])({$find})([^a-zA-Z0-9])/", '$1' . $replace . '$3', $script);
 }
 
-file_put_contents(__DIR__ . '/script.replace.js', $script);
+file_put_contents(__DIR__ . '/build/script.replace.js', $script);
 
 echo 'Minifying script.js' . PHP_EOL . PHP_EOL;
-exec('node_modules\.bin\esminify script.replace.js');
+exec('node_modules\.bin\esminify build/script.replace.js');
 
 
 echo 'Reading index.php' . PHP_EOL . PHP_EOL;
 ob_start();
-require __DIR__ . '/index.php';
+require __DIR__ . '/src/index.php';
 $index = ob_get_clean();
 
 $index = preg_replace('/\s+/', ' ', $index);
@@ -104,12 +109,12 @@ foreach ($tokens as $find => $replace) {
 echo 'Uncompressed length: ' . strlen($index) . PHP_EOL . PHP_EOL;
 
 echo 'Creating index.min.html' . PHP_EOL . PHP_EOL;
-file_put_contents(__DIR__ . '/index.min.html', $index);
+file_put_contents(__DIR__ . '/build/index.min.html', $index);
 
-echo 'Deleting boaty.zip' . PHP_EOL . PHP_EOL;
-unlink(__DIR__ . '/boaty.zip');
+echo 'Deleting spacetime.zip' . PHP_EOL . PHP_EOL;
+unlink(__DIR__ . '/build/spacetime.zip');
 
-echo 'Compressing boaty.zip' . PHP_EOL . PHP_EOL;
-exec('kzip boaty.zip index.min.html');
+echo 'Compressing spacetime.zip' . PHP_EOL . PHP_EOL;
+exec('kzip build/spacetime.zip build/index.min.html');
 
-echo 'Final size: ' . filesize(__DIR__ . '/boaty.zip') . PHP_EOL . PHP_EOL;
+echo 'Final size: ' . filesize(__DIR__ . '/build/spacetime.zip') . PHP_EOL . PHP_EOL;
