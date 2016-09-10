@@ -264,6 +264,11 @@ main = () => {
         }
     }
     
+    svgNode.viewBox.baseVal.x = player.x - window.innerWidth / 2;
+    svgNode.viewBox.baseVal.y = player.y - window.innerHeight / 2;
+    svgNode.viewBox.baseVal.width = window.innerWidth;
+    svgNode.viewBox.baseVal.height = window.innerHeight;
+    
     requestAnimationFrame(main);
 };
 
