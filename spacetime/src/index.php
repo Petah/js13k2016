@@ -6,9 +6,7 @@
     <polygon id="bullet" class="bullet" transform="translate(-100 -100) rotate(0)" points="-10 0 10 0"/>
     <g id="bottomLayer">
         <g id="stars"></g>
-        <g id="sun" transform="translate(0 0)">
-            <image xlink:href="/images/stars/p_sun.svg" x="0" y="0" height="300px" width="300px" transform="translate(50 50)"/>
-        </g>
+        <g id="solar-system"></g>
     </g>
     <g id="topLayer">
         <g id="boatWrapper" transform="translate(0 0)" filter="url(#dropShadow)">

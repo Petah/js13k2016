@@ -13,6 +13,152 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 };
 
 players = [];
+planets = [];
+
+// SVG Stuff
+svgNs = 'http://www.w3.org/2000/svg';
+
+randomSign = () => Math.random() > 0.5 ? -1 : 1;
+
+randomBetween = (min, max) => ((Math.random() * max) + min);
+
+radToDegrees = (rad) => (rad * (180 / Math.PI));
+
+createSvg = (data) => {
+    let svgEl = document.createElementNS(svgNs, 'image');
+    svgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', data.asset);
+    svgEl.setAttributeNS(null, 'height', data.dims.height);
+    svgEl.setAttributeNS(null, 'width', data.dims.width);
+    svgEl.setAttributeNS(null, 'x', data.origin.x);
+    svgEl.setAttributeNS(null, 'y', data.origin.y);
+    return svgEl;
+};
+
+createStar = (data) => {
+    let star = document.createElementNS(svgNs, 'circle');
+    let rand = Math.random();
+
+    star.setAttributeNS(null, 'r', rand * data.radius);
+    star.setAttributeNS(null, 'opacity', rand);
+    star.setAttributeNS(null, 'cx', (randomSign() * (Math.random() * data.field.width)));
+    star.setAttributeNS(null, 'cy', (randomSign() * (Math.random() * data.field.height)));
+
+    let fill = 'rgba(192, 247, 255, 1)';
+    if(rand <= 0.5){
+        fill = 'rgba(255, 255, 255, 1)';
+    } else if(rand > 0.75){
+        fill = 'rgba(255, 254, 196, 1)';
+    }
+    star.setAttributeNS(null, 'fill', fill);
+
+    data.field.element.appendChild(star);
+};
+
+createSolarSystem = (data) => {
+    // Append sun
+    let sunG = document.createElementNS(svgNs, 'g');
+    let sunSvg = createSvg({
+        asset: data.members.sun.asset,
+        dims: {
+            height: data.members.sun.radius,
+            width: data.members.sun.radius
+        },
+        origin: {
+            x: (data.origin.x - (data.members.sun.radius / 2)),
+            y: (data.origin.y - (data.members.sun.radius / 2))
+        }
+    });
+    sunG.appendChild(sunSvg);
+    data.element.appendChild(sunG);
+
+    // Append Planets
+    let planetG = document.createElementNS(svgNs, 'g');
+    let pRadOffset = data.members.sun.radius * 2;
+    data.members.planets.map((planet, i) => {
+        let offset = pRadOffset * (i + 1);
+        let angle = randomBetween(0, 2 * Math.PI);
+        let pSvg = {
+            asset: planet.asset,
+            angle: {
+                start: angle,
+                relative: 0
+            },
+            dims: {
+                height: planet.radius,
+                width: planet.radius
+            },
+            orbitSpeed: planet.orbitSpeed,
+            origin: {
+                x: ((data.origin.x + (offset * Math.sin(angle))) - (planet.radius / 2)),
+                y: ((data.origin.y + (offset * Math.cos(angle))) - (planet.radius / 2))
+            }
+        };
+        pSvg['element'] = createSvg(pSvg);
+        planets.push(pSvg);
+        planetG.appendChild(pSvg.element);
+    });
+    data.element.appendChild(planetG);
+
+    // Append stars
+    for (let i = 0; i < data.stars.count; i++) {
+        createStar(data.stars);
+    }
+};
+
+let solarSystemData = {
+    origin: {
+        x: 0,
+        y: 0
+    },
+    element: document.getElementById('solar-system'),
+    members: {
+        sun: {
+            asset: '/images/stars/p_sun.svg',
+            radius: 300
+        },
+        planets: [
+            {
+                asset: '/images/planets/p_orange.svg',
+                orbitSpeed: 0.02,
+                radius: 140
+            },
+            {
+                asset: '/images/planets/p_blue.svg',
+                orbitSpeed: 0.02,
+                radius: 180
+            },
+            {
+                asset: '/images/planets/p_grey.svg',
+                orbitSpeed: 0.02,
+                radius: 140
+            },
+            {
+                asset: '/images/planets/p_orange.svg',
+                orbitSpeed: 0.05,
+                radius: 140
+            },
+            {
+                asset: '/images/planets/p_blue.svg',
+                orbitSpeed: 0.01,
+                radius: 180
+            },
+            {
+                asset: '/images/planets/p_grey.svg',
+                orbitSpeed: 0.01,
+                radius: 140
+            }
+        ]
+    },
+    stars: {
+        count: 10000,
+        field: {
+            element: document.getElementById('stars'),
+            width: window.innerWidth * 15,
+            height: window.innerHeight * 15
+        },
+        radius: 5
+    }
+};
 
 createPlayer = () => {
     let playerNode = boatWrapper.cloneNode(true);
@@ -138,12 +284,18 @@ main = () => {
     updatedPerSecond++;
     if (updatedPerSecondTimer < performance.now()) {
         ups.innerHTML = 'UPS: ' + updatedPerSecond;
+        pos.innerHTML = `POS: ${parseInt(players[0].x)}, ${parseInt(players[0].y)}`;
         updatedPerSecondTimer = performance.now() + 1000;
         updatedPerSecond = 0;
     }
     ///debug
     
-    
+    // move planets
+    planets.map((planet, i) => {
+        planet.angle.relative += planet.orbitSpeed;
+        planet.element.setAttributeNS(null, 'transform', `rotate(${planet.angle.relative} ${solarSystemData.origin.x} ${solarSystemData.origin.y})`);
+    });
+
     for (let i = 0; i < players.length; i++) {
         controlUpdate(i);
         
@@ -197,7 +349,8 @@ main = () => {
             });
         }
     }
-//    console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
+
+    // console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
     moveGameObjects(players);
     moveGameObjects(bullets);
     for (let i = 0; i < bullets.length; i++) {
@@ -243,6 +396,8 @@ main = () => {
     requestAnimationFrame(main);
 };
 
+createSolarSystem(solarSystemData);
+
 main();
 
 go = () => {
@@ -250,44 +405,13 @@ go = () => {
 };
 
 setInterval(() => {
-    
+
 }, 100);
 
 
-window.addEventListener('gamepadconnected', (e) => { 
+window.addEventListener('gamepadconnected', (e) => {
     controllers = navigator.getGamepads();
 }, false);
-window.addEventListener('gamepaddisconnected', (e) => { 
+window.addEventListener('gamepaddisconnected', (e) => {
     controllers = navigator.getGamepads();
 }, false);
-
-// create random stars
-var starField = {
-    group: document.getElementById('stars'),
-    width: window.innerWidth,
-    height: window.innerHeight
-};
-
-for (var i = 0; i < 50; i++) {
-    appendStar(starField);
-}
-
-// Asset JS
-function appendStar(field){
-    var star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    var rand = Math.random();
-
-    star.setAttributeNS(null, 'r', rand * 5);
-    star.setAttributeNS(null, 'cx', Math.random() * field.width);
-    star.setAttributeNS(null, 'cy', Math.random() * field.height);
-
-    var fill = 'rgba(192, 247, 255, 1)';
-    if(rand <= 0.5){
-        fill = 'rgba(255, 255, 255, 1)';
-    } else if(rand > 0.75){
-        fill = 'rgba(255, 254, 196, 1)';
-    }
-    star.setAttributeNS(null, 'fill', fill);
-
-    field.group.appendChild(star);
-}
