@@ -13,6 +13,7 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 };
 
 players = [];
+glitches = [];
 
 createPlayer = () => {
     let playerNode = boatWrapper.cloneNode(true);
@@ -38,8 +39,13 @@ createPlayer = () => {
         turnAcceleration: 0.5,
         turnFriction: 1.2,
 
+        shoot: false,
         reloading: 0,
         reloadTime: 10,
+        
+        glitch: 0,
+        glitchTime: 30,
+        glitchLog: [],
     });
 };
 
@@ -60,41 +66,6 @@ bubbleParticleAnimation = (particle) => {
     particle.translate.style.opacity -= 0.01;
 };
 
-buttonMoveDown = false;
-buttonShootDown = false;
-buttonTurnLeftDown = false;
-buttonTurnRightDown = false;
-
-document.body.onkeydown = (e) => {
-    if (e.which == 38) {
-        buttonMoveDown = true;
-    }
-    if (e.which == 37) {
-        buttonTurnLeftDown = true;
-    }
-    if (e.which == 39) {
-        buttonTurnRightDown = true;
-    }
-    if (e.which == 32) {
-        buttonShootDown = true;
-    }
-};
-
-document.body.onkeyup = (e) => {
-    if (e.which == 38) {
-        buttonMoveDown = false;
-    }
-    if (e.which == 37) {
-        buttonTurnLeftDown = false;
-    }
-    if (e.which == 39) {
-        buttonTurnRightDown = false;
-    }
-    if (e.which == 32) {
-        buttonShootDown = false;
-    }
-};
-
 moveGameObjects = (gameObjects) => {
     for (let i = 0; i < gameObjects.length; i++) {
         gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
@@ -106,7 +77,6 @@ moveGameObjects = (gameObjects) => {
 };
 
 createExplosion = (x, y) => {
-    console.log(x, y);
     for (let i = 0; i < 16; i++) {
         explosionClone = explosion.cloneNode(true);
         explosionClone.id = '';
@@ -177,7 +147,7 @@ main = () => {
         }
 
         players[i].reloading--;
-        if (buttonShootDown && players[i].reloading < 0) {
+        if (players[i].shoot && players[i].reloading < 0) {
             players[i].reloading = players[i].reloadTime;
 
             bulletClone = bullet.cloneNode(true);
@@ -194,31 +164,47 @@ main = () => {
     //            direction: pointDirection(players[i].x, players[i].y, mouseX, mouseY),
                 direction: players[i].direction,
                 speed: 20,
+                life: 200,
             });
         }
+        players[i].shoot = false;
     }
-//    console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
+
+    for (let i = 0; i < glitches.length; i++) {
+        if (glitches[i].glitchLog[0]) {
+            move(glitches[i].translate, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
+            rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
+        }
+        if (!glitches[i].glitchLog.shift()) {
+            glitches[i].translate.remove();
+            glitches.splice(i, 1);
+        }
+    }
+
     moveGameObjects(players);
     moveGameObjects(bullets);
-    for (let i = 0; i < bullets.length; i++) {
-//        console.log(bullets[i]);
-
+    bulletLoop: for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < players.length; j++) {
             if (bullets[i].owner == j) {
                 continue;
             }
-            //console.log(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
-            collision = intersectPolygonPolygon(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
-            if (collision.length) {
-                console.log(collision);
-                createExplosion(collision[0][0], collision[0][1]);
+            collisionDistance = pointDistance(bullets[i].x, bullets[i].y, players[j].x, players[j].y);
+            if (collisionDistance < 20) {
+                createExplosion(bullets[i].x, bullets[i].y);
 
                 bullets[i].translate.remove();
                 bullets.splice(i, 1);
                 j = players.length;
+                continue bulletLoop;
             }
         }
-//        console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
+        bullets[i].life--;
+        if (bullets[i].life < 0) {
+            createExplosion(bullets[i].x, bullets[i].y);
+
+            bullets[i].translate.remove();
+            bullets.splice(i, 1);
+        }
     }
     
     for (let i = 0; i < particles.length; i++) {
@@ -244,14 +230,6 @@ main = () => {
 };
 
 main();
-
-go = () => {
-    console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
-};
-
-setInterval(() => {
-    
-}, 100);
 
 window.addEventListener('gamepadconnected', (e) => { 
     controllers = navigator.getGamepads();

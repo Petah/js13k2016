@@ -7,16 +7,6 @@ calculateRealPosition = (polygon) => {
     return transformedPoints;
 };
 
-calculateRealPositionXY = (polygon, x, y) => {
-    currentTransformMatrix = svgNode.createSVGMatrix();
-    currentTransformMatrix.translate(x, y);
-    transformedPoints = [];
-    for (let i = 0; i < polygon.points.length; i++) {
-        transformedPoints.push(polygon.points[i].matrixTransform(currentTransformMatrix));
-    }
-    return transformedPoints;
-};
-
 intersectLineLine = (a1, a2, b1, b2) => {
     let result = [];
 
@@ -52,3 +42,4 @@ intersectPolygonPolygon = (points1, points2) => {
     }
     return result;
 };
+
