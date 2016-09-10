@@ -1,0 +1,23 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-image: linear-gradient(135deg, #59C2BD 0%, #F0FAE2 100%);
+}
+
+svg {
+    width: 100vw;
+    height: 100vh;
+}
+
+.boat {
+    stroke: #444;
+    fill: #333;
+}
+
+.bullet {
+    stroke: #555;
+}
+
+.bubbleParticle {
+    fill: #fff;
+}

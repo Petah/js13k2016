@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+    <style>
+        path,
+        polygon {
+            stroke: red;
+            fill: none;
+        }
+        .guide {
+            display2: none;
+            stroke: #aaa;
+        }
+    </style>
+    <path class="guide" transform="translate(10, 50)" d="
+        M16 0 
+        L16 142 
+    " />
+    <path class="guide" transform="translate(10, 50)" d="
+        M0 71 
+        L32 71 
+    " />
+    <path id="b" transform="translate(10, 50)" d="
+        M16 0 
+        L8 14 
+        L0 40
+        L2 100 
+        L10 142 
+        
+        L22 142
+        
+        L30 100
+        L32 40
+        L24 14
+        
+        Z
+    " />
+    <path class="guide" transform="translate(50, 10)" d="
+        M71 0 
+        L71 32 
+    " />
+    <path class="guide" transform="translate(50, 10)" d="
+        M0 16 
+        L142 16 
+    " />
+    <path id="b" transform="translate(50, 10)" d="
+        M142 16 
+        L130 8 
+        L102 0
+        L40 2 
+        L0 10 
+        
+        L0 22
+        
+        L40 30
+        L102 32
+        L130 24
+        
+        Z
+    " />
+    <path id="b" transform="translate(2, 16)" d="
+        M28.4 3.2 
+        L26 1.6 
+        L20.4 0
+        L8 0.4 
+        L0 2 
+        
+        L0 4.4
+        
+        L8 6
+        L20.4 6.4
+        L26 4.8
+        
+        Z
+    " />
+    <path class="guide" transform="translate(2, 2)" d="
+        M16 0 
+        L16 8 
+    " />
+    <path class="guide" transform="translate(2, 2)" d="
+        M0 4 
+        L32 4 
+    " />
+    <path id="b" transform="translate(2, 2)" d="
+        M32 4 
+        L28 2 
+        L21 0
+        L5 1 
+        L0 2 
+        
+        L0 6
+        
+        L5 7
+        L21 8
+        L28 6
+        
+        Z
+    " />
+    <polygon id="p" transform="translate(2, 30)" points="
+        32 4 
+        28 2 
+        21 0
+        5 1 
+        0 2 
+        
+        0 6
+        
+        5 7
+        21 8
+        28 6
+    " />
+    
+    <polygon id="p" transform="translate(100, 100)" points="
+        32 4 
+        28 2 
+        21 0
+        5 -10 
+        7 2 
+        
+        7 6
+        
+        5 18
+        21 8
+        28 6
+    " />
+</svg>
+    
