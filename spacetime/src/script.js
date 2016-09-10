@@ -9,7 +9,7 @@ move = (element, x, y) => {
 };
 
 rotate = (element, angle, rotationPointX, rotationPointY) => {
-    element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY)
+    element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY);
 };
 
 planetMass = 1;
@@ -60,35 +60,23 @@ createStar = (data) => {
 
 createSolarSystem = (data) => {
     // Append sun
-    let sunG = document.createElementNS(svgNs, 'g');
-    let sunSvg = createSvg({
-        asset: data.members.sun.asset,
-        dims: {
-            height: data.members.sun.radius,
-            width: data.members.sun.radius
-        },
-        origin: {
-            x: (data.origin.x - (data.members.sun.radius / 2)),
-            y: (data.origin.y - (data.members.sun.radius / 2))
-        }
-    });
-    sunG.appendChild(sunSvg);
-    planetLayer.appendChild(sunG);
+    solarSystemData.members.sun.asset.transform.baseVal[1].setScale(1.5, 1.5);
+    move(solarSystemData.members.sun.asset, 0,0);
 
     // Append Planets
-    data.members.planets.map((planet, i) => {
-        let planetClone = planet.asset.cloneNode(true);
+    for (let i = 0; i < data.members.planets.length; i++) {
+        let planetClone = data.members.planets[i].asset.cloneNode(true);
         planetClone.id = '';
-        let scale = Math.random() + 0.2;
-        planetClone.transform.baseVal[1].setScale(scale, scale); 
+        let scale = Math.random() + 0.06;
+        planetClone.transform.baseVal[1].setScale(scale, scale);
         planets.push({
-            element: planetClone,
-            distance: data.members.sun.radius * 2 * (i + 1),
             angle: Math.random() * 360,
-            orbitSpeed: planet.orbitSpeed,
+            distance: data.members.sun.radius * 3.4 * (i + 1),
+            element: planetClone,
+            orbitSpeed: data.members.planets[i].orbitSpeed,
         });
         planetLayer.appendChild(planetClone);
-    });
+    }
 
     // Append stars
     for (let i = 0; i < data.stars.count; i++) {
@@ -104,7 +92,8 @@ solarSystemData = {
     element: solarSystem,
     members: {
         sun: {
-            asset: 'images/stars/p_sun.svg',
+            rotateAngle: 0,
+            asset: sunStar,
             radius: 300,
         },
         planets: [
@@ -360,16 +349,20 @@ main = () => {
         updatedPerSecond = 0;
     }
     ///debug
-    
-    // Move planets
+
+    // rotate sun
+    solarSystemData.members.sun.rotateAngle += 0.02;
+    rotate(solarSystemData.members.sun.asset, solarSystemData.members.sun.rotateAngle, solarSystemData.origin.x, solarSystemData.origin.y);
+
+    // move planets
     for (let i = 0; i < planets.length; i++) {
         planets[i].angle += planets[i].orbitSpeed;
         planets[i].x = lengthDirX(planets[i].distance, planets[i].angle);
         planets[i].y = lengthDirY(planets[i].distance, planets[i].angle);
         move(planets[i].element, planets[i].x, planets[i].y);
-//        planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
-if (planets[i].element.children[7])
-        planets[i].element.children[7].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
+		// planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
+		if (planets[i].element.children[7])
+	        planets[i].element.children[7].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
     }
 
     for (let i = 0; i < players.length; i++) {
