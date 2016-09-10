@@ -361,10 +361,15 @@ main = () => {
     }
     ///debug
     
-    // move planets
+    // Move planets
     for (let i = 0; i < planets.length; i++) {
         planets[i].angle += planets[i].orbitSpeed;
-        move(planets[i].element, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle));
+        planets[i].x = lengthDirX(planets[i].distance, planets[i].angle);
+        planets[i].y = lengthDirY(planets[i].distance, planets[i].angle);
+        move(planets[i].element, planets[i].x, planets[i].y);
+//        planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
+if (planets[i].element.children[7])
+        planets[i].element.children[7].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
     }
 
     for (let i = 0; i < players.length; i++) {
@@ -387,19 +392,17 @@ main = () => {
         }
     }
 
-    // console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
     moveGameObjects(players);
     moveGameObjects(cpus);
     moveGameObjects(bullets);
-    // moveGameObjects(planets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
-//        for (let j = 0; j < planets.length; j++) {
-//            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-//            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-//            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
-//            bullets[i].speed = ttt[0];
-//            bullets[i].direction = ttt[1];
-//        }
+        for (let j = 0; j < planets.length; j++) {
+            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
+            bullets[i].speed = ttt[0];
+            bullets[i].direction = ttt[1];
+        }
 
         // Collide with ships
         col(bullets[i], players);

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .planetOrange1{fill:#B7532C;}
+        .planetOrange2{fill:#DD6B38;}
+        .planetOrange3{fill:#F39C12;}
+        .planetOrange4{opacity:0.5;fill:#B7532C;}
+    </style>
+    <defs>
+        <clipPath id="planetClip">
+            <circle r="100"/>
+        </clipPath>
+        <mask id="planetShadowClip">
+            <circle cx="0" cy="0" r="100" fill="white" />
+            <circle cx="25" cy="0" r="100" fill="black" />
+        </mask>
+    </defs>
+
+    <g id="planetOrange" transform="translate(100 100) scale(1)" clip-path="url(#planetClip)">
+        <circle r="100" class="planetOrange2"/>
+        
+        <rect x="-120" y="-70" width="90" height="30" rx="15" ry="15" class="planetOrange3"/>
+        <rect x="-120" y="-55" width="130" height="30" rx="15" ry="15" class="planetOrange3"/>
+        <rect x="-120" y="-40" width="70" height="30" rx="15" ry="15" class="planetOrange3"/>
+        
+        <rect x="50" y="0" width="90" height="30" rx="15" ry="15" class="planetOrange3"/>
+        <rect x="-40" y="15" width="200" height="30" rx="15" ry="15" class="planetOrange3"/>
+        
+        <rect x="10" y="75" width="90" height="30" rx="15" ry="15" class="planetOrange3"/>
+        
+        <circle r="100" class="planetOrange4" mask="url(#planetShadowClip)" transform="rotate(0)"/>
+    </g>
+</svg>
+
