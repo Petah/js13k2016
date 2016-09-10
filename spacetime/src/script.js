@@ -12,6 +12,8 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
     element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY)
 };
 
+planetMass = 1;
+gravityPower = 25000;
 players = [];
 cpus = [];
 glitches = [];
@@ -61,6 +63,33 @@ createCpu = () => {
 createPlayer();
 //createPlayer();
 createCpu();
+
+planets = [];
+createPlanet = () => {
+    let planetNode = planet.cloneNode(true);
+    planetNode.id = '';
+    topLayer.appendChild(planetNode);
+    planets.push({
+        id: Math.floor(Math.random() * 1000000),
+        translate: planetNode,
+        rotate: planetNode,
+        rotationPointX: 0,
+        rotationPointY: 0,
+
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
+        direction: 0,
+        speed: 0,
+    });
+};
+
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
+createPlanet();
 
 bullets = [];
 particles = [];
@@ -162,6 +191,7 @@ updatePlayer = (player) => {
             direction: player.direction,
             speed: 20,
             life: 200,
+            mass: 0.8,
         });
         
         player.gunMount++;
@@ -170,6 +200,21 @@ updatePlayer = (player) => {
         }
     }
     player.shoot = false;
+};
+
+col = (bullet, ships) => {
+    for (let j = 0; j < ships.length; j++) {
+        if (bullet.owner.id == ships[j].id) {
+            continue;
+        }
+        collisionDistance = pointDistance(bullet.x, bullet.y, ships[j].x, ships[j].y);
+        if (collisionDistance < 20) {
+            createExplosion(bullet.x, bullet.y);
+
+            bullet.life = 0;
+            break;
+        }
+    }
 };
 
 main = () => {
@@ -206,23 +251,23 @@ main = () => {
     moveGameObjects(players);
     moveGameObjects(cpus);
     moveGameObjects(bullets);
+    moveGameObjects(planets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
-        for (let j = 0; j < players.length; j++) {
-            if (bullets[i].owner.id == players[j].id) {
-                continue;
-            }
-            collisionDistance = pointDistance(bullets[i].x, bullets[i].y, players[j].x, players[j].y);
-            if (collisionDistance < 20) {
-                createExplosion(bullets[i].x, bullets[i].y);
-
-                bullets[i].translate.remove();
-                bullets.splice(i, 1);
-                j = players.length;
-                continue bulletLoop;
-            }
+        for (let j = 0; j < planets.length; j++) {
+            let r = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let dir = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
+            let ttt = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (r * r), dir);
+            bullets[i].speed = ttt[0];
+            bullets[i].direction = ttt[1];
         }
+
+        // Collide with ships
+        col(bullets[i], players);
+        col(bullets[i], cpus);
+        
+        // Bullet life
         bullets[i].life--;
-        if (bullets[i].life < 0) {
+        if (bullets[i].life <= 0) {
             createExplosion(bullets[i].x, bullets[i].y);
 
             bullets[i].translate.remove();

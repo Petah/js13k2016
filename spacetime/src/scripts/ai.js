@@ -8,7 +8,7 @@ ai = (cpu) => {
             closestPlayerDistance = playerDisatance;
         }
     }
-    if (true) {
+    if (Math.random() < 0.8) {
         cpu.speed = Math.min(cpu.speed + cpu.acceleration, cpu.maxSpeed);
         directionDelta = (cpu.direction - pointDirection(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
         if (closestPlayerDistance < 200) {
