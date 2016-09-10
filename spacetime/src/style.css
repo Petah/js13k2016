@@ -22,6 +22,12 @@ svg {
     fill: #fff;
 }
 
+.sunMain{stroke:#F78118;stroke-width:8;}
+.sunRing{fill:none;stroke:#F78118;enable-background:new;}
+.sunRing1{opacity:0.15;stroke-width:8;stroke-miterlimit:10;}
+.sunRing2{opacity:0.1;stroke-width:6;stroke-miterlimit:10;stroke-dasharray:52.7219,52.7219;}
+.sunRing3{opacity:0.05;stroke-width:3;stroke-miterlimit:10;stroke-dasharray:30.4037,30.4037;}
+
 .planetBlue1{fill:#1A6189;}
 .planetBlue2{fill:#2574A9;}
 .planetBlue3{fill:#63BCB8;}

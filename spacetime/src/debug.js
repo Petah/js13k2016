@@ -1,7 +1,7 @@
 for (let p = -10000; p < 10000; p += 100) {
     let line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     if (p == 0) {
-        line.style.stroke = 'rgba(255, 255, 255, 0.1)';
+        line.style.stroke = 'rgba(255, 255, 255, 0.4)';
     } else {
         line.style.stroke = 'rgba(255, 255, 255, 0.02)';
     }
@@ -14,7 +14,7 @@ for (let p = -10000; p < 10000; p += 100) {
     
     line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     if (p == 0) {
-        line.style.stroke = 'rgba(255, 255, 255, 0.1)';
+        line.style.stroke = 'rgba(255, 255, 255, 0.4)';
     } else {
         line.style.stroke = 'rgba(255, 255, 255, 0.02)';
     }
