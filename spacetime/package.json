@@ -2,6 +2,7 @@
   "dependencies": {
     "clean-css": "^3.4.19",
     "esminify": "^2.0.19",
+    "jsfxr": "0.0.1",
     "node-minify": "^1.3.9"
   }
 }

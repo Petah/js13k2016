@@ -5,7 +5,9 @@ echo 'Minifying style.css' . PHP_EOL . PHP_EOL;
 exec('node_modules\.bin\cleancss -o build/style.min.css src/style.css');
 
 echo 'Replacing tokens in script.js' . PHP_EOL . PHP_EOL;
-$script = PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/math.js');
+$script = PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/sound.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/ai.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/math.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/collision.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/control-gamepad.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/script.js');
