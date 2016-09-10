@@ -10,5 +10,4 @@ if (!isDebug()) {
 }
 ?>
 <link rel="stylesheet" href="debug.css" />
-<script src="debug.js"></script>
 <div id="ups">UPS: 120</div>

@@ -1,28 +1,23 @@
-controlUpdate = () => {   
+controlUpdate = (playerIndex) => {   
     let gamepads = navigator.getGamepads();
-    if (gamepads[0].buttons[0].pressed) {
+    if (!gamepads[playerIndex]) {
+        return;
+    }
+    if (gamepads[playerIndex].buttons[0].pressed) {
         buttonShootDown = true;
     } else {
         buttonShootDown = false;
     }
     
-    if (gamepads[0].axes[0] < -0.5) {
-        buttonTurnLeftDown = true;
-        buttonTurnRightDown = false;
-    } else if (gamepads[0].axes[0] > 0.5) {
-        buttonTurnLeftDown = false;
-        buttonTurnRightDown = true;
-    }
-    
-    if (gamepads[0].buttons[7].value > 0.2 && player.speed < gamepads[0].buttons[7].value * player.maxSpeed) {
-        player.speed = Math.min(player.speed + (gamepads[0].buttons[7].value * player.acceleration), player.maxSpeed);
+    if (gamepads[playerIndex].buttons[7].value > 0.2 && players[playerIndex].speed < gamepads[playerIndex].buttons[7].value * players[playerIndex].maxSpeed) {
+        players[playerIndex].speed = Math.min(players[playerIndex].speed + (gamepads[playerIndex].buttons[7].value * players[playerIndex].acceleration), players[playerIndex].maxSpeed);
     } else {
-        player.speed /= player.friction;
+        players[playerIndex].speed /= players[playerIndex].friction;
     }
 
-    if (gamepads[0].axes[0] > 0.2 || gamepads[0].axes[0] < -0.2) {
-        player.turnSpeed = Math.round(gamepads[0].axes[0] * player.maxTurnSpeed);
+    if (gamepads[playerIndex].axes[0] > 0.2 || gamepads[playerIndex].axes[0] < -0.2) {
+        players[playerIndex].turnSpeed = Math.round(gamepads[playerIndex].axes[0] * players[playerIndex].maxTurnSpeed);
     } else {
-        player.turnSpeed /= player.turnFriction;
+        players[playerIndex].turnSpeed /= players[playerIndex].turnFriction;
     }
 };

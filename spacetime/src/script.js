@@ -12,29 +12,39 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
     element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY)
 };
 
-player = {
-    translate: boatWrapper,
-    rotate: boat,
-    rotationPointX: 16,
-    rotationPointY: 4,
-    
-    x: 500,
-    y: 500,
-    direction: 0,
-    speed: 0,
-    
-    maxSpeed: 10,
-    acceleration: 0.4,
-    friction: 1.1,
-    
-    turnSpeed: 0,
-    maxTurnSpeed: 5,
-    turnAcceleration: 0.5,
-    turnFriction: 1.2,
-    
-    reloading: 0,
-    reloadTime: 10,
+players = [];
+
+createPlayer = () => {
+    let playerNode = boatWrapper.cloneNode(true);
+    playerNode.id = '';
+    topLayer.appendChild(playerNode);
+    players.push({
+        translate: playerNode,
+        rotate: playerNode.children[0],
+        rotationPointX: 16,
+        rotationPointY: 4,
+
+        x: 500,
+        y: 500,
+        direction: 0,
+        speed: 0,
+
+        maxSpeed: 10,
+        acceleration: 0.4,
+        friction: 1.1,
+
+        turnSpeed: 0,
+        maxTurnSpeed: 5,
+        turnAcceleration: 0.5,
+        turnFriction: 1.2,
+
+        reloading: 0,
+        reloadTime: 10,
+    });
 };
+
+createPlayer();
+createPlayer();
 
 bullets = [];
 particles = [];
@@ -96,6 +106,7 @@ moveGameObjects = (gameObjects) => {
 };
 
 createExplosion = (x, y) => {
+    console.log(x, y);
     for (let i = 0; i < 16; i++) {
         explosionClone = explosion.cloneNode(true);
         explosionClone.id = '';
@@ -132,68 +143,81 @@ main = () => {
     }
     ///debug
     
-    controlUpdate();
     
-    player.direction += player.turnSpeed;
-    
-    while (player.direction > 360) {
-        player.direction -= 360;
-    }
-    while (player.direction < 0) {
-        player.direction += 360;
-    }
-    
-    emitter.reloading--;
-    if (emitter.reloading < 0 && player.speed > 0.1) {
-        emitter.reloading = emitter.reloadTime;
+    for (let i = 0; i < players.length; i++) {
+        controlUpdate(i);
         
-        for (let i = 0; i < emitter.amount; i++) {
-            particleClone = emitter.particle.cloneNode(true);
-            particleClone.id = '';
-            bottomLayer.appendChild(particleClone);
-            particles.push({
-                x: player.x + ((Math.random() * 4) - 2),
-                y: player.y + ((Math.random() * 4) - 2),
-                translate: particleClone,
-                life: 30,
-                speed: player.speed / 10,
-                direction: (player.direction - 180) + ((Math.random() * 30) - 15),
-                animate: bubbleParticleAnimation,
+        players[i].direction += players[i].turnSpeed;
+
+        while (players[i].direction > 360) {
+            players[i].direction -= 360;
+        }
+        while (players[i].direction < 0) {
+            players[i].direction += 360;
+        }
+
+        emitter.reloading--;
+        if (emitter.reloading < 0 && players[i].speed > 0.1) {
+            emitter.reloading = emitter.reloadTime;
+
+            for (let i = 0; i < emitter.amount; i++) {
+                particleClone = emitter.particle.cloneNode(true);
+                particleClone.id = '';
+                bottomLayer.appendChild(particleClone);
+                particles.push({
+                    x: players[i].x + ((Math.random() * 4) - 2),
+                    y: players[i].y + ((Math.random() * 4) - 2),
+                    translate: particleClone,
+                    life: 30,
+                    speed: players[i].speed / 10,
+                    direction: (players[i].direction - 180) + ((Math.random() * 30) - 15),
+                    animate: bubbleParticleAnimation,
+                });
+            }
+        }
+
+        players[i].reloading--;
+        if (buttonShootDown && players[i].reloading < 0) {
+            players[i].reloading = players[i].reloadTime;
+
+            bulletClone = bullet.cloneNode(true);
+            bulletClone.id = '';
+            topLayer.appendChild(bulletClone);
+            bullets.push({
+                owner: i,
+                translate: bulletClone,
+                rotate: bulletClone,
+                rotationPointX: 0,
+                rotationPointY: 0,
+                x: players[i].x,
+                y: players[i].y,
+    //            direction: pointDirection(players[i].x, players[i].y, mouseX, mouseY),
+                direction: players[i].direction,
+                speed: 20,
             });
         }
     }
-    
-    player.reloading--;
-    if (buttonShootDown && player.reloading < 0) {
-        player.reloading = player.reloadTime;
-        
-        bulletClone = bullet.cloneNode(true);
-        bulletClone.id = '';
-        topLayer.appendChild(bulletClone);
-        bullets.push({
-            translate: bulletClone,
-            rotate: bulletClone,
-            rotationPointX: 0,
-            rotationPointY: 0,
-            x: player.x,
-            y: player.y,
-//            direction: pointDirection(player.x, player.y, mouseX, mouseY),
-            direction: player.direction,
-            speed: 20,
-        });
-    }
-    
-    moveGameObjects([player]);
+//    console.log(players[0].rotate.getCTM().e, players[0].translate.getCTM().f);
+    moveGameObjects(players);
     moveGameObjects(bullets);
     for (let i = 0; i < bullets.length; i++) {
 //        console.log(bullets[i]);
-//        collision = intersectPolygonPolygon(calculateRealPosition(bullets[i].rotate), land.points);
-//        if (collision.length) {
-//            createExplosion(collision[0][0], collision[0][1]);
-//            
-//            bullets[i].translate.remove();
-//            bullets.splice(i, 1);
-//        }
+
+        for (let j = 0; j < players.length; j++) {
+            if (bullets[i].owner == j) {
+                continue;
+            }
+            //console.log(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
+            collision = intersectPolygonPolygon(calculateRealPosition(bullets[i].rotate), calculateRealPosition(players[j].rotate));
+            if (collision.length) {
+                console.log(collision);
+                createExplosion(collision[0][0], collision[0][1]);
+
+                bullets[i].translate.remove();
+                bullets.splice(i, 1);
+                j = players.length;
+            }
+        }
 //        console.log(intersectPolygonPolygon(calculateRealPosition(boat), land.points));
     }
     
@@ -211,8 +235,8 @@ main = () => {
         }
     }
     
-    svgNode.viewBox.baseVal.x = player.x - window.innerWidth / 2;
-    svgNode.viewBox.baseVal.y = player.y - window.innerHeight / 2;
+    svgNode.viewBox.baseVal.x = players[0].x - window.innerWidth / 2;
+    svgNode.viewBox.baseVal.y = players[0].y - window.innerHeight / 2;
     svgNode.viewBox.baseVal.width = window.innerWidth;
     svgNode.viewBox.baseVal.height = window.innerHeight;
     

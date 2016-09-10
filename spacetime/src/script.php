@@ -9,4 +9,6 @@ if (isDebug()) {
 } else {
     require __DIR__ . '/script.replace.min.js';
 }
-?></script>
+?></script><?php if (isDebug()): ?>
+<script src="debug.js"></script>
+<?php endif; ?>
