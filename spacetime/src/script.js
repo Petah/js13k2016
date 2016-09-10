@@ -253,9 +253,41 @@ setInterval(() => {
     
 }, 100);
 
+
 window.addEventListener('gamepadconnected', (e) => { 
     controllers = navigator.getGamepads();
 }, false);
 window.addEventListener('gamepaddisconnected', (e) => { 
     controllers = navigator.getGamepads();
 }, false);
+
+// create random stars
+var starField = {
+    group: document.getElementById('stars'),
+    width: window.innerWidth,
+    height: window.innerHeight
+};
+
+for (var i = 0; i < 50; i++) {
+    appendStar(starField);
+}
+
+// Asset JS
+function appendStar(field){
+    var star = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    var rand = Math.random();
+
+    star.setAttributeNS(null, 'r', rand * 5);
+    star.setAttributeNS(null, 'cx', Math.random() * field.width);
+    star.setAttributeNS(null, 'cy', Math.random() * field.height);
+
+    var fill = 'rgba(192, 247, 255, 1)';
+    if(rand <= 0.5){
+        fill = 'rgba(255, 255, 255, 1)';
+    } else if(rand > 0.75){
+        fill = 'rgba(255, 254, 196, 1)';
+    }
+    star.setAttributeNS(null, 'fill', fill);
+
+    field.group.appendChild(star);
+}
