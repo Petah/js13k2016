@@ -13,6 +13,7 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 };
 
 players = [];
+cpus = [];
 glitches = [];
 
 createPlayer = () => {
@@ -20,13 +21,14 @@ createPlayer = () => {
     playerNode.id = '';
     topLayer.appendChild(playerNode);
     players.push({
+        id: Math.floor(Math.random() * 1000000),
         translate: playerNode,
         rotate: playerNode.children[0],
         rotationPointX: 16,
         rotationPointY: 4,
 
-        x: 500,
-        y: 500,
+        x: Math.random() * 2000 - 1000,
+        y: Math.random() * 2000 - 1000,
         direction: 0,
         speed: 0,
 
@@ -42,6 +44,8 @@ createPlayer = () => {
         shoot: false,
         reloading: 0,
         reloadTime: 10,
+        gunMount: 0,
+        gunMounts: [10, -10],
         
         glitch: 0,
         glitchTime: 30,
@@ -49,8 +53,14 @@ createPlayer = () => {
     });
 };
 
+createCpu = () => {
+    createPlayer();
+    cpus.push(players.pop());
+};
+
 createPlayer();
-createPlayer();
+//createPlayer();
+createCpu();
 
 bullets = [];
 particles = [];
@@ -103,6 +113,65 @@ createExplosion = (x, y) => {
     }
 };
 
+updatePlayer = (player) => {
+    player.direction += player.turnSpeed;
+
+    while (player.direction > 360) {
+        player.direction -= 360;
+    }
+    while (player.direction < 0) {
+        player.direction += 360;
+    }
+
+    emitter.reloading--;
+    if (emitter.reloading < 0 && player.speed > 0.1) {
+        emitter.reloading = emitter.reloadTime;
+
+        for (let i = 0; i < emitter.amount; i++) {
+            particleClone = emitter.particle.cloneNode(true);
+            particleClone.id = '';
+            bottomLayer.appendChild(particleClone);
+            particles.push({
+                x: player.x + ((Math.random() * 4) - 2),
+                y: player.y + ((Math.random() * 4) - 2),
+                translate: particleClone,
+                life: 30,
+                speed: player.speed / 10,
+                direction: (player.direction - 180) + ((Math.random() * 30) - 15),
+                animate: bubbleParticleAnimation,
+            });
+        }
+    }
+
+    player.reloading--;
+    if (player.shoot && player.reloading < 0) {
+        player.reloading = player.reloadTime;
+
+        bulletClone = bullet.cloneNode(true);
+        bulletClone.id = '';
+        topLayer.appendChild(bulletClone);
+        bullets.push({
+            owner: player,
+            translate: bulletClone,
+            rotate: bulletClone,
+            rotationPointX: 0,
+            rotationPointY: 0,
+            x: player.x + lengthDirX(player.gunMounts[player.gunMount], player.direction + 90),
+            y: player.y + lengthDirY(player.gunMounts[player.gunMount], player.direction + 90),
+//            direction: pointDirection(player.x, player.y, mouseX, mouseY),
+            direction: player.direction,
+            speed: 20,
+            life: 200,
+        });
+        
+        player.gunMount++;
+        if (player.gunMount >= player.gunMounts.length) {
+            player.gunMount = 0;
+        }
+    }
+    player.shoot = false;
+};
+
 main = () => {
     //debug
     updatedPerSecond++;
@@ -116,58 +185,11 @@ main = () => {
     
     for (let i = 0; i < players.length; i++) {
         controlUpdate(i);
-        
-        players[i].direction += players[i].turnSpeed;
-
-        while (players[i].direction > 360) {
-            players[i].direction -= 360;
-        }
-        while (players[i].direction < 0) {
-            players[i].direction += 360;
-        }
-
-        emitter.reloading--;
-        if (emitter.reloading < 0 && players[i].speed > 0.1) {
-            emitter.reloading = emitter.reloadTime;
-
-            for (let i = 0; i < emitter.amount; i++) {
-                particleClone = emitter.particle.cloneNode(true);
-                particleClone.id = '';
-                bottomLayer.appendChild(particleClone);
-                particles.push({
-                    x: players[i].x + ((Math.random() * 4) - 2),
-                    y: players[i].y + ((Math.random() * 4) - 2),
-                    translate: particleClone,
-                    life: 30,
-                    speed: players[i].speed / 10,
-                    direction: (players[i].direction - 180) + ((Math.random() * 30) - 15),
-                    animate: bubbleParticleAnimation,
-                });
-            }
-        }
-
-        players[i].reloading--;
-        if (players[i].shoot && players[i].reloading < 0) {
-            players[i].reloading = players[i].reloadTime;
-
-            bulletClone = bullet.cloneNode(true);
-            bulletClone.id = '';
-            topLayer.appendChild(bulletClone);
-            bullets.push({
-                owner: i,
-                translate: bulletClone,
-                rotate: bulletClone,
-                rotationPointX: 0,
-                rotationPointY: 0,
-                x: players[i].x,
-                y: players[i].y,
-    //            direction: pointDirection(players[i].x, players[i].y, mouseX, mouseY),
-                direction: players[i].direction,
-                speed: 20,
-                life: 200,
-            });
-        }
-        players[i].shoot = false;
+        updatePlayer(players[i]);
+    }
+    for (let i = 0; i < cpus.length; i++) {
+        ai(cpus[i]);
+        updatePlayer(cpus[i]);
     }
 
     for (let i = 0; i < glitches.length; i++) {
@@ -182,10 +204,11 @@ main = () => {
     }
 
     moveGameObjects(players);
+    moveGameObjects(cpus);
     moveGameObjects(bullets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
         for (let j = 0; j < players.length; j++) {
-            if (bullets[i].owner == j) {
+            if (bullets[i].owner.id == players[j].id) {
                 continue;
             }
             collisionDistance = pointDistance(bullets[i].x, bullets[i].y, players[j].x, players[j].y);

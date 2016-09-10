@@ -10,8 +10,8 @@ controlUpdate = (playerIndex) => {
     players[playerIndex].glitch--;
     if (gamepads[playerIndex].buttons[2].pressed && players[playerIndex].glitch < 0) {
         players[playerIndex].glitch = players[playerIndex].glitchTime;
-        players[playerIndex].x += Math.random() * 200 - 100;
-        players[playerIndex].y += Math.random() * 200 - 100;
+        players[playerIndex].x += Math.random() * 2000 - 1000;
+        players[playerIndex].y += Math.random() * 2000 - 1000;
         let playerNode = boatWrapper.cloneNode(true);
         playerNode.id = '';
         topLayer.appendChild(playerNode);
