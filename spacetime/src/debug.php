@@ -11,3 +11,4 @@ if (!isDebug()) {
 ?>
 <link rel="stylesheet" href="debug.css" />
 <div id="ups">UPS: 120</div>
+<div id="pos">POS: 0,0</div>
