@@ -22,7 +22,17 @@ svg {
     fill: #fff;
 }
 
-.st0{fill:#1A6189;}
-.st1{fill:#2574A9;}
-.st2{fill:#63BCB8;}
-.st3{opacity:0.3;fill:#1A6189;}
+.planetBlue1{fill:#1A6189;}
+.planetBlue2{fill:#2574A9;}
+.planetBlue3{fill:#63BCB8;}
+.planetBlue4{opacity:0.3;fill:#1A6189;}
+
+.planetGrey1{fill:#989899;}
+.planetGrey2{fill:#C2C2C2;}
+.planetGrey3{fill:#ACBD86;}
+.planetGrey4{opacity:0.7;fill:#989899;}
+        
+.planetOrange1{fill:#B7532C;}
+.planetOrange2{fill:#DD6B38;}
+.planetOrange3{fill:#F39C12;}
+.planetOrange4{opacity:0.21;fill:#B7532C;}

@@ -79,7 +79,7 @@ createSolarSystem = (data) => {
     data.members.planets.map((planet, i) => {
         let planetClone = planet.asset.cloneNode(true);
         planetClone.id = '';
-        let scale = Math.random() * 0.2 + 0.2;
+        let scale = Math.random() + 0.2;
         planetClone.transform.baseVal[1].setScale(scale, scale); 
         planets.push({
             element: planetClone,
@@ -108,36 +108,36 @@ solarSystemData = {
             radius: 300,
         },
         planets: [
-//            {
-//                asset: 'images/planets/p_orange.svg',
-//                orbitSpeed: 0.02,
-//                radius: 140,
-//            },
+            {
+                asset: planetOrange,
+                orbitSpeed: 0.02,
+                radius: 140,
+            },
             {
                 asset: planetBlue,
                 orbitSpeed: 0.02,
                 radius: 180,
             },
-//            {
-//                asset: 'images/planets/p_grey.svg',
-//                orbitSpeed: 0.02,
-//                radius: 140,
-//            },
-//            {
-//                asset: 'images/planets/p_orange.svg',
-//                orbitSpeed: 0.05,
-//                radius: 140,
-//            },
+            {
+                asset: planetGrey,
+                orbitSpeed: 0.02,
+                radius: 140,
+            },
+            {
+                asset: planetOrange,
+                orbitSpeed: 0.05,
+                radius: 140,
+            },
             {
                 asset: planetBlue,
                 orbitSpeed: 0.01,
                 radius: 180,
             },
-//            {
-//                asset: 'images/planets/p_grey.svg',
-//                orbitSpeed: 0.01,
-//                radius: 140,
-//            },
+            {
+                asset: planetGrey,
+                orbitSpeed: 0.01,
+                radius: 140,
+            },
         ],
     },
     stars: {
