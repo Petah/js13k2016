@@ -13,7 +13,7 @@ svg {
     left: 0;
 }
 
-svg text {
+svg text.absCenter {
     transform: translate(50vw, 50vh);
     text-anchor: middle;
     fill: white;
@@ -68,10 +68,12 @@ svg text {
 .planetOrange4{opacity:0.5;fill:#71361f;}
 
 #hudLayer{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
+#hudLayer>svg{position:absolute;top:0;left:0;right:auto;width:auto;height:auto;}
+#hudLayer>svg.hudRight{left:auto;right:0;}
 .hudText{font-family:Helvetica;font-size:1.6em;letter-spacing:1;}
 .hudBase{fill:#66D9EF;}
-.hudLife .hudBar{fill:#F1C40F;stroke:#F1C40F;}
-.hudLife .hudBarE{fill:none;}
-.hudGlitch .hudBar{fill:#4eba6f;stroke:#4eba6f;}
-.hudGlitch .hudBarE{fill:none;}
+#hudLife .hudBar{fill:#F1C40F;stroke:#F1C40F;}
+#hudLife .hudBarE{fill:none;}
+#hudGlitch .hudBar{fill:#4eba6f;stroke:#4eba6f;}
+#hudGlitch .hudBarE{fill:none;}
 .hudBar{stroke-width:3;}

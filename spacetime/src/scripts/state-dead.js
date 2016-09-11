@@ -23,9 +23,15 @@ stateDeadInit = () => {
     while (stars.length) {
         destroy(planets, 0);
     }
+    while(hudLayer.firstChild) {
+        hudLayer.removeChild(hudLayer.firstChild);
+    }
 };
 
 stateDead = () => {
+    if (buttonShootDown) {
+        stateGameInit();
+    }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
         if (gamepads[i] && gamepads[i].buttons[9].pressed) {

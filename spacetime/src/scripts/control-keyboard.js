@@ -35,9 +35,9 @@ document.body.onkeyup = (e) => {
 
 controlUpdate = (playerIndex) => {
     if (buttonMoveDown) {
-        players[playerIndex].speed = Math.min(players[playerIndex].speed + players[playerIndex].acceleration, players[playerIndex].maxSpeed);
+        players[playerIndex].currentAcceleration = players[playerIndex].acceleration;
     } else {
-        players[playerIndex].speed /= players[playerIndex].friction;
+        players[playerIndex].currentAcceleration = 0;
     }
 
     if (buttonTurnLeftDown) {
@@ -51,4 +51,6 @@ controlUpdate = (playerIndex) => {
     if (buttonShootDown) {
         players[playerIndex].shoot = true;
     }
+
+
 };

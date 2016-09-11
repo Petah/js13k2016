@@ -218,21 +218,20 @@ updatePlayer = (player) => {
 createHud = (data, player) => {
     for (let j = 0; j < data.length; j++) {
         let h = hud.cloneNode(true);
-        h.id = '';
-        h.setAttributeNS(null, 'class', 'hud' + data[j].id.charAt(0).toUpperCase() + data[j].id.substr(1).toLowerCase());
+        h.id = 'hud' + data[j].id.charAt(0).toUpperCase() + data[j].id.substr(1).toLowerCase();
 
         // Scale to suit viewport
         hScale = (window.innerWidth / 900 * 0.1) + 0.5;
-        h.transform.baseVal[0].setScale(hScale, hScale);
+        h.transform.baseVal[1].setScale(hScale, hScale);
 
         // Flip base if aligning right
         if (data[j].hasOwnProperty('hAlign') && data[j].hAlign === 'right') {
+            h.setAttributeNS(null, 'class', 'hudRight');
             let base = h.children[0].children[0];
             let baseW = 436; // Magic
             base.transform.baseVal[1].setScale(-1, 1);
             move(base, baseW, 0);
             move(h.children[0].children[1], baseW - 112, 76);
-            move(h, window.innerWidth - baseW + 106, 0);
         }
 
         // Append bars
@@ -247,6 +246,7 @@ createHud = (data, player) => {
             bars.appendChild(bar);
         }
 
+        h.style.display = '';
         hudLayer.appendChild(h);
         player.hud[data[j].id] = hudLayer.children[hudLayer.children.length - 1];
     }
