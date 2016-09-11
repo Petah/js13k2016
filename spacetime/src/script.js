@@ -3,14 +3,7 @@ updatedPerSecond = 0;
 updatedPerSecondTimer = performance.now();
 ///debug
 
-move = (element, x, y) => {
-    element.transform.baseVal[0].matrix.e = x;
-    element.transform.baseVal[0].matrix.f = y;
-};
-
-rotate = (element, angle, rotationPointX, rotationPointY) => {
-    element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY);
-};
+state = stateGame;
 
 planetMass = 1;
 gravityPower = 25000;
@@ -22,40 +15,7 @@ planets = [];
 // SVG Stuff
 svgNs = 'http://www.w3.org/2000/svg';
 
-randomSign = () => Math.random() > 0.5 ? -1 : 1;
-
-randomBetween = (min, max) => ((Math.random() * max) + min);
-
-radToDegrees = (rad) => (rad * (180 / Math.PI));
-
-createSvg = (data) => {
-    let svgEl = document.createElementNS(svgNs, 'image');
-    svgEl.setAttributeNS('http://www.w3.org/1999/xlink', 'href', data.asset);
-    svgEl.setAttributeNS(null, 'height', data.dims.height);
-    svgEl.setAttributeNS(null, 'width', data.dims.width);
-    svgEl.setAttributeNS(null, 'x', data.origin.x);
-    svgEl.setAttributeNS(null, 'y', data.origin.y);
-    return svgEl;
-};
-
 createStar = (data) => {
-    let star = document.createElementNS(svgNs, 'circle');
-    let rand = Math.random();
-
-    star.setAttributeNS(null, 'r', rand * data.radius);
-    star.setAttributeNS(null, 'opacity', rand);
-    star.setAttributeNS(null, 'cx', (randomSign() * (Math.random() * data.field.width)));
-    star.setAttributeNS(null, 'cy', (randomSign() * (Math.random() * data.field.height)));
-
-    let fill = 'rgba(192, 247, 255, 1)';
-    if(rand <= 0.5){
-        fill = 'rgba(255, 255, 255, 1)';
-    } else if(rand > 0.75){
-        fill = 'rgba(255, 254, 196, 1)';
-    }
-    star.setAttributeNS(null, 'fill', fill);
-
-    data.field.element.appendChild(star);
 };
 
 createSolarSystem = (data) => {
@@ -71,7 +31,7 @@ createSolarSystem = (data) => {
             distance: data.members.sun.radius * 2 * (i + 1),
             angle: Math.random() * 360,
             scale: Math.random() + 0.2,
-            orbitSpeed: Math.random() * 0.5 + 0.2,
+            orbitSpeed: 0.4 - (1 / 10000 * (data.members.sun.radius * 2 * (i + 1))),
         };
         planets.push(planet);
         planetClone.transform.baseVal[1].setScale(planet.scale, planet.scale); 
@@ -80,7 +40,22 @@ createSolarSystem = (data) => {
 
     // Append stars
     for (let i = 0; i < data.stars.count; i++) {
-        createStar(data.stars);
+        let star = starNode.cloneNode(true);
+        star.id = '';
+
+        star.r.baseVal.value = Math.random() * 5;
+        star.cx.baseVal.value = data.stars.field.width * 2 * Math.random() - data.stars.field.width;
+        star.cy.baseVal.value = data.stars.field.height * 2 * Math.random() - data.stars.field.height;
+        star.style.opacity = Math.random();
+
+        star.style.fill = '#c0f7ff';
+        if (Math.random() <= 0.5){
+            star.style.fill = '#fff';
+        } else if (Math.random() <= 0.5){
+            star.style.fill = '#fffec4';
+        }
+
+        stars.appendChild(star);
     }
 };
 
@@ -120,11 +95,9 @@ solarSystemData = {
     stars: {
         count: 10000,
         field: {
-            element: stars,
             width: window.innerWidth * 15,
             height: window.innerHeight * 15,
         },
-        radius: 5,
     }
 };
 
@@ -140,6 +113,9 @@ createPlayer = () => {
         rotationPointY: 4,
         
         health: 10,
+        
+        shootSound: soundGenerator.generateLaserShoot(),
+        explosionSound: soundGenerator.generateExplosion(),
 
         x: Math.random() * 2000 - 1000,
         y: Math.random() * 2000 - 1000,
@@ -200,8 +176,8 @@ moveGameObjects = (gameObjects) => {
     }
 };
 
-createExplosion = (x, y) => {
-    playSound([3,,0.3708,0.5822,0.3851,0.0584,,-0.0268,,,,-0.0749,0.7624,,,,,,1,,,,,0.5])
+createExplosion = (x, y, sound) => {
+    playSound(sound, x, y);
     for (let i = 0; i < 16; i++) {
         explosionClone = explosion.cloneNode(true);
         explosionClone.id = '';
@@ -268,7 +244,7 @@ updatePlayer = (player) => {
     
     player.reloading--;
     if (player.shoot && player.reloading < 0) {
-        playSound([1,,0.2126,,0.2145,0.8144,0.4185,-0.1908,,,,,,0.4178,0.0931,,,,1,,,0.1469,,0.5]);
+        playSound(player.shootSound, player.x, player.y);
         
         player.reloading = player.reloadTime;
 
@@ -311,11 +287,8 @@ col = (bullet, ships) => {
         }
         collisionDistance = pointDistance(bullet.x, bullet.y, ships[j].x, ships[j].y);
         if (collisionDistance < 20) {
-            createExplosion(bullet.x, bullet.y);
-            ships[j].health -= 1;
-            console.log(ships[j].health);
-
             bullet.life = 0;
+            ships[j].health -= 1;
             break;
         }
     }
@@ -332,97 +305,7 @@ main = () => {
     }
     ///debug
 
-    // rotate sun
-    solarSystemData.members.sun.rotateAngle += 0.02;
-    rotate(solarSystemData.members.sun.asset, solarSystemData.members.sun.rotateAngle, solarSystemData.origin.x, solarSystemData.origin.y);
-
-    // move planets
-    for (let i = 0; i < planets.length; i++) {
-        planets[i].angle += planets[i].orbitSpeed;
-        planets[i].x = lengthDirX(planets[i].distance, planets[i].angle);
-        planets[i].y = lengthDirY(planets[i].distance, planets[i].angle);
-        move(planets[i].element, planets[i].x, planets[i].y);
-		// planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
-        planets[i].element.children[planets[i].element.children.length - 1].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
-    }
-
-    for (let i = 0; i < players.length; i++) {
-        if (players[i].health > 0) {
-            controlUpdate(i);
-            updatePlayer(players[i]);
-        } else {
-            players[i].speed = 0;
-        }
-    }
-    for (let i = 0; i < cpus.length; i++) {
-        if (cpus[i].health > 0) {
-            ai(cpus[i]);
-            updatePlayer(cpus[i]);
-        } else {
-            cpus[i].speed = 0;
-        }
-    }
-
-    for (let i = 0; i < glitches.length; i++) {
-        if (glitches[i].glitchLog[0]) {
-            move(glitches[i].translate, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
-            rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
-        }
-        if (!glitches[i].glitchLog.shift()) {
-            glitches[i].translate.remove();
-            glitches.splice(i, 1);
-        }
-    }
-
-    moveGameObjects(players);
-    moveGameObjects(cpus);
-    moveGameObjects(bullets);
-    bulletLoop: for (let i = 0; i < bullets.length; i++) {
-        emit(bullets[i].emitter, bullets[i].x, bullets[i].y, bullets[i].speed, bullets[i].direction);
-    
-        for (let j = 0; j < planets.length; j++) {
-            let planetDistance = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            if (planetDistance < 100 * planets[j].scale) {
-                bullets[i].life = 0;
-            }
-            let planetDirection = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let newPlanetMotion = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (planetDistance * planetDistance), planetDirection);
-            bullets[i].speed = newPlanetMotion[0];
-            bullets[i].direction = newPlanetMotion[1];
-        }
-
-        // Collide with ships
-        col(bullets[i], players);
-        col(bullets[i], cpus);
-        
-        // Bullet life
-        bullets[i].life--;
-        if (bullets[i].life <= 0) {
-            createExplosion(bullets[i].x, bullets[i].y);
-
-            bullets[i].translate.remove();
-            bullets.splice(i, 1);
-        }
-    }
-    
-    for (let i = 0; i < particles.length; i++) {
-        particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
-        particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
-        particles[i].animate(particles[i]);
-
-        move(particles[i].translate, particles[i].x, particles[i].y);
-//        rotate(particles[i].rotate, particles[i].direction, particles[i].rotationPointX, particles[i].rotationPointY);
-        particles[i].life--;
-        if (particles[i].life < 0) {
-            particles[i].translate.remove();
-            particles.splice(i, 1);
-        }
-    }
-    
-    svgNode.viewBox.baseVal.x = players[0].x - window.innerWidth / 2;
-    svgNode.viewBox.baseVal.y = players[0].y - window.innerHeight / 2;
-    svgNode.viewBox.baseVal.width = window.innerWidth;
-    svgNode.viewBox.baseVal.height = window.innerHeight;
+    state();
     
     requestAnimationFrame(main);
 };

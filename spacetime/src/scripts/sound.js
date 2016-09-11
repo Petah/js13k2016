@@ -1,16 +1,16 @@
 function SfxrParams() {
   this.setSettings = function(values)
   {
-    for ( var i = 0; i < 24; i++ )
+    for ( let i = 0; i < 24; i++ )
     {
       this[String.fromCharCode( 97 + i )] = values[i] || 0;
     }
     if (this['c'] < .01) {
       this['c'] = .01;
     }
-    var totalTime = this['b'] + this['c'] + this['e'];
+    let totalTime = this['b'] + this['c'] + this['e'];
     if (totalTime < .18) {
-      var multiplier = .18 / totalTime;
+      let multiplier = .18 / totalTime;
       this['b']  *= multiplier;
       this['c'] *= multiplier;
       this['e']   *= multiplier;
@@ -20,7 +20,7 @@ function SfxrParams() {
 
 function SfxrSynth() {
   this._params = new SfxrParams();
-  var _envelopeLength0, // Length of the attack stage
+  let _envelopeLength0, // Length of the attack stage
       _envelopeLength1, // Length of the sustain stage
       _envelopeLength2, // Length of the decay stage
       _period,          // Period of the wave
@@ -33,7 +33,7 @@ function SfxrSynth() {
       _squareDuty,      // Offset of center switching point in the square wave
       _dutySweep;       // Amount to change the duty by
   this.reset = function() {
-    var p = this._params;
+    let p = this._params;
     _period       = 100 / (p['f'] * p['f'] + .001);
     _maxPeriod    = 100 / (p['g']   * p['g']   + .001);
     _slide        = 1 - p['h'] * p['h'] * p['h'] * .01;
@@ -49,7 +49,7 @@ function SfxrSynth() {
 
   this.totalReset = function() {
     this.reset();
-    var p = this._params;
+    let p = this._params;
     _envelopeLength0 = p['b']  * p['b']  * 100000;
     _envelopeLength1 = p['c'] * p['c'] * 100000;
     _envelopeLength2 = p['e']   * p['e']   * 100000 + 12;
@@ -57,10 +57,10 @@ function SfxrSynth() {
   }
   this.synthWave = function(buffer, length) {
     // Shorter reference
-    var p = this._params;
+    let p = this._params;
 
     // If the filters are active
-    var _filters = p['s'] != 1 || p['v'],
+    let _filters = p['s'] != 1 || p['v'],
         // Cutoff multiplier which adjusts the amount the wave position can move
         _hpFilterCutoff = p['v'] * p['v'] * .1,
         // Speed of the high-pass cutoff multiplier
@@ -92,19 +92,19 @@ function SfxrSynth() {
         // The type of wave to generate
         _waveType = p['a'];
 
-    var _envelopeLength      = _envelopeLength0,     // Length of the current envelope stage
+    let _envelopeLength      = _envelopeLength0,     // Length of the current envelope stage
         _envelopeOverLength0 = 1 / _envelopeLength0, // (for quick calculations)
         _envelopeOverLength1 = 1 / _envelopeLength1, // (for quick calculations)
         _envelopeOverLength2 = 1 / _envelopeLength2; // (for quick calculations)
 
     // Damping muliplier which restricts how fast the wave position can move
-    var _lpFilterDamping = 5 / (1 + p['u'] * p['u'] * 20) * (.01 + _lpFilterCutoff);
+    let _lpFilterDamping = 5 / (1 + p['u'] * p['u'] * 20) * (.01 + _lpFilterCutoff);
     if (_lpFilterDamping > .8) {
       _lpFilterDamping = .8;
     }
     _lpFilterDamping = 1 - _lpFilterDamping;
 
-    var _finished = false,     // If the sound has finished
+    let _finished = false,     // If the sound has finished
         _envelopeStage    = 0, // Current stage of the envelope (attack, sustain, decay, end)
         _envelopeTime     = 0, // Current time through current enelope stage
         _envelopeVolume   = 0, // Current volume of the envelope
@@ -123,17 +123,17 @@ function SfxrSynth() {
         _vibratoPhase     = 0; // Phase through the vibrato sine wave
 
     // Buffer of wave values used to create the out of phase second wave
-    var _phaserBuffer = new Array(1024),
+    let _phaserBuffer = new Array(1024),
         // Buffer of random values used to generate noise
         _noiseBuffer  = new Array(32);
-    for (var i = _phaserBuffer.length; i--; ) {
+    for (let i = _phaserBuffer.length; i--; ) {
       _phaserBuffer[i] = 0;
     }
-    for (var i = _noiseBuffer.length; i--; ) {
+    for (let i = _noiseBuffer.length; i--; ) {
       _noiseBuffer[i] = Math.random() * 2 - 1;
     }
 
-    for (var i = 0; i < length; i++) {
+    for (let i = 0; i < length; i++) {
       if (_finished) {
         return i;
       }
@@ -240,7 +240,7 @@ function SfxrSynth() {
       }
 
       _superSample = 0;
-      for (var j = 8; j--; ) {
+      for (let j = 8; j--; ) {
         // Cycles through the period
         _phase++;
         if (_phase >= _periodTemp) {
@@ -248,7 +248,7 @@ function SfxrSynth() {
 
           // Generates new random noise for this period
           if (_waveType == 3) {
-            for (var n = _noiseBuffer.length; n--; ) {
+            for (let n = _noiseBuffer.length; n--; ) {
               _noiseBuffer[n] = Math.random() * 2 - 1;
             }
           }
@@ -319,16 +319,16 @@ function SfxrSynth() {
 }
 
 // Adapted from http://codebase.es/riffwave/
-var synth = new SfxrSynth();
+let synth = new SfxrSynth();
 // Export for the Closure Compiler
-var jsfxr = function(settings) {
+let jsfxr = function(settings) {
   // Initialize SfxrParams
   synth._params.setSettings(settings);
   // Synthesize Wave
-  var envelopeFullLength = synth.totalReset();
-  var data = new Uint8Array(((envelopeFullLength + 1) / 2 | 0) * 4 + 44);
-  var used = synth.synthWave(new Uint16Array(data.buffer, 44), envelopeFullLength) * 2;
-  var dv = new Uint32Array(data.buffer, 0, 44);
+  let envelopeFullLength = synth.totalReset();
+  let data = new Uint8Array(((envelopeFullLength + 1) / 2 | 0) * 4 + 44);
+  let used = synth.synthWave(new Uint16Array(data.buffer, 44), envelopeFullLength) * 2;
+  let dv = new Uint32Array(data.buffer, 0, 44);
   // Initialize header
   dv[0] = 0x46464952; // "RIFF"
   dv[1] = used + 36;  // put total size here
@@ -344,20 +344,24 @@ var jsfxr = function(settings) {
 
   // Base64 encoding written by me, @maettig
   used += 44;
-  var i = 0,
+  let i = 0,
       base64Characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/',
       output = 'data:audio/wav;base64,';
   for (; i < used; i += 3)
   {
-    var a = data[i] << 16 | data[i + 1] << 8 | data[i + 2];
+    let a = data[i] << 16 | data[i + 1] << 8 | data[i + 2];
     output += base64Characters[a >> 18] + base64Characters[a >> 12 & 63] + base64Characters[a >> 6 & 63] + base64Characters[a & 63];
   }
   return output;
 }
 
-playSound = (params) => {
-    var soundURL = jsfxr(params);
-    var player = new Audio();
-    player.src = soundURL;
-    player.play();
+playSound = (params, x, y) => {
+    let distance = pointDistance(players[0].x, players[0].y, x, y);
+    if (distance < 2000) {
+        let soundURL = jsfxr(params);
+        let player = new Audio();
+        player.src = soundURL;
+        player.volume = -(1 / 2000 * distance) + 1;
+        player.play();
+    }
 };

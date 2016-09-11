@@ -19,7 +19,6 @@ intersectLineLine = (a1, a2, b1, b2) => {
         let ub = ub_t / u_b;
 
         if (0 <= ua && ua <= 1 && 0 <= ub && ub <= 1) {
-            console.log(a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y));
             result.push([a1.x + ua * (a2.x - a1.x), a1.y + ua * (a2.y - a1.y)]);
         }
     }
