@@ -6,18 +6,18 @@ updatedPerSecondTimer = performance.now();
 state = stateGame;
 
 planetMass = 1;
-gravityPower = 25000;
+bullets = [];
 cpus = [];
 glitches = [];
-players = [];
+gravityPower = 25000;
+particles = [];
 planets = [];
+players = [];
 
 // SVG Stuff
 svgNs = 'http://www.w3.org/2000/svg';
 
-createStar = (data) => {
-};
-
+// Solar System
 createSolarSystem = (data) => {
     // Append sun
     solarSystemData.members.sun.asset.transform.baseVal[1].setScale(1.5, 1.5);
@@ -104,7 +104,7 @@ solarSystemData = {
 createPlayer = () => {
     let playerNode = boatWrapper.cloneNode(true);
     playerNode.id = '';
-    playerNode.setAttribute('class', 'player1');
+    playerNode.setAttributeNS(null, 'class', 'player1');
     topLayer.appendChild(playerNode);
     players.push({
         id: Math.floor(Math.random() * 1000000),
@@ -113,8 +113,11 @@ createPlayer = () => {
         rotationPointX: 34,
         rotationPointY: 48,
         
-        health: 10,
-        
+        health: 20,
+        healthMax: 20,
+
+        hud: {},
+
         shootSound: soundGenerator.generateLaserShoot(),
         explosionSound: soundGenerator.generateExplosion(),
 
@@ -139,9 +142,10 @@ createPlayer = () => {
         gunMounts: [10, -10],
         
         glitch: 0,
-        glitchTime: 30,
+        glitchMax: 20,
         glitchLog: [],
-        
+        glitchTime: 30,
+
         emitter: {
             particle: bubbleParticle,
             reloading: 0,
@@ -154,16 +158,9 @@ createPlayer = () => {
 createCpu = () => {
     createPlayer();
     cpuPlayer = players.pop();
-    cpuPlayer.translate.setAttribute('class', 'player2');
+    cpuPlayer.translate.setAttributeNS(null, 'class', 'player2');
     cpus.push(cpuPlayer);
 };
-
-createPlayer();
-//createPlayer();
-createCpu();
-
-bullets = [];
-particles = [];
 
 bubbleParticleAnimation = (particle) => {
     particle.translate.style.opacity -= 0.01;
@@ -292,10 +289,75 @@ col = (bullet, ships) => {
         if (collisionDistance < 20) {
             bullet.life = 0;
             ships[j].health -= 1;
+            updateHud(ships[j], 'health');
             break;
         }
     }
 };
+
+// HUD
+createHud = (data, player) => {
+    for (let j = 0; j < data.length; j++) {
+        let h = hud.cloneNode(true);
+        h.id = '';
+        h.setAttributeNS(null, 'class', 'hud' + data[j].id.charAt(0).toUpperCase() + data[j].id.substr(1).toLowerCase());
+
+        // Scale to suit viewport
+        hScale = (window.innerWidth / 900 * 0.1) + 0.5;
+        h.transform.baseVal[0].setScale(hScale, hScale);
+
+        // Flip base if aligning right
+        if (data[j].hasOwnProperty('hAlign') && data[j].hAlign === 'right') {
+            let base = h.children[0].children[0];
+            let baseW = 436; // Magic
+            base.transform.baseVal[1].setScale(-1, 1);
+            move(base, baseW, 0);
+            move(h.children[0].children[1], baseW - 112, 76);
+            move(h, window.innerWidth - baseW + 106, 0);
+        }
+
+        // Append bars
+        let bars = h.children[1];
+        h.children[0].children[1].innerHTML = data[j].text;
+        for (let i = 0; i < player.healthMax; i++) {
+            let bar = i == 0 ? bars.children[0] : bars.children[0].cloneNode(true);
+            bar.setAttributeNS(null, 'x', i * data[j].bars.offset);
+            if (i >= player[data[j].id]) {
+                bar.setAttributeNS(null, 'class', 'hudBar hudBarE');
+            }
+            bars.appendChild(bar);
+        }
+
+        hudLayer.appendChild(h);
+        player.hud[data[j].id] = hudLayer.children[hudLayer.children.length - 1];
+    }
+};
+
+updateHud = (player, id) => {
+    if (player[id] >= 0 && player.hud.hasOwnProperty(id)) {
+        player.hud[id].children[1].children[player[id]].setAttributeNS(null, 'class', 'hudBar hudBarE');
+    }
+};
+
+hudData = [
+    {
+        id: 'glitch',
+        hAlign: 'right',
+        bars: {
+            width: 16,
+            offset: 22,
+        },
+        text: 'GLITCH',
+    },
+    {
+        id: 'health',
+        bars: {
+            width: 16,
+            offset: 22,
+        },
+        text: 'HEALTH',
+    },
+];
 
 main = () => {
     //debug
@@ -313,6 +375,13 @@ main = () => {
     requestAnimationFrame(main);
 };
 
+
+createPlayer();
+//createPlayer();
+createCpu();
+
 createSolarSystem(solarSystemData);
+
+createHud(hudData, players[0]);
 
 main();
