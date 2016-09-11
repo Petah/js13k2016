@@ -9,8 +9,7 @@
             <g id="planetLayer"></g>            
         </g>
     </g>
-    <g id="topLayer">
-    </g>
+    <g id="topLayer"></g>
 </svg>
 <svg id="svgStartNode">
     <text>Press [START]!</text>
@@ -49,6 +48,7 @@
 <svg id="svgDeadNode">
     <text>DED!</text>
 </svg>
+<svg id="hudLayer"></svg>
 <svg style="display: none">
     <g id="boatWrapper" transform="translate(0 0) rotate(90)">
         <g id="boat" transform="translate(-33.5 -26.5) rotate(0) scale(0.7)">
@@ -106,6 +106,15 @@
         <rect x="-40" y="15" width="200" height="30" rx="15" ry="15" class="planetOrange3"/>
         <rect x="10" y="75" width="90" height="30" rx="15" ry="15" class="planetOrange3"/>
         <circle r="100" class="planetOrange4" mask="url(#planetShadowClip)" transform="rotate(0)"/>
+    </g>
+    <g id="hud" transform="translate(0 0) scale(1 1)">
+        <g id="hudBase">
+            <polygon class="hudBase" points="436,48 136,48 120,86 0,86 0,46 436,46" transform="translate(0, 0) scale(1, 1)"/>
+            <text class="hudText" transform="translate(10 76)"></text>
+        </g>
+        <g id="hudBars">
+            <rect x="0" y="0" class="hudBar" width="16" height="36"/>
+        </g>
     </g>
 </svg>
 <?php require __DIR__ . '/style.php'; ?>

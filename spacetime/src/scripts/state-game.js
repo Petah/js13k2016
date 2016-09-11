@@ -11,6 +11,8 @@ stateGameInit = () => {
     createCpu();
     createCpu();
     
+    createHud(hudData, players[0]);
+
     main(true);
 }
 

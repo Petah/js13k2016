@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Sun" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="680.5 290.5 603 603" style="enable-background:new 680.5 290.5 603 603;" xml:space="preserve">
+<style type="text/css">
+	.main{stroke:#F78118;stroke-width:8;}
+	.ring{fill:none;stroke:#F78118;enable-background:new;}
+	.ring-1{opacity:0.15;stroke-width:8;stroke-miterlimit:10;}
+	.ring-2{opacity:0.1;stroke-width:6;stroke-miterlimit:10;stroke-dasharray:52.7219,52.7219;}
+	.ring-3{opacity:0.05;stroke-width:3;stroke-miterlimit:10;stroke-dasharray:30.4037,30.4037;}
+</style>
+<defs>
+	<radialGradient id="sungrad" cx="982" cy="593" r="200" gradientUnits="userSpaceOnUse">
+		<stop  offset="0" style="stop-color:#F7C000"/>
+		<stop  offset="0.3137" style="stop-color:#F7BD01"/>
+		<stop  offset="0.5387" style="stop-color:#F7B405"/>
+		<stop  offset="0.7359" style="stop-color:#F7A40B"/>
+		<stop  offset="0.9162" style="stop-color:#F78E13"/>
+		<stop  offset="1" style="stop-color:#F78118"/>
+	</radialGradient>
+</defs>
+<circle class="main" cx="982" cy="593" r="200" fill="url(#sungrad)"/>
+<circle class="ring ring-1" cx="982" cy="593" r="235"/>
+<circle class="ring ring-2" cx="982" cy="592" r="268.5"/>
+<circle class="ring ring-3" cx="982" cy="592" r="300"/>
+</svg>
