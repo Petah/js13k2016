@@ -9,8 +9,8 @@ ai = (cpu) => {
         }
     }
     if (Math.random() < 0.8) {
-        cpu.speed = Math.min(cpu.speed + cpu.acceleration, cpu.maxSpeed);
-        directionDelta = (cpu.direction - pointDirection(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
+        cpu.currentAcceleration = cpu.acceleration;
+        directionDelta = (cpu.facing - pointDirection(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
         if (closestPlayerDistance < 200) {
             directionDelta = -directionDelta + 360;
         }
@@ -30,7 +30,7 @@ ai = (cpu) => {
             }
         }
     } else {
-        cpu.speed = Math.max(cpu.speed - cpu.acceleration, 0);
+        cpu.currentAccelleration = 0;
         cpu.turnSpeed /= 1.2;
     }
 };

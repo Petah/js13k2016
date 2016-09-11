@@ -3,12 +3,6 @@
     <?php require __DIR__ . '/filters.php'; ?>
     <g id="gridLayer"></g>
     <g id="bottomLayer"></g>
-    <g id="sunStar" transform="translate(0 0) scale(1)">
-        <circle class="sunMain" cx="0" cy="0" r="200" fill="url(#sungrad)"/>
-        <circle class="sunRing sunRing1" cx="0" cy="0" r="235"/>
-        <circle class="sunRing sunRing2" cx="0" cy="0" r="268.5"/>
-        <circle class="sunRing sunRing3" cx="0" cy="0" r="300"/>
-    </g>
     <g id="solarSystemLayer">
         <g id="stars"></g>
         <g id="solarSystem">
@@ -18,9 +12,46 @@
     <g id="topLayer">
     </g>
 </svg>
+<svg id="svgStartNode">
+    <text>Press [START]!</text>
+<!--
+    <g>
+        <path d="M123,223c-16,0-30,13-30,30s13,30,30,30
+                c16,0,30-13,30-30S140,223,123,223z"/>
+        <path d="
+                M387,164c-26,26-100,23-100,23s-74,2-100-23
+                c-26-26-106-2-128,33S-8,350,1,465C11,579,65,542,109,506
+                c43-35,58-67,178-67c120,0,134,31,178,67c43,35,97,72,107-41
+                c10-114-35-230-57-267C494,161,414,137,387,164z 
+                
+                M80,254c0-23,19-42,42-42s42,19,42,42
+                s-19,42-42,42S80,277,80,254z 
+                
+                M206,416c-29,0-53-24-53-53
+                c0-29,24-53,53-53s53,24,53,53S236,416,206,416z 
+                
+                M352,397c-23,0-42-19-42-42
+                s19-42,42-42s42,19,42,42S376,397,352,397z
+                "/>
+        <path d="M206,315c-26,0-47,21-47,47c0,26,21,47,47,47
+                c26,0,47-21,47-47C254,336,232,315,206,315z M191,392v3
+                c-7-3-14-10-17-17h3h3c2,4,6,8,10,10V392z M191,333v3
+                c-4,2-8,6-10,10h-3h-3c3-7,10-14,17-17V333z M221,396v-3
+                v-3c4-2,8-6,10-10h3h3C236,386,229,392,221,396z M236,347
+                h-3c-2-4-6-8-10-10v-3v-3c7,3,14,10,17,17H236z"/>
+        <circle cx="405" cy="265" r="18" fill="red"/>
+        <circle cx="447" cy="223" r="18" fill="red"/>
+        <circle cx="447" cy="307" r="18" fill="red"/>
+        <circle cx="490" cy="265" r="18" fill="red"/>
+        <circle cx="353" cy="355" r="30" />
+    </g>-->
+</svg>
+<svg id="svgDeadNode">
+    <text>DED!</text>
+</svg>
 <svg style="display: none">
     <g id="boatWrapper" transform="translate(0 0) rotate(90)">
-        <g id="boat" transform="translate(-34 -48) rotate(0) scale(0.7)">
+        <g id="boat" transform="translate(-33.5 -26.5) rotate(0) scale(0.7)">
             <path class="playerBoat0" d="M46.7,2H46l-5.9,13l-0.3,0.3l-1.4-1.4l5.8-12.7c0.1-0.4,0.4-0.7,0.8-0.9C45.3,0.1,45.6,0,46,0h0.7V2 M27.3,63.6 l9.4,9.3h24.3l9.4-9.3l0.8,2l-8.8,8.8c-0.4,0.4-0.9,0.6-1.4,0.6H36.6c-0.6,0-1-0.2-1.4-0.6l-8.8-8.8L27.3,63.6 M57.3,15L51.5,2h-0.7 V0h0.7c0.4,0,0.8,0.1,1.1,0.3l0.8,0.9L59,13.9L57.3,15"/>
             <path class="playerBoat1" d="M57.3,15l19.1,42.4L73,60.8l-2.8,2.8l-9.4,9.3H36.6l-9.4-9.3l-2.8-2.8L21,57.3L40.1,15L46,2h0.7L30.3,53.9 l6.5,11.8h24l6.5-11.8L50.8,2h0.7L57.3,15"/>
             <path class="playerBoat2" d="M46.7,2V0h4v2H46.7 M92.4,53.3l4.6,5.4c0.3,0.4,0.5,0.8,0.5,1.3v4.7c0,0.6-0.2,1-0.6,1.4 c-0.4,0.4-0.9,0.6-1.4,0.6h-5.3h-0.3l0.3-2h5.3v-4.7l-3.6-4.3L92.4,53.3 M7.6,66.7l-0.4,0.1H2c-0.6,0-1-0.2-1.4-0.6 C0.2,65.8,0,65.3,0,64.8v-4.7c0-0.5,0.2-0.9,0.5-1.3L5,53.4l0.6,2.4L2,60.1v4.7h5.3L7.6,66.7"/>
@@ -38,7 +69,13 @@
     <circle id="starNode"/>
     <circle id="bubbleParticle" class="bubbleParticle" transform="translate(0 0)" r="2" style="opacity:.4"/>
     <circle id="explosion" class="explosion" transform="translate(0 0)" r="10" style="opacity:1"/>
-    <polygon id="bullet" class="bullet" transform="translate(0 0) rotate(0)" points="-10 0 10 0"/>
+    <polygon id="bullet" class="bullet" transform="translate(0 0) rotate(0)" points="-25 0 0 3 3 0 0 -3"/>
+    <g id="sunStar" transform="translate(0 0) scale(1)">
+        <circle class="sunMain" cx="0" cy="0" r="100" fill="url(#sungrad)"/>
+        <circle class="sunRing sunRing1" cx="0" cy="0" r="135"/>
+        <circle class="sunRing sunRing2" cx="0" cy="0" r="168.5"/>
+        <circle class="sunRing sunRing3" cx="0" cy="0" r="200" transform="rotate(0)"/>
+    </g>
     <g id="planetBlue" transform="translate(0 0) scale(1)" clip-path="url(#planetClip)">
         <circle class="planetBlue1" r="100"/>
         <ellipse class="planetBlue3" cx="45" cy="-40" rx="90" ry="45"/>

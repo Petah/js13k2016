@@ -14,10 +14,11 @@ lengthDirY = (length, direction) => {
     return Math.sin(direction * Math.PI / 180) * length;
 };
 
-motionAdd = (speed1, direction1, speed2, direction2) => {
-    let x2 = lengthDirX(speed1, direction1) + lengthDirX(speed2, direction2);
-    let y2 = lengthDirY(speed1, direction1) + lengthDirY(speed2, direction2);
-    return [Math.hypot(x2, y2), pointDirection(0, 0, x2, y2)]
+motionAdd = (self, speed, direction) => {
+    let x2 = lengthDirX(self.speed, self.direction) + lengthDirX(speed, direction);
+    let y2 = lengthDirY(self.speed, self.direction) + lengthDirY(speed, direction);
+    self.speed = Math.hypot(x2, y2);
+    self.direction = pointDirection(0, 0, x2, y2);
 };
 
 randomSign = () => Math.random() > 0.5 ? -1 : 1;

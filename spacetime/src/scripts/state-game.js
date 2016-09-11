@@ -1,34 +1,52 @@
-stateGame = () => {
-    // rotate sun
-    solarSystemData.members.sun.rotateAngle += 0.02;
-    rotate(solarSystemData.members.sun.asset, solarSystemData.members.sun.rotateAngle, solarSystemData.origin.x, solarSystemData.origin.y);
+stateGameInit = () => {
+    svgStartNode.style.display = 'none';
+    svgDeadNode.style.display = 'none';
+    state = stateGame;
+    
+    createSolarSystem(solarSystemData);
+    
+    createPlayer();
+    //createPlayer();
+    createCpu();
+    createCpu();
+    createCpu();
+    
+    main(true);
+}
 
-    // move planets
+stateGame = () => {
+    // Move planets
     for (let i = 0; i < planets.length; i++) {
         planets[i].angle += planets[i].orbitSpeed;
         planets[i].x = lengthDirX(planets[i].distance, planets[i].angle);
         planets[i].y = lengthDirY(planets[i].distance, planets[i].angle);
-        move(planets[i].element, planets[i].x, planets[i].y);
-		// planets[i].element.children[0].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
-        planets[i].element.children[planets[i].element.children.length - 1].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
+        move(planets[i].translate, planets[i].x, planets[i].y);
+        planets[i].translate.children[planets[i].translate.children.length - 1].transform.baseVal[0].setRotate(pointDirection(0, 0, planets[i].x, planets[i].y), 0, 0);
     }
 
     for (let i = 0; i < players.length; i++) {
-        if (players[i].health > 0) {
+        checkCollisions(players[i], planets);
+        if (players[i].life > 0) {
+            applyGravity(players[i]);
             controlUpdate(i);
             updatePlayer(players[i]);
         } else {
-            players[i].speed = 0;
+            createExplosion(players[i].x, players[i].y, players[i].explosionSound);
+            destroy(players, i);
         }
     }
     for (let i = 0; i < cpus.length; i++) {
-        if (cpus[i].health > 0) {
+        checkCollisions(cpus[i], planets);
+        if (cpus[i].life > 0) {
+            applyGravity(cpus[i]);
             ai(cpus[i]);
             updatePlayer(cpus[i]);
         } else {
-            cpus[i].speed = 0;
+            createExplosion(cpus[i].x, cpus[i].y, cpus[i].explosionSound);
+            destroy(cpus, i);
         }
     }
+    
 
     for (let i = 0; i < glitches.length; i++) {
         if (glitches[i].glitchLog[0]) {
@@ -36,39 +54,27 @@ stateGame = () => {
             rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
         }
         if (!glitches[i].glitchLog.shift()) {
-            glitches[i].translate.remove();
-            glitches.splice(i, 1);
+            destroy(glitches, i);
         }
     }
 
-    moveGameObjects(players);
-    moveGameObjects(cpus);
+    moveGameObjects2(players);
+    moveGameObjects2(cpus);
     moveGameObjects(bullets);
     bulletLoop: for (let i = 0; i < bullets.length; i++) {
-        emit(bullets[i].emitter, bullets[i].x, bullets[i].y, bullets[i].speed, bullets[i].direction);
-    
-        for (let j = 0; j < planets.length; j++) {
-            let planetDistance = pointDistance(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            if (planetDistance < 100 * planets[j].scale) {
-                bullets[i].life = 0;
-            }
-            let planetDirection = pointDirection(bullets[i].x, bullets[i].y, planets[j].x, planets[j].y);
-            let newPlanetMotion = motionAdd(bullets[i].speed, bullets[i].direction, 1 / bullets[i].mass * gravityPower * (bullets[i].mass * planetMass) / (planetDistance * planetDistance), planetDirection);
-            bullets[i].speed = newPlanetMotion[0];
-            bullets[i].direction = newPlanetMotion[1];
-        }
+//        emit(bullets[i].emitter, bullets[i].x, bullets[i].y, bullets[i].speed, bullets[i].direction);
+        applyGravity(bullets[i]);
 
         // Collide with ships
-        col(bullets[i], players);
-        col(bullets[i], cpus);
+        checkCollisions(bullets[i], players);
+        checkCollisions(bullets[i], cpus);
+        checkCollisions(bullets[i], planets);
         
         // Bullet life
         bullets[i].life--;
         if (bullets[i].life <= 0) {
             createExplosion(bullets[i].x, bullets[i].y, bullets[i].owner.explosionSound);
-
-            bullets[i].translate.remove();
-            bullets.splice(i, 1);
+            destroy(bullets, i);
         }
     }
     
@@ -81,13 +87,18 @@ stateGame = () => {
 //        rotate(particles[i].rotate, particles[i].direction, particles[i].rotationPointX, particles[i].rotationPointY);
         particles[i].life--;
         if (particles[i].life < 0) {
-            particles[i].translate.remove();
-            particles.splice(i, 1);
+            destroy(particles, i);
         }
     }
     
-    svgNode.viewBox.baseVal.x = players[0].x - window.innerWidth / 2;
-    svgNode.viewBox.baseVal.y = players[0].y - window.innerHeight / 2;
-    svgNode.viewBox.baseVal.width = window.innerWidth;
-    svgNode.viewBox.baseVal.height = window.innerHeight;
+    if (players[0]) {
+        svgNode.viewBox.baseVal.x = players[0].x - (window.innerWidth * zoom) / 2;
+        svgNode.viewBox.baseVal.y = players[0].y - (window.innerHeight * zoom) / 2;
+        svgNode.viewBox.baseVal.width = window.innerWidth * zoom;
+        svgNode.viewBox.baseVal.height = window.innerHeight * zoom;
+    }
+    
+    if (!players.length) {
+        stateDeadInit();
+    }
 }

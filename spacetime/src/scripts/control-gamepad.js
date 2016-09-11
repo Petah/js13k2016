@@ -22,17 +22,26 @@ controlUpdate = (playerIndex) => {
         });
         players[playerIndex].glitchLog = [];
     }
-    players[playerIndex].glitchLog.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].direction]);
+    players[playerIndex].glitchLog.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].facing]);
 
-    if (gamepads[playerIndex].buttons[7].value > 0.2 && players[playerIndex].speed < gamepads[playerIndex].buttons[7].value * players[playerIndex].maxSpeed) {
-        players[playerIndex].speed = Math.min(players[playerIndex].speed + (gamepads[playerIndex].buttons[7].value * players[playerIndex].acceleration), players[playerIndex].maxSpeed);
+    if (gamepads[playerIndex].buttons[7].value > 0.2) {
+        players[playerIndex].currentAcceleration = gamepads[playerIndex].buttons[7].value * players[playerIndex].acceleration;
     } else {
-        players[playerIndex].speed /= players[playerIndex].friction;
+        players[playerIndex].currentAcceleration = 0;
     }
 
     if (gamepads[playerIndex].axes[0] > 0.3 || gamepads[playerIndex].axes[0] < -0.3) {
         players[playerIndex].turnSpeed = Math.round(gamepads[playerIndex].axes[0] * players[playerIndex].maxTurnSpeed);
     } else {
         players[playerIndex].turnSpeed /= players[playerIndex].turnFriction;
+    }
+
+    if (gamepads[playerIndex].buttons[6].pressed) {
+        zoom += 0.1;
+        zoom = Math.min(10, zoom);
+    }
+    if (gamepads[playerIndex].buttons[4].pressed) {
+        zoom -= 0.1;
+        zoom = Math.max(0.1, zoom);
     }
 };

@@ -356,7 +356,7 @@ let jsfxr = function(settings) {
 }
 
 playSound = (params, x, y) => {
-    let distance = pointDistance(players[0].x, players[0].y, x, y);
+    let distance = pointDistance(svgNode.viewBox.baseVal.x + (window.innerWidth * zoom) / 2, svgNode.viewBox.baseVal.y + (window.innerHeight * zoom) / 2, x, y);
     if (distance < 2000) {
         let soundURL = jsfxr(params);
         let player = new Audio();

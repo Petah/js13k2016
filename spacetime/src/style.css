@@ -7,15 +7,21 @@ body {
 svg {
     width: 100vw;
     height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
-.boat {
-    stroke: #444;
-    fill: #333;
+svg text {
+    transform: translate(50vw, 50vh);
+    text-anchor: middle;
+    fill: white;
+    font-size: 50px;
+    font-family: monospace;
 }
 
 .bullet {
-    stroke: #555;
+    fill: url(#gradient1);
 }
 
 .bubbleParticle {
