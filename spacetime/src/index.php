@@ -68,7 +68,7 @@
     </g>
     <circle id="starNode"/>
     <circle id="bubbleParticle" class="bubbleParticle" transform="translate(0 0)" r="2" style="opacity:.4"/>
-    <circle id="explosion" class="explosion" transform="translate(0 0)" r="10" style="opacity:1"/>
+    <circle id="explosion" class="explosion" transform="translate(0 0)" />
     <polygon id="bullet" class="bullet" transform="translate(0 0) rotate(0)" points="-25 0 0 3 3 0 0 -3"/>
     <g id="sunStar" transform="translate(0 0) scale(1)">
         <circle class="sunMain" cx="0" cy="0" r="100" fill="url(#sungrad)"/>

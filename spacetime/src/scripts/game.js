@@ -10,10 +10,14 @@ rotate = (element, angle, rotationPointX, rotationPointY) => {
 createExplosion = (x, y, sound) => {
     playSound(sound, x, y);
     for (let i = 0; i < 16; i++) {
-        explosionClone = explosion.cloneNode(true);
-        explosionClone.id = '';
+        if (!nodeExplosions.length) {
+            return;
+        }
+        explosionClone = nodeExplosions.pop();
         explosionClone.style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 4)];
-        topLayer.appendChild(explosionClone);
+        explosionClone.r.baseVal.value = 10;
+        explosionClone.style.opacity = 1;
+        explosionClone.style.display = '';
         particles.push({
             x: x + ((Math.random() * 10) - 5),
             y: y + ((Math.random() * 10) - 5),
@@ -31,6 +35,10 @@ createExplosion = (x, y, sound) => {
                     particle.life = 0;
                 }
             },
+            destroy: (node) => {
+                node.style.display = 'none';
+                nodeExplosions.push(node);
+            },
         });
     }
 };
@@ -41,9 +49,12 @@ emit = (emitter, x, y, speed, direction) => {
         emitter.reloading = emitter.reloadTime;
 
         for (let i = 0; i < emitter.amount; i++) {
-            particleClone = emitter.particle.cloneNode(true);
-            particleClone.id = '';
-            bottomLayer.appendChild(particleClone);
+            if (!nodeBubbles.length) {
+                return;
+            }
+            particleClone = nodeBubbles.pop();
+            particleClone.style.opacity = 1;
+            particleClone.style.display = '';
             particles.push({
                 x: x + lengthDirX(-speed, direction),
                 y: y + lengthDirY(-speed, direction),
@@ -51,7 +62,13 @@ emit = (emitter, x, y, speed, direction) => {
                 life: 30,
                 speed: speed / 10,
                 direction: (direction - 180) + ((Math.random() * 30) - 15),
-                animate: bubbleParticleAnimation,
+                animate: (particle) => {
+                    particle.translate.style.opacity -= 0.04;
+                },
+                destroy: (node) => {
+                    node.style.display = 'none';
+                    nodeBubbles.push(node);
+                },
             });
         }
     }
@@ -88,6 +105,10 @@ moveGameObjects2 = (gameObjects) => {
 };
 
 destroy = (gameObjects, i) => {
-    gameObjects[i].translate.remove();
+    if (gameObjects[i].destroy) {
+        gameObjects[i].destroy(gameObjects[i].translate);
+    } else {
+        gameObjects[i].translate.remove();
+    }
     gameObjects.splice(i, 1);
 };

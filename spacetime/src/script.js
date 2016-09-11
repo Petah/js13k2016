@@ -4,13 +4,29 @@ updatedPerSecondTimer = performance.now();
 ///debug
 
 zoom = 2;
-gravityPower = 25000;
+gravityPower = 2500;
 cpus = [];
 glitches = [];
 players = [];
 planets = [];
 bullets = [];
 particles = [];
+
+createNodes = (nodeArray, node, layer) => {
+    while (nodeArray.length < 1000) {
+        let nodeClone = node.cloneNode(true);
+        nodeClone.id = '';
+        layer.appendChild(nodeClone);
+        nodeArray.push(nodeClone);
+    }
+};
+
+nodeExplosions = [];
+createNodes(nodeExplosions, explosion, topLayer);
+nodeBullets = [];
+createNodes(nodeBullets, bullet, bottomLayer);
+nodeBubbles = [];
+createNodes(nodeBubbles, bubbleParticle, bottomLayer);
 
 createSolarSystem = (data) => {
     // Append Planets
@@ -25,7 +41,7 @@ createSolarSystem = (data) => {
             orbitSpeed: 0.1 - (1 / 100000 * (300 * i)),
         };
         planet.collisionRadius = 100 * planet.scale;
-        planet.mass = planet.scale;
+        planet.mass = planet.scale * 10;
         planets.push(planet);
         planetClone.transform.baseVal[1].setScale(planet.scale, planet.scale); 
         planetLayer.appendChild(planetClone);
@@ -71,19 +87,18 @@ for (let i = 0; i < solarSystemData.stars.count; i++) {
     stars.appendChild(star);
 }
 
-createPlayer = () => {
+createPlayer = (options) => {
     let playerNode = boatWrapper.cloneNode(true);
     playerNode.id = '';
     playerNode.setAttributeNS(null, 'class', 'player1');
     topLayer.appendChild(playerNode);
-    players.push({
+    let player = {
         id: Math.floor(Math.random() * 1000000),
         translate: playerNode,
         rotate: playerNode.children[0],
         rotationPointX: 67/2,
         rotationPointY: 53/2,
         
-        life: 20,
         lifeMax: 20,
 
         hud: {},
@@ -127,18 +142,21 @@ createPlayer = () => {
             reloadTime: 1,
             amount: 1,
         },
-    });
+    };
+    
+    for (let key in options) {
+        player[key] = options[key];
+    }
+    
+    player.life = player.lifeMax;
+    players.push(player);
 };
 
-createCpu = () => {
-    createPlayer();
+createCpu = (options) => {
+    createPlayer(options);
     cpuPlayer = players.pop();
     cpuPlayer.translate.setAttributeNS(null, 'class', 'player2');
     cpus.push(cpuPlayer);
-};
-
-bubbleParticleAnimation = (particle) => {
-    particle.translate.style.opacity -= 0.01;
 };
 
 updatePlayer = (player) => {
@@ -157,14 +175,11 @@ updatePlayer = (player) => {
     }
     
     player.reloading--;
-    if (player.shoot && player.reloading < 0) {
+    if (player.shoot && player.reloading < 0 && nodeBullets.length) {
         playSound(player.shootSound, player.x, player.y);
-        
         player.reloading = player.reloadTime;
-
-        bulletClone = bullet.cloneNode(true);
-        bulletClone.id = '';
-        bottomLayer.appendChild(bulletClone);
+        bulletClone = nodeBullets.pop();
+        bulletClone.style.display = '';
         bullets.push({
             owner: player,
             translate: bulletClone,
@@ -184,6 +199,10 @@ updatePlayer = (player) => {
                 reloading: 0,
                 reloadTime: 1,
                 amount: 1,
+            },
+            destroy: (node) => {
+                node.style.display = 'none';
+                nodeBullets.push(node);
             },
         });
         
@@ -267,13 +286,18 @@ main = (init) => {
         updatedPerSecondTimer = performance.now() + 1000;
         updatedPerSecond = 0;
     }
-    if (players[0] && cpus[0]) {
+    pos.innerHTML = '';
+    if (players[0]) {
         pos.innerHTML = `
             POS: ${parseInt(players[0].x)}, ${parseInt(players[0].y)} 
             SPEED: ${parseInt(players[0].speed)} 
             DIR: ${parseInt(players[0].direction)} 
             FACE: ${parseInt(players[0].facing)}
             ACEL: ${players[0].currentAcceleration.toFixed(3)}
+        `;
+    }
+    if (cpus[0]) {
+        pos.innerHTML += `
             <br/>
             POS: ${parseInt(cpus[0].x)}, ${parseInt(cpus[0].y)} 
             SPEED: ${parseInt(cpus[0].speed)} 

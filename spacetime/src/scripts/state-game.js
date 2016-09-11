@@ -5,11 +5,9 @@ stateGameInit = () => {
     
     createSolarSystem(solarSystemData);
     
-    createPlayer();
-    //createPlayer();
-    createCpu();
-    createCpu();
-    createCpu();
+    createPlayer({
+        reloadTime: 5,
+    });
     
     createHud(hudData, players[0]);
 
@@ -98,6 +96,12 @@ stateGame = () => {
         svgNode.viewBox.baseVal.y = players[0].y - (window.innerHeight * zoom) / 2;
         svgNode.viewBox.baseVal.width = window.innerWidth * zoom;
         svgNode.viewBox.baseVal.height = window.innerHeight * zoom;
+    }
+    
+    while (cpus.length < 3) {
+        createCpu({
+            lifeMax: 1,
+        });
     }
     
     if (!players.length) {
