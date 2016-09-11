@@ -5,6 +5,9 @@ stateStartInit = () => {
 };
 
 stateStart = () => {
+    if (buttonShootDown) {
+        stateGameInit();
+    }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
         if (gamepads[i] && gamepads[i].buttons[9].pressed) {

@@ -7,6 +7,7 @@ checkCollisions = (self, others) => {
         if (collisionDistance < self.collisionRadius + others[i].collisionRadius) {
             self.life = 0;
             others[i].life -= self.damage;
+            updateHud(others[i], 'life');
             break;
         }
     }
