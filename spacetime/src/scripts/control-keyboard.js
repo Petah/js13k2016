@@ -47,4 +47,8 @@ controlUpdate = (playerIndex) => {
     } else {
         players[playerIndex].turnSpeed /= players[playerIndex].turnFriction;
     }
+
+    if (buttonShootDown) {
+        players[playerIndex].shoot = true;
+    }
 };

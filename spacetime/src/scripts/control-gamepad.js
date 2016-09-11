@@ -24,7 +24,6 @@ controlUpdate = (playerIndex) => {
     }
     players[playerIndex].glitchLog.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].direction]);
 
-    
     if (gamepads[playerIndex].buttons[7].value > 0.2 && players[playerIndex].speed < gamepads[playerIndex].buttons[7].value * players[playerIndex].maxSpeed) {
         players[playerIndex].speed = Math.min(players[playerIndex].speed + (gamepads[playerIndex].buttons[7].value * players[playerIndex].acceleration), players[playerIndex].maxSpeed);
     } else {

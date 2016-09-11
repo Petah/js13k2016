@@ -104,13 +104,14 @@ solarSystemData = {
 createPlayer = () => {
     let playerNode = boatWrapper.cloneNode(true);
     playerNode.id = '';
+    playerNode.setAttribute('class', 'player1');
     topLayer.appendChild(playerNode);
     players.push({
         id: Math.floor(Math.random() * 1000000),
         translate: playerNode,
         rotate: playerNode.children[0],
-        rotationPointX: 16,
-        rotationPointY: 4,
+        rotationPointX: 34,
+        rotationPointY: 48,
         
         health: 10,
         
@@ -152,7 +153,9 @@ createPlayer = () => {
 
 createCpu = () => {
     createPlayer();
-    cpus.push(players.pop());
+    cpuPlayer = players.pop();
+    cpuPlayer.translate.setAttribute('class', 'player2');
+    cpus.push(cpuPlayer);
 };
 
 createPlayer();
