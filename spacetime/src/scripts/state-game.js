@@ -77,7 +77,7 @@ stateGame = () => {
             destroy(bullets, i);
         }
     }
-    
+
     for (let i = 0; i < particles.length; i++) {
         particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
         particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
@@ -90,20 +90,22 @@ stateGame = () => {
             destroy(particles, i);
         }
     }
-    
+
     if (players[0]) {
         svgNode.viewBox.baseVal.x = players[0].x - (window.innerWidth * zoom) / 2;
         svgNode.viewBox.baseVal.y = players[0].y - (window.innerHeight * zoom) / 2;
         svgNode.viewBox.baseVal.width = window.innerWidth * zoom;
         svgNode.viewBox.baseVal.height = window.innerHeight * zoom;
+
+        while (cpus.length < cpuCount(players[0].points)) {
+            createCpu({
+                lifeMax: 1,
+            });
+        }
+        regenerateHealth(players[0]);
     }
-    
-    while (cpus.length < 3) {
-        createCpu({
-            lifeMax: 1,
-        });
-    }
-    
+
+
     if (!players.length) {
         stateDeadInit();
     }

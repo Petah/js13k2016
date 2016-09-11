@@ -34,3 +34,5 @@ ai = (cpu) => {
         cpu.turnSpeed /= 1.2;
     }
 };
+
+cpuCount = (points) => (Math.floor(Math.sqrt(points)) || 1);
