@@ -18,14 +18,18 @@ ai = (cpu) => {
             if (directionDelta > 3) {
                 cpu.turnSpeed = Math.max(cpu.turnSpeed - cpu.turnAcceleration, -cpu.maxTurnSpeed);
             } else {
-                cpu.shoot = true;
+                if (closestPlayerDistance < 1000) {
+                    cpu.shoot = true;
+                }
                 cpu.turnSpeed /= 1.2;
             }
         } else if (directionDelta > 180) {
             if (directionDelta < 357) {
                 cpu.turnSpeed = Math.min(cpu.turnSpeed + cpu.turnAcceleration, cpu.maxTurnSpeed);
             } else {
-                cpu.shoot = true;
+                if (closestPlayerDistance < 1000) {
+                    cpu.shoot = true;
+                }
                 cpu.turnSpeed /= 1.2;
             }
         }

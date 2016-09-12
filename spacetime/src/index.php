@@ -1,56 +1,41 @@
 <?php require __DIR__ . '/debug.php'; ?>
-<svg id="svgNode">
+<svg class="splitLeft" viewBox="0 0 100 100">
     <?php require __DIR__ . '/filters.php'; ?>
-    <g id="gridLayer"></g>
-    <g id="bottomLayer"></g>
+    <g class="bottomLayer"></g>
     <g id="solarSystemLayer">
-        <g id="stars"></g>
+        <g class="stars"></g>
         <g id="solarSystem">
-            <g id="planetLayer"></g>            
+            <g class="planetLayer"></g>            
         </g>
     </g>
-    <g id="topLayer"></g>
+    <g class="topLayer"></g>
+</svg>
+<svg class="splitRight" viewBox="0 0 100 100">
+    <?php require __DIR__ . '/filters.php'; ?>
+    <g class="bottomLayer"></g>
+    <g class="solarSystemLayer">
+        <g class="stars"></g>
+        <g class="solarSystem">
+            <g class="planetLayer"></g>            
+        </g>
+    </g>
+    <g class="topLayer"></g>
 </svg>
 <svg id="svgStartNode">
-    <text class="absCenter">Press [START]!</text>
-<!--
-    <g>
-        <path d="M123,223c-16,0-30,13-30,30s13,30,30,30
-                c16,0,30-13,30-30S140,223,123,223z"/>
-        <path d="
-                M387,164c-26,26-100,23-100,23s-74,2-100-23
-                c-26-26-106-2-128,33S-8,350,1,465C11,579,65,542,109,506
-                c43-35,58-67,178-67c120,0,134,31,178,67c43,35,97,72,107-41
-                c10-114-35-230-57-267C494,161,414,137,387,164z 
-                
-                M80,254c0-23,19-42,42-42s42,19,42,42
-                s-19,42-42,42S80,277,80,254z 
-                
-                M206,416c-29,0-53-24-53-53
-                c0-29,24-53,53-53s53,24,53,53S236,416,206,416z 
-                
-                M352,397c-23,0-42-19-42-42
-                s19-42,42-42s42,19,42,42S376,397,352,397z
-                "/>
-        <path d="M206,315c-26,0-47,21-47,47c0,26,21,47,47,47
-                c26,0,47-21,47-47C254,336,232,315,206,315z M191,392v3
-                c-7-3-14-10-17-17h3h3c2,4,6,8,10,10V392z M191,333v3
-                c-4,2-8,6-10,10h-3h-3c3-7,10-14,17-17V333z M221,396v-3
-                v-3c4-2,8-6,10-10h3h3C236,386,229,392,221,396z M236,347
-                h-3c-2-4-6-8-10-10v-3v-3c7,3,14,10,17,17H236z"/>
-        <circle cx="405" cy="265" r="18" fill="red"/>
-        <circle cx="447" cy="223" r="18" fill="red"/>
-        <circle cx="447" cy="307" r="18" fill="red"/>
-        <circle cx="490" cy="265" r="18" fill="red"/>
-        <circle cx="353" cy="355" r="30" />
-    </g>-->
+    <text x="50vw" y="10vh" id="title">SPACETIME</text>
+    <text x="50vw" y="50vh" id="startText">Press Button to Join!</text>
+    <text x="25vw" y="70vh" class="link" onclick="split = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs CPU</text>
+    <text x="75vw" y="70vh" class="link" onclick="split = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs Player (Split Screen)</text>
+    <text x="50vw" y="80vh">Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</text>
+    <text x="25vw" y="90vh" class="link" onclick="low = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">High Quality</text>
+    <text x="75vw" y="90vh" class="link" onclick="low = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Low Quality</text>
 </svg>
-<svg id="svgDeadNode">
-    <text class="absCenter">DED!</text>
+<svg id="svgDeadNode" style="display: none">
+    <text class="absCenter">YOU DIED!</text>
 </svg>
 <div id="hudLayer"></div>
 <svg style="display: none">
-    <g id="boatWrapper" transform="translate(0 0) rotate(90)">
+    <g id="boatWrapper" class="player1" transform="translate(0 0) rotate(90)">
         <g id="boat" transform="translate(-33.5 -26.5) rotate(0) scale(0.7)">
             <path class="playerBoat0" d="M46.7,2H46l-5.9,13l-0.3,0.3l-1.4-1.4l5.8-12.7c0.1-0.4,0.4-0.7,0.8-0.9C45.3,0.1,45.6,0,46,0h0.7V2 M27.3,63.6 l9.4,9.3h24.3l9.4-9.3l0.8,2l-8.8,8.8c-0.4,0.4-0.9,0.6-1.4,0.6H36.6c-0.6,0-1-0.2-1.4-0.6l-8.8-8.8L27.3,63.6 M57.3,15L51.5,2h-0.7 V0h0.7c0.4,0,0.8,0.1,1.1,0.3l0.8,0.9L59,13.9L57.3,15"/>
             <path class="playerBoat1" d="M57.3,15l19.1,42.4L73,60.8l-2.8,2.8l-9.4,9.3H36.6l-9.4-9.3l-2.8-2.8L21,57.3L40.1,15L46,2h0.7L30.3,53.9 l6.5,11.8h24l6.5-11.8L50.8,2h0.7L57.3,15"/>
@@ -65,11 +50,14 @@
             <path class="playerBoat10" d="M24.5,60.8l2.8,2.8h-4.1l-2.8-2.8H24.5 M70.2,63.6l2.8-2.8h4.1l-2.8,2.8H70.2"/>
             <path class="playerBoat11" d="M77.1,60.8H91l-0.5,2.8H74.4L77.1,60.8 M23.1,63.6H7l-0.5-2.8h13.9L23.1,63.6"/>
         </g>
+        <g>
+            <g transform="translate(0 0)"><polygon class="pointer" transform="rotate(0)" points="20 0 0 -8 0 8"/></g>
+        </g>
     </g>
     <circle id="starNode"/>
-    <circle id="bubbleParticle" class="bubbleParticle" transform="translate(0 0)" r="2" style="opacity:.4"/>
-    <circle id="explosion" class="explosion" transform="translate(0 0)" />
-    <polygon id="bullet" class="bullet" transform="translate(0 0) rotate(0)" points="-25 0 0 3 3 0 0 -3"/>
+    <g id="bubbleParticle" transform="translate(0 0)"><circle class="bubbleParticle" r="2" style="opacity:.4"/></g>
+    <g id="explosion" transform="translate(0 0)"><circle class="explosion" /></g>
+    <g id="bullet" transform="translate(0 0)"><polygon class="bullet" transform="translate(0 0) rotate(0)" points="-25 0 0 3 3 0 0 -3"/></g>
     <g id="sunStar" transform="translate(0 0) scale(1)">
         <circle class="sunMain" cx="0" cy="0" r="100" fill="url(#sungrad)"/>
         <circle class="sunRing sunRing1" cx="0" cy="0" r="135"/>

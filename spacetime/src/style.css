@@ -3,6 +3,8 @@ body {
     margin: 0;
     overflow: hidden;
     background-image: linear-gradient(135deg, #280023 0%, #111c23 100%);
+    height: 100vh;
+    width: 100vw;
 }
 
 svg {
@@ -11,14 +13,35 @@ svg {
     position: fixed;
     top: 0;
     left: 0;
+    shape-rendering: optimizeSpeed;
 }
 
-svg text.absCenter {
-    transform: translate(50vw, 50vh);
+.splitLeft {
+    width: 50vw;
+    border-right: 1px dotted rgba(255, 255, 255, 0.3);
+}
+
+.splitRight {
+    width: 50vw;
+    right: 0;
+    left: auto;
+}
+
+#svgStartNode  text {
     text-anchor: middle;
     fill: white;
-    font-size: 50px;
     font-family: monospace;
+    font-size: 30px;
+}
+
+#svgStartNode .link {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#svgStartNode #title {
+    font-size: 70px;
+    font-weight: bold;
 }
 
 .bullet {
@@ -27,6 +50,10 @@ svg text.absCenter {
 
 .bubbleParticle {
     fill: #fff;
+}
+
+.pointer {
+    fill: RGBA(255, 255, 255, 0.7);
 }
 
 .playerBoat0{fill:#CBCBCB;}

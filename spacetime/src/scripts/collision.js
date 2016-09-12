@@ -13,7 +13,7 @@ checkCollisions = (self, others) => {
             if (others[i].type === 'cpu') {
                 for (let j = 0; j < players.length; j++) {
                     if (players[j].id === self.owner.id) {
-                        ++players[j].points;
+                        players[j].points++;
                     }
                 }
             }
