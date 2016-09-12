@@ -1,0 +1,49 @@
+<canvas>
+<script>
+$ = document.querySelector.bind(document);
+canvas = $('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+context = canvas.getContext('2d');
+
+pixel = context.createImageData(1,1);
+d = pixel.data;
+d[0] = 255;
+d[1] = 0;
+d[2] = 0;
+d[3] = 255;
+
+playerX = 100;
+playerY = 100;
+deltaX = 0;
+deltaY = 0;
+
+window.addEventListener('keydown', (e) => {
+    switch (e.keyCode) {
+        case 37: deltaX = -1; deltaY = 0; break; // Left
+        case 38: deltaX = 0; deltaY = -1; break; // Up
+        case 39: deltaX = 1; deltaY = 0; break; // Right
+        case 40: deltaX = 0; deltaY = 1; break; // Down
+    }
+});
+
+main = () => {
+    window.requestAnimationFrame(main);
+    if (deltaX || deltaY) {
+        if (context.getImageData(playerX + deltaX, playerY + deltaY, 1, 1).data.toString() != '0,0,0,0') {
+            deltaX = 0;
+            deltaY = 0;
+        }
+    }
+    playerX += deltaX;
+    playerY += deltaY;
+    context.putImageData(pixel, playerX, playerY);
+};
+
+main();
+
+</script>
+<style>
+body {
+    margin: 0;
+}
