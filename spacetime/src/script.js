@@ -94,15 +94,18 @@ createPlayer = (options) => {
     topLayer.appendChild(playerNode);
     let player = {
         id: Math.floor(Math.random() * 1000000),
+        type: 'human',
         translate: playerNode,
         rotate: playerNode.children[0],
         rotationPointX: 67/2,
         rotationPointY: 53/2,
-        
+
         lifeMax: 20,
+        lifeRegenRate: 5,
+        lifeRegenTime: 0,
 
         hud: {},
-        
+
         shootSound: soundGenerator.generateLaserShoot(),
         explosionSound: soundGenerator.generateExplosion(),
 
@@ -130,7 +133,9 @@ createPlayer = (options) => {
         reloadTime: 10,
         gunMount: 0,
         gunMounts: [20, -20],
-        
+
+        points: 0,
+
         glitch: 0,
         glitchMax: 20,
         glitchLog: [],
@@ -155,6 +160,7 @@ createPlayer = (options) => {
 createCpu = (options) => {
     createPlayer(options);
     cpuPlayer = players.pop();
+    cpuPlayer.type = 'cpu';
     cpuPlayer.translate.setAttributeNS(null, 'class', 'player2');
     cpus.push(cpuPlayer);
 };
@@ -214,6 +220,20 @@ updatePlayer = (player) => {
     player.shoot = false;
 };
 
+regenerateHealth = (player) => {
+    if (player.life < player.lifeMax) {
+        if (player.lifeRegenTime === 0) {
+            player.lifeRegenTime = Date.now();
+            return;
+        }
+        if ((Date.now() - player.lifeRegenTime) > (player.lifeRegenRate * 1000)) {
+            ++player.life;
+            player.lifeRegenTime = Date.now();
+            updateHud(player, 'life');
+        }
+    }
+}
+
 // HUD
 createHud = (data, player) => {
     for (let j = 0; j < data.length; j++) {
@@ -253,8 +273,12 @@ createHud = (data, player) => {
 };
 
 updateHud = (player, id) => {
-    if (player[id] >= 0 && player.hud.hasOwnProperty(id)) {
-        player.hud[id].children[1].children[player[id]].setAttributeNS(null, 'class', 'hudBar hudBarE');
+    if (player[id] >= 0 && player[id] <= player.lifeMax && player.hud.hasOwnProperty(id)) {
+        let bClass = 'hudBar';
+        for (let i = 0; i < player.hud[id].children[1].children.length; i++) {
+            if (i >= player[id]) bClass += ' hudBarE';
+            player.hud[id].children[1].children[i].setAttributeNS(null, 'class', bClass);
+        }
     }
 };
 
@@ -279,34 +303,34 @@ hudData = [
 ];
 
 main = (init) => {
-    //debug
-    updatedPerSecond++;
-    if (updatedPerSecondTimer < performance.now()) {
-        ups.innerHTML = 'UPS: ' + updatedPerSecond;
-        updatedPerSecondTimer = performance.now() + 1000;
-        updatedPerSecond = 0;
-    }
-    pos.innerHTML = '';
-    if (players[0]) {
-        pos.innerHTML = `
-            POS: ${parseInt(players[0].x)}, ${parseInt(players[0].y)} 
-            SPEED: ${parseInt(players[0].speed)} 
-            DIR: ${parseInt(players[0].direction)} 
-            FACE: ${parseInt(players[0].facing)}
-            ACEL: ${players[0].currentAcceleration.toFixed(3)}
-        `;
-    }
-    if (cpus[0]) {
-        pos.innerHTML += `
-            <br/>
-            POS: ${parseInt(cpus[0].x)}, ${parseInt(cpus[0].y)} 
-            SPEED: ${parseInt(cpus[0].speed)} 
-            DIR: ${parseInt(cpus[0].direction)} 
-            FACE: ${parseInt(cpus[0].facing)}
-            ACEL: ${cpus[0].currentAcceleration.toFixed(3)}
-        `;
-    }
-    ///debug
+    /// debug
+    // updatedPerSecond++;
+    // if (updatedPerSecondTimer < performance.now()) {
+    //     ups.innerHTML = 'UPS: ' + updatedPerSecond;
+    //     updatedPerSecondTimer = performance.now() + 1000;
+    //     updatedPerSecond = 0;
+    // }
+    // pos.innerHTML = '';
+    // if (players[0]) {
+    //     pos.innerHTML = `
+    //         POS: ${parseInt(players[0].x)}, ${parseInt(players[0].y)}
+    //         SPEED: ${parseInt(players[0].speed)}
+    //         DIR: ${parseInt(players[0].direction)}
+    //         FACE: ${parseInt(players[0].facing)}
+    //         ACEL: ${players[0].currentAcceleration.toFixed(3)}
+    //     `;
+    // }
+    // if (cpus[0]) {
+    //     pos.innerHTML += `
+    //         <br/>
+    //         POS: ${parseInt(cpus[0].x)}, ${parseInt(cpus[0].y)}
+    //         SPEED: ${parseInt(cpus[0].speed)}
+    //         DIR: ${parseInt(cpus[0].direction)}
+    //         FACE: ${parseInt(cpus[0].facing)}
+    //         ACEL: ${cpus[0].currentAcceleration.toFixed(3)}
+    //     `;
+    // }
+    /// debug
 
     state();
 
