@@ -18,6 +18,26 @@ timeElapsed = 0;
 timeElapsedID = false;
 zoom = 2;
 
+setGameState = (s, l) => {
+    split = s;
+    low = l;
+    location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high');
+};
+
+updateLinkClass = (c, a) => {
+    els = document.getElementsByClassName(c);
+    for (var i = 0; i < els.length; i++) {
+        els[i].className += a;
+    }
+};
+
+updateButtons = () => {
+    c = location.search.substr(1).split(',');
+    for(var i = 0; i < c.length; ++i) {
+        updateLinkClass(c[i], ' active');
+    }
+};
+
 updateTimeElapsed = () => {
     timeElapsedID = setInterval(() => {
         elapsedTime.innerText = ++timeElapsed;
@@ -468,4 +488,5 @@ main = (init) => {
 };
 
 stateStartInit();
+updateButtons();
 main();

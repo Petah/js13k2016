@@ -7,6 +7,7 @@ body {
     font-size: 18px;
     height: 100vh;
     width: 100vw;
+    color: #fff;
 }
 
 svg {
@@ -16,6 +17,14 @@ svg {
     top: 0;
     left: 0;
     shape-rendering: optimizeSpeed;
+}
+
+.absCenter {
+    position: absolute;
+    margin: auto;
+    left: 0; right: 0;
+    top: 0; bottom: 0;
+    text-align: center;
 }
 
 svg text.absCenter {
@@ -43,11 +52,6 @@ svg text.absCenter {
     fill: white;
     font-family: monospace;
     font-size: 30px;
-}
-
-#svgStartNode .link {
-    text-decoration: underline;
-    cursor: pointer;
 }
 
 #svgStartNode #title {
@@ -118,3 +122,20 @@ svg text.absCenter {
 
 #hudLayerBottom{top:auto;bottom:10px;text-align:center;font-weight:bold;color: #fff;font-size: 22px;opacity:0.35;}
 #hudLayerBottom>div{display:inline-block;margin:0 1em;}
+
+#svgStartNode{height:500px}
+.link {
+    border: 3px solid #841cdc;
+    display: inline-block;
+    width: 300px;
+    padding: 1em;
+    margin: 0 10px 30px;
+    cursor: pointer;
+}
+.link:hover {
+    border-color: #ac5eef;
+}
+
+.link.active {
+    background-color: rgba(138, 28, 220, 0.15);
+}

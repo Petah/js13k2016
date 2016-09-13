@@ -23,15 +23,21 @@
     <g class="topLayer"></g>
     <g class="glitchLayer"></g>
 </svg>
-<svg id="svgStartNode">
-    <text x="50vw" y="10vh" id="title">SPACETIME</text>
-    <text x="50vw" y="50vh" id="startText">Press Button to Join!</text>
-    <text x="25vw" y="70vh" class="link" onclick="split = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs CPU</text>
-    <text x="75vw" y="70vh" class="link" onclick="split = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs Player (Split Screen)</text>
-    <text x="50vw" y="80vh">Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</text>
-    <text x="25vw" y="90vh" class="link" onclick="low = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">High Quality</text>
-    <text x="75vw" y="90vh" class="link" onclick="low = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Low Quality</text>
-</svg>
+<div id="svgStartNode" class="absCenter">
+    <h1 id="title">SPACETIME</h1>
+    <div id="gameType">
+        <div class="link cpu" onclick="setGameState(false, low)">Player vs CPU</div>
+        <div class="link split" onclick="setGameState(true, low)">Player vs Player (Split Screen)</div>
+    </div>
+    <div id="gameQuality">
+        <div class="link high" onclick="setGameState(split, false)">High Quality</div>
+        <div class="link low" onclick="setGameState(split, true)">Low Quality</div>
+    </div>
+    <div id="helperText">
+        <h3>Press Button to Join!</h3>
+        <h3>Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</h3>
+    </div>
+</div>
 <svg id="svgDeadNode" style="display: none">
     <text x="50vw" y="50vh">YOU DIED!</text>
     <text x="50vw" y="55vh">Coding https://github.com/petah and https://github.com/reybenher</text>
