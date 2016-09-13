@@ -7,9 +7,9 @@ controlUpdate = (playerIndex) => {
         players[playerIndex].shoot = true;
     }
 
-    players[playerIndex].glitch--;
-    if (gamepads[playerIndex].buttons[2].pressed && players[playerIndex].glitch < 0) {
-        players[playerIndex].glitch = players[playerIndex].glitchTime;
+    players[playerIndex].stats.glitch.value--;
+    if (gamepads[playerIndex].buttons[2].pressed && players[playerIndex].stats.glitch.value < 0) {
+        players[playerIndex].stats.glitch.value = players[playerIndex].stats.glitch.time;
         players[playerIndex].x += Math.random() * 2000 - 1000;
         players[playerIndex].y += Math.random() * 2000 - 1000;
         let playerNode = boatWrapper.cloneNode(true);
@@ -18,11 +18,11 @@ controlUpdate = (playerIndex) => {
         glitches.push({
             translate: playerNode,
             rotate: playerNode.children[0],
-            glitchLog: players[playerIndex].glitchLog,
+            glitchLog: players[playerIndex].stats.glitch.log,
         });
-        players[playerIndex].glitchLog = [];
+        players[playerIndex].stats.glitch.log = [];
     }
-    players[playerIndex].glitchLog.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].facing]);
+    players[playerIndex].stats.glitch.log.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].facing]);
 
     if (gamepads[playerIndex].buttons[7].value > 0.2) {
         players[playerIndex].currentAcceleration = gamepads[playerIndex].buttons[7].value * players[playerIndex].acceleration;

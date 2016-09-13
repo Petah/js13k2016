@@ -1,20 +1,24 @@
 stateGameInit = () => {
+    updateTimeElapsed();
+
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'none';
     state = stateGame;
-    
+
     createSolarSystem(solarSystemData);
-    
+
     createPlayer({
         reloadTime: 5,
     });
-    
+
     createHud(hudData, players[0]);
+    killCount.innerText = elapsedTime.innetText = '0';
 
     main(true);
 }
 
 stateGame = () => {
+
     // Move planets
     for (let i = 0; i < planets.length; i++) {
         planets[i].angle += planets[i].orbitSpeed;
@@ -26,7 +30,7 @@ stateGame = () => {
 
     for (let i = 0; i < players.length; i++) {
         checkCollisions(players[i], planets);
-        if (players[i].life > 0) {
+        if (players[i].stats.life.value > 0) {
             applyGravity(players[i]);
             controlUpdate(i);
             updatePlayer(players[i]);
@@ -37,7 +41,7 @@ stateGame = () => {
     }
     for (let i = 0; i < cpus.length; i++) {
         checkCollisions(cpus[i], planets);
-        if (cpus[i].life > 0) {
+        if (cpus[i].stats.life.value > 0) {
             applyGravity(cpus[i]);
             ai(cpus[i]);
             updatePlayer(cpus[i]);
@@ -99,10 +103,16 @@ stateGame = () => {
 
         while (cpus.length < cpuCount(players[0].points)) {
             createCpu({
-                lifeMax: 1,
+                stats: {
+                    life: {
+                        value: 1,
+                        valueMax: 1,
+                    }
+                }
             });
         }
-        regenerateHealth(players[0]);
+        regenerateStat(players[0], 'life');
+        regenerateStat(players[0], 'glitch');
     }
 
 

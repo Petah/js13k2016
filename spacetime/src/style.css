@@ -3,6 +3,8 @@ body {
     margin: 0;
     overflow: hidden;
     background-image: linear-gradient(135deg, #280023 0%, #111c23 100%);
+    font-family:Helvetica;
+    font-size: 18px;
 }
 
 svg {
@@ -11,6 +13,7 @@ svg {
     position: fixed;
     top: 0;
     left: 0;
+    shape-rendering: optimizeSpeed;
 }
 
 svg text.absCenter {
@@ -67,13 +70,16 @@ svg text.absCenter {
 .planetOrange3{fill:#F39C12;}
 .planetOrange4{opacity:0.5;fill:#71361f;}
 
-#hudLayer{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
+.hud{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
+.hudText{font-size:1.6em;letter-spacing:1;}
+.hudBase{fill:#66D9EF;}
+.hudBar{stroke-width:3;}
 #hudLayer>svg{position:absolute;top:0;left:0;right:auto;width:auto;height:auto;}
 #hudLayer>svg.hudRight{left:auto;right:0;}
-.hudText{font-family:Helvetica;font-size:1.6em;letter-spacing:1;}
-.hudBase{fill:#66D9EF;}
 #hudLife .hudBar{fill:#F1C40F;stroke:#F1C40F;}
 #hudLife .hudBarE{fill:none;}
 #hudGlitch .hudBar{fill:#4eba6f;stroke:#4eba6f;}
 #hudGlitch .hudBarE{fill:none;}
-.hudBar{stroke-width:3;}
+
+#hudLayerBottom{top:auto;bottom:10px;text-align:center;font-weight:bold;color: #fff;font-size: 22px;opacity:0.35;}
+#hudLayerBottom>div{display:inline-block;margin:0 1em;}

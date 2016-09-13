@@ -3,14 +3,22 @@ updatedPerSecond = 0;
 updatedPerSecondTimer = performance.now();
 ///debug
 
-zoom = 2;
-gravityPower = 2500;
+bullets = [];
+timeElapsed = 0;
+timeElapsedID = false;
 cpus = [];
 glitches = [];
+gravityPower = 2500;
 players = [];
-planets = [];
-bullets = [];
 particles = [];
+planets = [];
+zoom = 2;
+
+updateTimeElapsed = () => {
+    timeElapsedID = setInterval(() => {
+        elapsedTime.innerText = ++timeElapsed;
+    }, 1000);
+};
 
 createNodes = (nodeArray, node, layer) => {
     while (nodeArray.length < 1000) {
@@ -100,9 +108,24 @@ createPlayer = (options) => {
         rotationPointX: 67/2,
         rotationPointY: 53/2,
 
-        lifeMax: 20,
-        lifeRegenRate: 5,
-        lifeRegenTime: 0,
+        stats: {
+            glitch: {
+                log: [],
+                hud: 'glitch',
+                regenRate: 3,
+                regenTime: 0,
+                time: 30,
+                value: 0,
+                valueMax: 20,
+            },
+            life: {
+                hud: 'life',
+                regenRate: 5,
+                regenTime: 0,
+                value: 20,
+                valueMax: 20,
+            }
+        },
 
         hud: {},
 
@@ -136,11 +159,6 @@ createPlayer = (options) => {
 
         points: 0,
 
-        glitch: 0,
-        glitchMax: 20,
-        glitchLog: [],
-        glitchTime: 30,
-
         emitter: {
             particle: bubbleParticle,
             reloading: 0,
@@ -153,7 +171,7 @@ createPlayer = (options) => {
         player[key] = options[key];
     }
     
-    player.life = player.lifeMax;
+    player.stats.life.value = player.stats.life.valueMax;
     players.push(player);
 };
 
@@ -220,16 +238,16 @@ updatePlayer = (player) => {
     player.shoot = false;
 };
 
-regenerateHealth = (player) => {
-    if (player.life < player.lifeMax) {
-        if (player.lifeRegenTime === 0) {
-            player.lifeRegenTime = Date.now();
+regenerateStat = (player, stat) => {
+    if (player.stats[stat].value < player.stats[stat].valueMax) {
+        if (player.stats[stat].regenTime === 0) {
+            player.stats[stat].regenTime = Date.now();
             return;
         }
-        if ((Date.now() - player.lifeRegenTime) > (player.lifeRegenRate * 1000)) {
-            ++player.life;
-            player.lifeRegenTime = Date.now();
-            updateHud(player, 'life');
+        if ((Date.now() - player.stats[stat].regenTime) > (player.stats[stat].regenRate * 1000)) {
+            ++player.stats[stat].value;
+            player.stats[stat].regenTime = Date.now();
+            updateHud(player, stat);
         }
     }
 }
@@ -257,7 +275,7 @@ createHud = (data, player) => {
         // Append bars
         let bars = h.children[1];
         h.children[0].children[1].innerHTML = data[j].text;
-        for (let i = 0; i < player.lifeMax; i++) {
+        for (let i = 0; i < player.stats.life.valueMax; i++) {
             let bar = i == 0 ? bars.children[0] : bars.children[0].cloneNode(true);
             bar.setAttributeNS(null, 'x', i * data[j].bars.offset);
             if (i >= player[data[j].id]) {
@@ -268,16 +286,20 @@ createHud = (data, player) => {
 
         h.style.display = '';
         hudLayer.appendChild(h);
-        player.hud[data[j].id] = hudLayer.children[hudLayer.children.length - 1];
+        player.hud[data[j].id] = {
+            data: data[j],
+            element: hudLayer.children[hudLayer.children.length - 1],
+        };
     }
 };
 
-updateHud = (player, id) => {
-    if (player[id] >= 0 && player[id] <= player.lifeMax && player.hud.hasOwnProperty(id)) {
+updateHud = (player, stat) => {
+    if (player.stats[stat].value >= 0 && player.stats[stat].value <= player.stats[stat].valueMax && player.hud.hasOwnProperty(stat)) {
         let bClass = 'hudBar';
-        for (let i = 0; i < player.hud[id].children[1].children.length; i++) {
-            if (i >= player[id]) bClass += ' hudBarE';
-            player.hud[id].children[1].children[i].setAttributeNS(null, 'class', bClass);
+        for (let i = 0; i < player.hud[stat].element.children[1].children.length; i++) {
+            if (i >= player.stats[stat].value) bClass += ' hudBarE';
+            let index = (player.hud[stat].data.hAlign === 'right') ? (player.hud[stat].element.children[1].children.length - (i + 1)) : i;
+            player.hud[stat].element.children[1].children[index].setAttributeNS(null, 'class', bClass);
         }
     }
 };

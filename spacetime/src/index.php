@@ -48,7 +48,11 @@
 <svg id="svgDeadNode">
     <text class="absCenter">DED!</text>
 </svg>
-<div id="hudLayer"></div>
+<div id="hudLayer" class="hud"></div>
+<div id="hudLayerBottom" class="hud">
+    <div>KILLS: <span id="killCount">0</span></div>
+    <div>LAPSE: <span id="elapsedTime">0</span>s</div>
+</div>
 <svg style="display: none">
     <g id="boatWrapper" transform="translate(0 0) rotate(90)">
         <g id="boat" transform="translate(-33.5 -26.5) rotate(0) scale(0.7)">

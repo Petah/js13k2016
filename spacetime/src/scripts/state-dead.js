@@ -2,6 +2,11 @@ stateDeadInit = () => {
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'block';
     state = stateDead;
+    if (timeElapsedID) {
+        clearInterval(timeElapsedID);
+        timeElapsedID = false;
+        timeElapsed = 0;
+    }
     while (players.length) {
         destroy(players, 0);
     }
@@ -34,7 +39,7 @@ stateDead = () => {
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i] && gamepads[i].buttons[9].pressed) {
+        if (gamepads[i]  && gamepads[i].mapping === 'standard' && gamepads[i].buttons[9].pressed) {
             stateGameInit();
         }
     }
