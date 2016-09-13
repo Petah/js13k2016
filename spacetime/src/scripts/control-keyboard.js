@@ -43,8 +43,6 @@ document.body.onkeyup = (e) => {
 controlKeyboardUpdate = (playerIndex) => {
     if (buttonMoveDown) {
         players[playerIndex].currentAcceleration = players[playerIndex].acceleration;
-    } else {
-        players[playerIndex].currentAcceleration = 0;
     }
 
     if (buttonTurnLeftDown) {

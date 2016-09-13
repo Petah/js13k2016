@@ -191,13 +191,6 @@ createPlayer = (options) => {
         gunMounts: [20, -20],
 
         points: 0,
-
-        emitter: {
-            particle: bubbleParticle,
-            reloading: 0,
-            reloadTime: 1,
-            amount: 1,
-        },
     };
 
     for (let key in options) {
@@ -226,14 +219,12 @@ updatePlayer = (player) => {
         player.facing += 360;
     }
 
-    player.emitter.reloading--;
-    if (player.currentAcceleration > 0.1) {
-        emit(player.emitter, player.x, player.y, 25, player.facing);
-    }
-
     if (player.type === 'human') {
-        player.stats.glitch.reload--;
-        if (player.stats.glitch.value && player.stats.glitch.reload < 0) {
+        if (player.currentAcceleration > 0.1 && !player.glitching) {
+            emit(player.x, player.y, 25, player.facing);
+        }
+
+        if (player.glitch && player.glitchReload < 0) {
             // Emit glitch particles
             for (let i = 0; i < 30; i++) {
                 particles.push({
@@ -241,11 +232,11 @@ updatePlayer = (player) => {
                     y: player.y + lengthDirY((Math.random() * 50) - 25, player.facing),
                     node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
                         element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
-                element.children[0].style.opacity = Math.random();
-                element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
-                element.children[0].transform.baseVal[1].setScale(1, 1);
-            }),
-                life: 50,
+                        element.children[0].style.opacity = Math.random();
+                        element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
+                        element.children[0].transform.baseVal[1].setScale(1, 1);
+                    }),
+                    life: 100,
                     speed: Math.random() * 2,
                     direction: i % 2 == 0 ? player.facing + 90 : player.facing - 90,
                     animate: (particle, element) => {
@@ -256,25 +247,12 @@ updatePlayer = (player) => {
             }
 
             // Glitch player
-            // player.stats.glitch.glitching = true;
-            // player.stats.glitch.reload = player.stats.glitch.time;
-            // for (let e = 0; e < player.node.elements.length; e++) {
-            //     player.node.elements[e].style.display = 'none';
-            // }
-            // player.x += Math.random() * 2000 - 1000;
-            // player.y += Math.random() * 2000 - 1000;
-            // player.x += Math.random() * 200 - 100;
-            // player.y += Math.random() * 200 - 100;
-            // glitches.push({
-            //    node: nodeCreate('boatWrapper', '.topLayer', (element) => {
-            //        element.children[1].children[0].style.display = 'none';
-            //    }),
-            //    rotationPointX: 67/2,
-            //    rotationPointY: 53/2,
-            //    glitchLog: player.stats.glitch.log,
-            // });
-            // player.speed = 0;
-            // player.stats.glitch.log = [];
+            player.stats.glitch.glitching = true;
+            player.stats.glitch.reload = player.stats.glitch.time;
+            for (let e = 0; e < player.node.elements.length; e++) {
+                player.node.elements[e].style.display = 'none';
+            }
+            player.speed = 0;
         }
 
         if (player.stats.glitch.glitching && player.stats.glitch.reload < 0) {
@@ -282,44 +260,87 @@ updatePlayer = (player) => {
             for (let e = 0; e < player.node.elements.length; e++) {
                 player.node.elements[e].style.display = '';
             }
+            glitches.push({
+                owner: player,
+                node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+                    element.style.display = 'none';
+                    element.children[1].children[0].style.display = 'none';
+                }),
+                rotationPointX: 67 / 2,
+                rotationPointY: 53 / 2,
+                delay: Math.random() * 100,
+                glitchLog: player.stats.glitch.log,
+            });
+
+            player.stats.glitch.log = [];
+            let x = 0, y = 0, minDistance;
+            do {
+                minDistance = 9999999;
+                x += Math.random() * 200 - 100;
+                y += Math.random() * 200 - 100;
+                for (let i = 0; i < players.length; i++) {
+                    let distance = Math.abs(pointDistance(x, y, players[i].x, players[i].y));
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                    }
+                }
+                for (let i = 0; i < cpus.length; i++) {
+                    let distance = Math.abs(pointDistance(x, y, cpus[i].x, cpus[i].y));
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                    }
+                }
+                for (let i = 0; i < glitches.length; i++) {
+                    let distance = Math.abs(pointDistance(x, y, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]));
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                    }
+                }
+            } while (minDistance < 500);
+            player.x = x;
+            player.y = y;
         }
 
+        if (!player.stats.glitch.glitching) {
+            player.stats.glitch.log.push([
+                player.x,
+                player.y,
+                player.facing,
+                player.currentAcceleration,
+                player.shoot && player.reloading < 0 && !player.stats.glitch.glitching,
+                player.gunMount
+            ]);
+        }
+
+        if (player.shoot && player.reloading < 0 && !player.stats.glitch.glitching) {
+            playSound(player.shootSound, player.x, player.y);
+            player.reloading = player.reloadTime;
+            bullets.push({
+                owner: player,
+                node: nodeCreate('bullet', '.bottomLayer'),
+                rotationPointX: 0,
+                rotationPointY: 0,
+                x: player.x + lengthDirX(player.gunMounts[player.gunMount], player.facing + 90),
+                y: player.y + lengthDirY(player.gunMounts[player.gunMount], player.facing + 90),
+                direction: player.facing,
+                speed: 30,
+                life: 60,
+                mass: 0.8,
+                collisionRadius: 10,
+                damage: 1,
+            });
+
+            player.gunMount++;
+            if (player.gunMount >= player.gunMounts.length) {
+                player.gunMount = 0;
+            }
+        }
+
+        player.stats.glitch.reload--;
         player.stats.glitch.value = false;
-
-        player.stats.glitch.log.push([player.x, player.y, player.facing]);
+        player.reloading--;
+        player.shoot = false;
     }
-
-    player.reloading--;
-    if (player.shoot && player.reloading < 0) {
-        playSound(player.shootSound, player.x, player.y);
-        player.reloading = player.reloadTime;
-        bullets.push({
-            owner: player,
-            node: nodeCreate('bullet', '.bottomLayer'),
-            rotationPointX: 0,
-            rotationPointY: 0,
-            x: player.x + lengthDirX(player.gunMounts[player.gunMount], player.facing + 90),
-            y: player.y + lengthDirY(player.gunMounts[player.gunMount], player.facing + 90),
-            direction: player.facing,
-            speed: 30,
-            life: 60,
-            mass: 0.8,
-            collisionRadius: 10,
-            damage: 1,
-            emitter: {
-                particle: bubbleParticle,
-                reloading: 0,
-                reloadTime: 1,
-                amount: 1,
-            },
-        });
-        
-        player.gunMount++;
-        if (player.gunMount >= player.gunMounts.length) {
-            player.gunMount = 0;
-        }
-    }
-    player.shoot = false;
 };
 
 regenerateStat = (player, stat) => {
