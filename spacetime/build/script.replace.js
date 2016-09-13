@@ -62,11 +62,11 @@ function SfxrSynth() {
 
     // If the filters are active
     let _filters = p['s'] != 1 || p['v'],
-        // Cutoff multiplier which adjusts the ah the wave position can a
+        // Cutoff multiplier which adjusts the ai the wave position can a
         _hpFilterCutoff = p['v'] * p['v'] * .1,
         // Speed of the high-pass cutoff multiplier
         _hpFilterDeltaCutoff = 1 + p['w'] * .0003,
-        // Cutoff multiplier which adjusts the ah the wave position can a
+        // Cutoff multiplier which adjusts the ai the wave position can a
         _lpFilterCutoff = p['s'] * p['s'] * p['s'] * .1,
         // Speed of the low-pass cutoff multiplier
         _lpFilterDeltaCutoff = 1 + p['t'] * .0001,
@@ -356,14 +356,30 @@ let jsfxr = function(settings) {
   return output;
 }
 
-playSound = (params, x, y) => {
-    let distance = n(svgNode.viewBox.baseVal.x + (window.innerWidth * zoom) / 2, svgNode.viewBox.baseVal.y + (window.innerHeight * zoom) / 2, x, y);
-    if (distance < 2000) {
+createSound = (params) => {
+    let players = [];
+    for (let i = 0; i < 10; i++) {
         let soundURL = jsfxr(params);
-        let v = new Audio();
-        v.src = soundURL;
-        v.volume = -(1 / 2000 * distance) + 1;
-        v.play();
+        let w = new Audio();
+        w.src = soundURL;
+        players.push(w);
+    }
+    return players;
+};
+
+playSound = (players, x, y) => {
+    let minDistance = 2000;
+    for (let p = 0; p < panes.length; p++) {
+        let distance = n(panes[p].viewBox.baseVal.x + (window.innerWidth * zoom) / 2, panes[p].viewBox.baseVal.y + (window.innerHeight * zoom) / 2, x, y);
+        if (distance < minDistance) {
+            minDistance = distance;
+        }
+    }
+    if (minDistance < 2000) {
+        w = players.shift();
+        w.volume = -(1 / 2000 * minDistance) + 1;
+        w.play();
+        players.push(w);
     }
 };
 
@@ -637,93 +653,67 @@ o = (length, d) => {
     return Math.cos(d * Math.PI / 180) * length;
 };
 
-p = (length, d) => {
+q = (length, d) => {
     return Math.sin(d * Math.PI / 180) * length;
 };
 
 motionAdd = (self, e, d) => {
     let x2 = o(self.e, self.d) + o(e, d);
-    let y2 = p(self.e, self.d) + p(e, d);
+    let y2 = q(self.e, self.d) + q(e, d);
     self.e = Math.hypot(x2, y2);
     self.d = m(0, 0, x2, y2);
 };
 
 randomSign = () => Math.random() > 0.5 ? -1 : 1;
 
-a = (element, x, y) => {
-    element.transform.baseVal[0].matrix.e = x;
-    element.transform.baseVal[0].matrix.f = y;
+a = (node, x, y) => {
+    for (let i = 0; i < node.elements.length; i++) {
+        node.elements[i].transform.baseVal[0].matrix.e = x;
+        node.elements[i].transform.baseVal[0].matrix.f = y;
+    }
 };
 
-b = (element, angle, z, aa) => {
-    element.transform.baseVal[1].setRotate(angle, z, aa);
+b = (node, angle, aa, ab) => {
+    for (let i = 0; i < node.elements.length; i++) {
+        node.elements[i].children[0].transform.baseVal[1].setRotate(angle, aa, ab);
+    }
 };
 
 createExplosion = (x, y, sound) => {
     playSound(sound, x, y);
-    for (let i = 0; i < 16; i++) {
-        if (!nodeExplosions.length) {
-            return;
-        }
-        explosionClone = nodeExplosions.pop();
-        explosionClone.style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 4)];
-        explosionClone.r.baseVal.value = 10;
-        explosionClone.style.opacity = 1;
-        explosionClone.style.display = '';
-        ac.push({
-            x: x + ((Math.random() * 10) - 5),
-            y: y + ((Math.random() * 10) - 5),
-            c: explosionClone,
-            life: 5000,
-            e: Math.random() / 2,
+    for (let i = 0; i < 4; i++) {
+        ad.push({
+            x: x + ((Math.random() * 20) - 10),
+            y: y + ((Math.random() * 20) - 10),
+            node: nodeCreate('explosion', '.topLayer', (element) => {
+                element.children[0].style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i)];
+            }),
+            life: 50,
+            e: Math.random() / 4,
             d: Math.random() * 360,
-            animationState: 0,
-            animationSpeed: Math.random() * 2 + 5,
-            animate: (ae) => {
-                ae.animationState += ae.animationSpeed;
-                ae.c.r.baseVal.value = -(Math.cos(ae.animationState * (Math.PI / 100)) - 1) * 5;
-                ae.c.style.opacity -= 0.02;
-                if (ae.animationState > 200) {
-                    ae.life = 0;
-                }
-            },
-            destroy: (node) => {
-                node.style.display = 'none';
-                nodeExplosions.push(node);
+            animate: (af, element) => {
+                element.children[0].r.baseVal.value = af.life / 2 + 20;
+                element.children[0].style.opacity = 1 / 50 * af.life;
             },
         });
     }
 };
     
-emit = (ad, x, y, e, d) => {
-    ad.af--;
-    if (ad.af < 0) {
-        ad.af = ad.ag;
-
-        for (let i = 0; i < ad.ah; i++) {
-            if (!nodeBubbles.length) {
-                return;
-            }
-            ak = nodeBubbles.pop();
-            ak.style.opacity = 1;
-            ak.style.display = '';
-            ac.push({
-                x: x + o(-e, d),
-                y: y + p(-e, d),
-                c: ak,
-                life: 30,
-                e: e / 10,
-                d: (d - 180) + ((Math.random() * 30) - 15),
-                animate: (ae) => {
-                    ae.c.style.opacity -= 0.04;
-                },
-                destroy: (node) => {
-                    node.style.display = 'none';
-                    nodeBubbles.push(node);
-                },
-            });
-        }
+emit = (x, y, e, d) => {
+    if (Math.random() > quality) {
+        return;
     }
+    ad.push({
+        x: x + o(-e, d),
+        y: y + q(-e, d),
+        node: nodeCreate('bubbleParticle', '.bottomLayer'),
+        life: 120,
+        e: e / 10,
+        d: (d - 180) + ((Math.random() * 30) - 15),
+        animate: (af, element) => {
+            element.children[0].style.opacity = 1 / 30 * af.life;
+        },
+    });
 };
 
 applyGravity = (self) => {
@@ -734,38 +724,85 @@ applyGravity = (self) => {
     }
 };
 
-moveGameObjects = (ab) => {
-    for (let i = 0; i < ab.length; i++) {
-        ab[i].x += o(ab[i].e, ab[i].d);
-        ab[i].y += p(ab[i].e, ab[i].d);
+moveGameObjects = (ac) => {
+    for (let i = 0; i < ac.length; i++) {
+        ac[i].x += o(ac[i].e, ac[i].d);
+        ac[i].y += q(ac[i].e, ac[i].d);
 
-        a(ab[i].c, ab[i].x, ab[i].y);
-        b(ab[i].b, ab[i].d, ab[i].z, ab[i].aa);
+        a(ac[i].node, ac[i].x, ac[i].y);
+        b(ac[i].node, ac[i].d, ac[i].aa, ac[i].ab);
     }
 };
 
-moveGameObjects2 = (ab) => {
-    for (let i = 0; i < ab.length; i++) {
-        motionAdd(ab[i], ab[i].currentAcceleration, ab[i].facing);
-        ab[i].e = Math.min(ab[i].e, ab[i].f);
-        ab[i].x += o(ab[i].e, ab[i].d);
-        ab[i].y += p(ab[i].e, ab[i].d);
+moveGameObjects2 = (ac) => {
+    for (let i = 0; i < ac.length; i++) {
+        if (ac[i].glitching || ac[i].dead) {
+            continue;
+        }
+        motionAdd(ac[i], ac[i].currentAcceleration, ac[i].facing);
+        ac[i].currentAcceleration = 0;
+        ac[i].e = Math.min(ac[i].e, ac[i].f);
+        ac[i].x += o(ac[i].e, ac[i].d);
+        ac[i].y += q(ac[i].e, ac[i].d);
 
-        a(ab[i].c, ab[i].x, ab[i].y);
-        b(ab[i].b, ab[i].facing, ab[i].z, ab[i].aa);
+        a(ac[i].node, ac[i].x, ac[i].y);
+        b(ac[i].node, ac[i].facing, ac[i].aa, ac[i].ab);
     }
 };
 
-destroy = (ab, i) => {
-    if (ab[i].destroy) {
-        ab[i].destroy(ab[i].c);
-    } else {
-        ab[i].c.remove();
+destroy = (ac, i) => {
+    nodeDestroy(ac[i].node);
+//    if (ac[i].destroy) {
+//        ac[i].destroy(ac[i].c);
+//    } else {
+//        for (let j = 0; j < ac[j].c.length; j++) {
+//            ac[i].c[j].remove();
+//        }
+//    }
+    ac.splice(i, 1);
+};
+
+nodes = {};
+
+nodeCreate = (baseNode, layer, init) => {
+    if (!nodes[baseNode]) {
+        nodes[baseNode] = [];
     }
-    ab.splice(i, 1);
+    if (!nodes[baseNode].length) {
+        let elements = [];
+        for (let p = 0; p < panes.length; p++) {
+            let element = window[baseNode].cloneNode(true);
+            element.id = '';
+            elements.push(element);
+            panes[p].querySelector(layer).appendChild(element);
+        }
+        nodes[baseNode].push({
+            baseNode: baseNode,
+            elements: elements,
+        });
+    }
+    let node = nodes[baseNode].pop();
+    for (let n = 0; n < node.elements.length; n++) {
+        node.elements[n].style.display = '';
+        node.elements[n].style.opacity = 1;
+        if (init) {
+            init(node.elements[n], n);
+        }
+    }
+    return node;
+};
+
+nodeDestroy = (node) => {
+    for (let n = 0; n < node.elements.length; n++) {
+        node.elements[n].style.display = 'none';
+    }
+    nodes[node.baseNode].push(node);
 };
 
 checkCollisions = (self, others) => {
+    if (self.dead) {
+        return;
+    }
     for (let i = 0; i < others.length; i++) {
         if (self.owner && self.owner.id == others[i].id) {
             continue;
@@ -774,7 +811,16 @@ checkCollisions = (self, others) => {
         if (collisionDistance < self.collisionRadius + others[i].collisionRadius) {
             self.life = 0;
             others[i].life -= self.damage;
-            updateHud(others[i], 'life');
+            if (others[i].type === 'cpu') {
+                for (let j = 0; j < players.length; j++) {
+                    if (players[j].id === self.owner.id) {
+                        players[j].points++;
+                        if (!split) {
+                        	killCount.innerText = players[j].points;
+                        }
+                    }
+                }
+            }
             break;
         }
     }
@@ -784,6 +830,7 @@ buttonMoveDown = false;
 buttonShootDown = false;
 buttonTurnLeftDown = false;
 buttonTurnRightDown = false;
+buttonGlitchDown = false;
 
 document.body.onkeydown = (e) => {
     if (e.which == 38) {
@@ -795,8 +842,11 @@ document.body.onkeydown = (e) => {
     if (e.which == 39) {
         buttonTurnRightDown = true;
     }
-    if (e.which == 32) {
+    if (e.which == 17) {
         buttonShootDown = true;
+    }
+    if (e.which == 16) {
+        buttonGlitchDown = true;
     }
 };
 
@@ -810,16 +860,17 @@ document.body.onkeyup = (e) => {
     if (e.which == 39) {
         buttonTurnRightDown = false;
     }
-    if (e.which == 32) {
+    if (e.which == 17) {
         buttonShootDown = false;
+    }
+    if (e.which == 16) {
+        buttonGlitchDown = false;
     }
 };
 
-controlUpdate = (playerIndex) => {
+controlKeyboardUpdate = (playerIndex) => {
     if (buttonMoveDown) {
         players[playerIndex].currentAcceleration = players[playerIndex].l;
-    } else {
-        players[playerIndex].currentAcceleration = 0;
     }
 
     if (buttonTurnLeftDown) {
@@ -830,56 +881,43 @@ controlUpdate = (playerIndex) => {
         players[playerIndex].g /= players[playerIndex].turnFriction;
     }
 
+    if (buttonGlitchDown) {
+        players[playerIndex].glitch = true;
+    }
+
     if (buttonShootDown) {
         players[playerIndex].shoot = true;
     }
-
-
 };
 
-controlUpdate = (playerIndex) => {   
+controlGamepadUpdate = (playerIndex, gamepadIndex) => {
     let gamepads = navigator.getGamepads();
-    if (!gamepads[playerIndex]) {
+    if (!gamepads[gamepadIndex]) {
         return;
     }
-    if (gamepads[playerIndex].buttons[0].pressed) {
+    if (gamepads[gamepadIndex].buttons[0].pressed) {
         players[playerIndex].shoot = true;
     }
 
-    players[playerIndex].glitch--;
-    if (gamepads[playerIndex].buttons[2].pressed && players[playerIndex].glitch < 0) {
-        players[playerIndex].glitch = players[playerIndex].glitchTime;
-        players[playerIndex].x += Math.random() * 2000 - 1000;
-        players[playerIndex].y += Math.random() * 2000 - 1000;
-        let playerNode = boatWrapper.cloneNode(true);
-        playerNode.id = '';
-        topLayer.appendChild(playerNode);
-        glitches.push({
-            c: playerNode,
-            b: playerNode.children[0],
-            glitchLog: players[playerIndex].glitchLog,
-        });
-        players[playerIndex].glitchLog = [];
-    }
-    players[playerIndex].glitchLog.push([players[playerIndex].x, players[playerIndex].y, players[playerIndex].facing]);
-
-    if (gamepads[playerIndex].buttons[7].value > 0.2) {
-        players[playerIndex].currentAcceleration = gamepads[playerIndex].buttons[7].value * players[playerIndex].l;
-    } else {
-        players[playerIndex].currentAcceleration = 0;
+    if (gamepads[gamepadIndex].buttons[2].pressed) {
+        players[playerIndex].glitch = true;
     }
 
-    if (gamepads[playerIndex].axes[0] > 0.3 || gamepads[playerIndex].axes[0] < -0.3) {
-        players[playerIndex].g = Math.round(gamepads[playerIndex].axes[0] * players[playerIndex].h);
+    if (gamepads[gamepadIndex].buttons[7].value > 0.2) {
+        players[playerIndex].currentAcceleration = gamepads[gamepadIndex].buttons[7].value * players[playerIndex].l;
+    }
+
+    if (gamepads[gamepadIndex].axes[0] > 0.3 || gamepads[gamepadIndex].axes[0] < -0.3) {
+        players[playerIndex].g = Math.round(gamepads[gamepadIndex].axes[0] * players[playerIndex].h);
     } else {
         players[playerIndex].g /= players[playerIndex].turnFriction;
     }
 
-    if (gamepads[playerIndex].buttons[6].pressed) {
+    if (gamepads[gamepadIndex].buttons[6].pressed) {
         zoom += 0.1;
         zoom = Math.min(10, zoom);
     }
-    if (gamepads[playerIndex].buttons[4].pressed) {
+    if (gamepads[gamepadIndex].buttons[4].pressed) {
         zoom -= 0.1;
         zoom = Math.max(0.1, zoom);
     }
@@ -897,22 +935,29 @@ ai = (cpu) => {
     }
     if (Math.random() < 0.8) {
         cpu.currentAcceleration = cpu.l;
-        t = (cpu.facing - m(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
-        if (closestPlayerDistance < 200) {
-            t = -t + 360;
+        u = (cpu.facing - m(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
+        if (closestPlayerDistance < 800) {
+            u = -u + 360;
         }
-        if (t < 180) {
-            if (t > 3) {
+        if (closestPlayerDistance < 400 && Math.random() < 0.2) {
+            cpu.glitch = true;
+        }
+        if (u < 180) {
+            if (u > 3) {
                 cpu.g = Math.max(cpu.g - cpu.k, -cpu.h);
             } else {
-                cpu.shoot = true;
+                if (closestPlayerDistance < 1000) {
+                    cpu.shoot = true;
+                }
                 cpu.g /= 1.2;
             }
-        } else if (t > 180) {
-            if (t < 357) {
+        } else if (u > 180) {
+            if (u < 357) {
                 cpu.g = Math.min(cpu.g + cpu.k, cpu.h);
             } else {
-                cpu.shoot = true;
+                if (closestPlayerDistance < 1000) {
+                    cpu.shoot = true;
+                }
                 cpu.g /= 1.2;
             }
         }
@@ -922,20 +967,63 @@ ai = (cpu) => {
     }
 };
 
+startTimer = null;
+startCountDown = 0;
+playerJoined = {};
+
 stateStartInit = () => {
     svgStartNode.style.display = 'block';
     svgDeadNode.style.display = 'none';
     state = stateStart;
 };
 
-stateStart = () => {
-    if (buttonShootDown) {
+countDown = () => {
+    startCountDown--;
+    if (startCountDown <= 0) {
         stateGameInit();
+    } else {
+        startText.textContent = startCountDown;
+        startTimer = setTimeout(countDown, 500)
+    }
+};
+
+stateStart = () => {
+    if (buttonShootDown && !playerJoined.keyboard) {
+        playerJoined.keyboard = true;
+        playerInputs.push([controlKeyboardUpdate]);
+        if (startTimer) {
+            clearTimeout(startTimer);
+        }
+        startText.classList.remove('blink');
+        if (split && playerInputs.length < 2) {
+            startText.textContent = 'Waiting for w 2';
+        } else {
+            startCountDown = 3;
+            startText.textContent = startCountDown;
+            startTimer = setTimeout(countDown, 500);
+        }
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i] && gamepads[i].buttons[9].pressed) {
-            stateGameInit();
+        if (!gamepads[i]) {
+            continue;
+        }
+        for (let b = 0; b < gamepads[i].buttons.length; b++) {
+            if (gamepads[i] && gamepads[i].buttons[b].pressed && !playerJoined['gamepad' + i]) {
+                playerJoined['gamepad' + i] = true;
+                playerInputs.push([controlGamepadUpdate, i]);
+                if (startTimer) {
+                    clearTimeout(startTimer);
+                }
+                if (split && playerInputs.length < 2) {
+                    startText.textContent = 'Waiting for w 2';
+                } else {
+                    startText.classList.remove('blink');
+                    startCountDown = 3;
+                    startText.textContent = startCountDown;
+                    startTimer = setTimeout(countDown, 500);
+                }
+            }
         }
     }
 };
@@ -944,16 +1032,23 @@ stateGameInit = () => {
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'none';
     state = stateGame;
-    
-    createSolarSystem(solarSystemData);
-    
-    createPlayer({
-        ag: 5,
-    });
-    
-    createHud(hudData, players[0]);
 
-    s(true);
+    createSolarSystem(solarSystemData);
+
+    playerInputs.forEach(() => {
+        createPlayer({
+            ah: 5,
+        });
+    });
+
+    if (!split) {
+        hudLayerBottom.style.display = 'block';
+        updateTimeElapsed();
+        killCount.innerText = elapsedTime.innetText = '0';
+        createHud(hudData, players[0]);
+    }
+
+    t(0, true);
 }
 
 stateGame = () => {
@@ -961,20 +1056,92 @@ stateGame = () => {
     for (let i = 0; i < planets.length; i++) {
         planets[i].angle += planets[i].orbitSpeed;
         planets[i].x = o(planets[i].distance, planets[i].angle);
-        planets[i].y = p(planets[i].distance, planets[i].angle);
-        a(planets[i].c, planets[i].x, planets[i].y);
-        planets[i].c.children[planets[i].c.children.length - 1].transform.baseVal[0].setRotate(m(0, 0, planets[i].x, planets[i].y), 0, 0);
+        planets[i].y = q(planets[i].distance, planets[i].angle);
+        a(planets[i].node, planets[i].x, planets[i].y);
+        for (let n = 0; n < planets[i].node.elements.length; n++) {
+            planets[i].node.elements[n].children[planets[i].node.elements[n].children.length - 1].transform.baseVal[0].setRotate(m(0, 0, planets[i].x, planets[i].y), 0, 0);
+        }
     }
 
     for (let i = 0; i < players.length; i++) {
         checkCollisions(players[i], planets);
         if (players[i].life > 0) {
             applyGravity(players[i]);
-            controlUpdate(i);
+            playerInputs[i][0](i, playerInputs[i][1]);
             updatePlayer(players[i]);
+            if (players[i].life > 0) {
+                players[i].life += 0.005;
+                if (players[i].life > players[i].lifeMax) {
+                    players[i].life = players[i].lifeMax;
+                }
+                players[i].glitchCharge += 0.2;
+                if (players[i].glitchCharge > players[i].glitchMax) {
+                    players[i].glitchCharge = players[i].glitchMax;
+                }
+            }
+            let minDistance = 9999999;
+            let closest = null;
+            for (let j = 0; j < players.length; j++) {
+                if (i === j) {
+                    continue;
+                }
+                let distance = n(players[i].x, players[i].y, players[j].x, players[j].y);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closest = players[j];
+                }
+            }
+            for (let j = 0; j < cpus.length; j++) {
+                let distance = n(players[i].x, players[i].y, cpus[j].x, cpus[j].y);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closest = cpus[j];
+                }
+            }
+            let pointer = players[i].node.elements[i].children[1].children[0];
+            if (closest !== null) {
+                let d = m(players[i].x, players[i].y, closest.x, closest.y);
+                minDistance /= 20;
+                if (minDistance < 70) {
+                    minDistance = 70;
+                } else if (minDistance > 200) {
+                    minDistance = 200;
+                }
+                pointer.transform.baseVal[0].matrix.e = o(minDistance, d - 90);
+                pointer.transform.baseVal[0].matrix.f = q(minDistance, d - 90);
+                pointer.children[0].transform.baseVal[0].setRotate(d - 90, 0, 0);
+                pointer.style.display = '';
+            } else {
+                pointer.style.display = 'none';
+            }
+        
+            if (!split) {
+                updateHud(players[i], players[i].life, players[i].lifeMax, 'life');
+                updateHud(players[i], players[i].glitchCharge, players[i].glitchMax, 'glitch');
+            }
         } else {
-            createExplosion(players[i].x, players[i].y, players[i].explosionSound);
-            destroy(players, i);
+            if (!players[i].dead) {
+                createExplosion(players[i].x, players[i].y, players[i].explosionSound);
+                players[i].dead = true;
+                for (let e = 0; e < players[i].node.elements.length; e++) {
+                    players[i].node.elements[e].style.display = 'none';
+                }
+            }
+            if (!split) {
+                destroy(players, i);
+            }
+        } 
+        if (split && players[i].dead) {
+            players[i].life--;
+            if (players[i].life < -100) {
+                players[i].dead = false;
+                for (let e = 0; e < players[i].node.elements.length; e++) {
+                    players[i].node.elements[e].style.display = '';
+                }
+                players[i].life = players[i].lifeMax;
+                players[i].e = 0;
+                spawnPlayer(players[i]);
+            }
         }
     }
     for (let i = 0; i < cpus.length; i++) {
@@ -983,70 +1150,157 @@ stateGame = () => {
             applyGravity(cpus[i]);
             ai(cpus[i]);
             updatePlayer(cpus[i]);
+            cpus[i].glitchCharge += 0.2;
+            if (cpus[i].glitchCharge > cpus[i].glitchMax) {
+                cpus[i].glitchCharge = cpus[i].glitchMax;
+            }
         } else {
             createExplosion(cpus[i].x, cpus[i].y, cpus[i].explosionSound);
             destroy(cpus, i);
         }
     }
-    
+
 
     for (let i = 0; i < glitches.length; i++) {
-        if (glitches[i].glitchLog[0]) {
-            a(glitches[i].c, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
-            b(glitches[i].b, glitches[i].glitchLog[0][2], 16, 4);
+        if (glitches[i].delay !== null && glitches[i].delay-- < 0) {
+            // Emit glitch ad
+            let glitch = glitches[i].glitchLog[0];
+            for (let i = 0; i < 30; i++) {
+                ad.push({
+                    x: glitch[0] + o((Math.random() * 50) - 25, glitch[2]),
+                    y: glitch[1] + q((Math.random() * 50) - 25, glitch[2]),
+                    node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                        element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                        element.children[0].style.opacity = Math.random();
+                        element.children[0].transform.baseVal[0].setRotate(glitch[2], 0, 0);
+                        element.children[0].transform.baseVal[1].setScale(1, 1);
+                    }),
+                    life: 100,
+                    e: Math.random() * 2,
+                    d: i % 2 == 0 ? glitch[2] + 90 : glitch[2] - 90,
+                    animate: (af, element) => {
+                        element.children[0].transform.baseVal[1].setScale(1 / 50 * af.life, 1 / 50 * af.life);
+                        element.children[0].style.opacity = 1 / 50 * af.life;
+                    },
+                });
+            }
+            
+            glitches[i].delay = null;
+            for (let n = 0; n < glitches[i].node.elements.length; n++) {
+                glitches[i].node.elements[n].style.display = '';
+            }
         }
-        if (!glitches[i].glitchLog.shift()) {
-            destroy(glitches, i);
+        
+        if (glitches[i].delay === null) {
+            let glitch = glitches[i].glitchLog.shift();
+            a(glitches[i].node, glitch[0], glitch[1]);
+            b(glitches[i].node, glitch[2], glitches[i].aa, glitches[i].ab);
+            if (glitch[3] > 0.1) {
+                emit(glitch[0], glitch[1], 25, glitch[2]);
+            }
+            
+            if (glitch[4]) {
+                playSound(glitches[i].owner.shootSound, glitch[0], glitch[1]);
+                bullets.push({
+                    owner: glitches[i].owner,
+                    node: nodeCreate('bullet', '.bottomLayer'),
+                    aa: 0,
+                    ab: 0,
+                    x: glitch[0] + o(glitches[i].owner.gunMounts[glitch[5]], glitch[2] + 90),
+                    y: glitch[1] + q(glitches[i].owner.gunMounts[glitch[5]], glitch[2] + 90),
+                    d: glitch[2],
+                    e: 30,
+                    life: 60,
+                    mass: 0.8,
+                    collisionRadius: 10,
+                    damage: 1,
+                });
+            }
+            
+            if (!glitches[i].glitchLog.length) {
+                // Emit glitch ad
+                for (let i = 0; i < 30; i++) {
+                    ad.push({
+                        x: glitch[0] + o((Math.random() * 50) - 25, glitch[2]),
+                        y: glitch[1] + q((Math.random() * 50) - 25, glitch[2]),
+                        node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                            element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                            element.children[0].style.opacity = Math.random();
+                            element.children[0].transform.baseVal[0].setRotate(glitch[2], 0, 0);
+                            element.children[0].transform.baseVal[1].setScale(1, 1);
+                        }),
+                        life: 100,
+                        e: Math.random() * 2,
+                        d: i % 2 == 0 ? glitch[2] + 90 : glitch[2] - 90,
+                        animate: (af, element) => {
+                            element.children[0].transform.baseVal[1].setScale(1 / 50 * af.life, 1 / 50 * af.life);
+                            element.children[0].style.opacity = 1 / 50 * af.life;
+                        },
+                    });
+                }
+                destroy(glitches, i);
+            }
         }
     }
 
     moveGameObjects2(players);
     moveGameObjects2(cpus);
     moveGameObjects(bullets);
-    bulletLoop: for (let i = 0; i < bullets.length; i++) {
-//        emit(bullets[i].ad, bullets[i].x, bullets[i].y, bullets[i].e, bullets[i].d);
+    
+    for (let i = 0; i < bullets.length; i++) {
         applyGravity(bullets[i]);
 
         // Collide with ships
         checkCollisions(bullets[i], players);
         checkCollisions(bullets[i], cpus);
         checkCollisions(bullets[i], planets);
-        
+        if (bullets[i].life <= 0) {
+            bullets[i].explode = true;
+        }
+
         // Bullet life
         bullets[i].life--;
         if (bullets[i].life <= 0) {
-            createExplosion(bullets[i].x, bullets[i].y, bullets[i].owner.explosionSound);
+            if (bullets[i].explode) {
+                createExplosion(bullets[i].x, bullets[i].y, bullets[i].owner.explosionSound);
+            }
             destroy(bullets, i);
         }
     }
-    
-    for (let i = 0; i < ac.length; i++) {
-        ac[i].x += o(ac[i].e, ac[i].d);
-        ac[i].y += p(ac[i].e, ac[i].d);
-        ac[i].animate(ac[i]);
 
-        a(ac[i].c, ac[i].x, ac[i].y);
-//        b(ac[i].b, ac[i].d, ac[i].z, ac[i].aa);
-        ac[i].life--;
-        if (ac[i].life < 0) {
-            destroy(ac, i);
+    for (let i = 0; i < ad.length; i++) {
+        ad[i].x += o(ad[i].e, ad[i].d);
+        ad[i].y += q(ad[i].e, ad[i].d);
+        for (let j = 0; j < ad[i].node.elements.length; j++) {
+            ad[i].animate(ad[i], ad[i].node.elements[j]);
+        }
+
+        a(ad[i].node, ad[i].x, ad[i].y);
+        ad[i].life--;
+        if (ad[i].life < 0) {
+            destroy(ad, i);
         }
     }
-    
-    if (players[0]) {
-        svgNode.viewBox.baseVal.x = players[0].x - (window.innerWidth * zoom) / 2;
-        svgNode.viewBox.baseVal.y = players[0].y - (window.innerHeight * zoom) / 2;
-        svgNode.viewBox.baseVal.width = window.innerWidth * zoom;
-        svgNode.viewBox.baseVal.height = window.innerHeight * zoom;
+
+
+    for (let p = 0; p < panes.length; p++) {
+        if (players[p]) {
+            panes[p].viewBox.baseVal.x = players[p].x - (window.innerWidth * zoom) / 2;
+            panes[p].viewBox.baseVal.y = players[p].y - (window.innerHeight * zoom) / 2;
+            panes[p].viewBox.baseVal.width = window.innerWidth * zoom;
+            panes[p].viewBox.baseVal.height = window.innerHeight * zoom;
+        }
     }
-    
-    while (cpus.length < 3) {
-        createCpu({
-            lifeMax: 1,
-        });
+
+    if (playerInputs.length === 1 && players[0]) {
+        while (cpus.length < (players[0].points / 3) + 1) {
+            createCpu({
+                lifeMax: 1,
+            });
+        }
     }
-    
-    if (!players.length) {
+
+    if (!split && !players.length) {
         stateDeadInit();
     }
 }
@@ -1055,14 +1309,19 @@ stateDeadInit = () => {
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'block';
     state = stateDead;
+    if (timeElapsedID) {
+        clearInterval(timeElapsedID);
+        timeElapsedID = false;
+        timeElapsed = 0;
+    }
     while (players.length) {
         destroy(players, 0);
     }
     while (cpus.length) {
         destroy(cpus, 0);
     }
-    while (ac.length) {
-        destroy(ac, 0);
+    while (ad.length) {
+        destroy(ad, 0);
     }
     while (bullets.length) {
         destroy(bullets, 0);
@@ -1073,85 +1332,145 @@ stateDeadInit = () => {
     while (planets.length) {
         destroy(planets, 0);
     }
-    while (stars.length) {
-        destroy(planets, 0);
-    }
-    while(hudLayer.firstChild) {
+    while (hudLayer.firstChild) {
         hudLayer.removeChild(hudLayer.firstChild);
     }
+    canRestart = false;
+    setTimeout(() => {
+        canRestart = true;
+    }, 2000);
 };
 
 stateDead = () => {
+    if (!canRestart) {
+        return;
+    }
+
     if (buttonShootDown) {
-        stateGameInit();
+        location.reload();
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i] && gamepads[i].buttons[9].pressed) {
-            stateGameInit();
+        if (!gamepads[i]) {
+            continue;
+        }
+        for (let b = 0; b < gamepads[i].buttons.length; b++) {
+            if (gamepads[i] && gamepads[i].buttons[b].pressed) {
+                location.reload();
+            }
         }
     }
 };
 
 
 
-zoom = 2;
-gravityPower = 2500;
+bullets = [];
 cpus = [];
 glitches = [];
-players = [];
+gravityPower = 2500;
+low = location.search.indexOf('low') !== -1;
 planets = [];
-bullets = [];
-ac = [];
+players = [];
+playerInputs = [];
+ad = [];
+quality = low ? 0.1 : 1;
+split = location.search.indexOf('split') !== -1;
+timeElapsed = 0;
+timeElapsedID = false;
+zoom = 2;
+glitchColors = {
+    human: ['#9417FF', '#5A30CC', '#9417FF', '#fff'],
+    cpu: ['#e0421d', '#ed4559', '#e0421d', '#fff']
+};
 
-createNodes = (nodeArray, node, layer) => {
-    while (nodeArray.length < 1000) {
-        let nodeClone = node.cloneNode(true);
-        nodeClone.id = '';
-        layer.appendChild(nodeClone);
-        nodeArray.push(nodeClone);
+setGameState = (s, l) => {
+    split = s;
+    low = l;
+    location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high');
+};
+
+updateLinkClass = (c, a) => {
+    els = document.getElementsByClassName(c);
+    for (var i = 0; i < els.length; i++) {
+        els[i].className += a;
     }
 };
 
-nodeExplosions = [];
-createNodes(nodeExplosions, explosion, topLayer);
-nodeBullets = [];
-createNodes(nodeBullets, bullet, bottomLayer);
-nodeBubbles = [];
-createNodes(nodeBubbles, bubbleParticle, bottomLayer);
+updateButtons = () => {
+    c = location.search.substr(1).split(',');
+    for(var i = 0; i < c.length; ++i) {
+        updateLinkClass(c[i], ' active');
+    }
+};
 
-createSolarSystem = (data) => {
-    // Append Planets
-    data.planets.forEach((asset, i) => {
-        let planetClone = asset.cloneNode(true);
-        planetClone.id = '';
+updateTimeElapsed = () => {
+    timeElapsedID = setInterval(() => {
+        elapsedTime.innerText = ++timeElapsed;
+    }, 1000);
+};
+
+if (split) {
+    panes = [
+        document.querySelector('.splitLeft'),
+        document.querySelector('.splitRight'),
+    ];
+} else {
+    panes = [
+        document.querySelector('.splitLeft'),
+    ];
+    panes[0].style.width = '100vw';
+}
+
+createNodes = (nodeArray, node, layer) => {
+    for (let p = 0; p < panes.length; p++) {
+        for (let p = 0; p < panes.length; p++) {
+            while (nodeArray.length < 1000) {
+                let nodeClone = node.cloneNode(true);
+                nodeClone.id = '';
+                panes[p].querySelector(layer).appendChild(nodeClone);
+                nodeArray.push(nodeClone);
+            }
+        }
+    }
+};
+
+//nodeExplosions = [];
+//createNodes(nodeExplosions, explosion, '.topLayer');
+//nodeBullets = [];
+//createNodes(nodeBullets, bullet, '.bottomLayer');
+//nodeBubbles = [];
+//createNodes(nodeBubbles, bubbleParticle, '.bottomLayer');
+
+createSolarSystem = () => {
+    let planetNodes = [
+        'sunStar',
+        'planetOrange',
+        'planetBlue',
+        'planetGrey',
+        'planetOrange',
+        'planetBlue',
+        'planetGrey',
+    ];
+    for (let i = 0; i < planetNodes.length; i++) {
+        let scale = i > 0 ? Math.random() + 0.5 : 3;
         let planet = {
-            c: planetClone,
+            node: nodeCreate(planetNodes[i], '.planetLayer', (element) => {
+                element.transform.baseVal[1].setScale(scale, scale);
+            }),
             distance: 1000 * i,
             angle: Math.random() * 360,
-            scale: i > 0 ? Math.random() + 0.5 : 3,
+            scale: scale,
+            mass: scale * 10,
+            collisionRadius: scale * 100,
             orbitSpeed: 0.1 - (1 / 100000 * (300 * i)),
         };
-        planet.collisionRadius = 100 * planet.scale;
-        planet.mass = planet.scale * 10;
         planets.push(planet);
-        planetClone.transform.baseVal[1].setScale(planet.scale, planet.scale); 
-        planetLayer.appendChild(planetClone);
-    });
+    }
 };
 
 solarSystemData = {
-    planets: [
-        sunStar,
-        planetOrange,
-        planetBlue,
-        planetGrey,
-        planetOrange,
-        planetBlue,
-        planetGrey,
-    ],
     stars: {
-        count: 10000,
+        count: 2000 * quality,
         field: {
             width: window.innerWidth * 15,
             height: window.innerHeight * 15,
@@ -1160,46 +1479,70 @@ solarSystemData = {
 };
 
 // Append stars
-for (let i = 0; i < solarSystemData.stars.count; i++) {
-    let star = starNode.cloneNode(true);
-    star.id = '';
+for (let p = 0; p < panes.length; p++) {
+    for (let i = 0; i < solarSystemData.stars.count; i++) {
+        let star = starNode.cloneNode(true);
+        star.id = '';
 
-    star.r.baseVal.value = Math.random() * 5;
-    star.cx.baseVal.value = solarSystemData.stars.field.width * 2 * Math.random() - solarSystemData.stars.field.width;
-    star.cy.baseVal.value = solarSystemData.stars.field.height * 2 * Math.random() - solarSystemData.stars.field.height;
-    star.style.opacity = Math.random();
+        star.r.baseVal.value = Math.random() * 5;
+        star.cx.baseVal.value = solarSystemData.stars.field.width * 2 * Math.random() - solarSystemData.stars.field.width;
+        star.cy.baseVal.value = solarSystemData.stars.field.height * 2 * Math.random() - solarSystemData.stars.field.height;
+        star.style.opacity = Math.random();
 
-    star.style.fill = '#c0f7ff';
-    if (Math.random() <= 0.5){
-        star.style.fill = '#fff';
-    } else if (Math.random() <= 0.5){
-        star.style.fill = '#fffec4';
+        star.style.fill = '#c0f7ff';
+        if (Math.random() <= 0.5){
+            star.style.fill = '#fff';
+        } else if (Math.random() <= 0.5){
+            star.style.fill = '#fffec4';
+        }
+
+        panes[p].querySelector('.stars').appendChild(star);
     }
-
-    stars.appendChild(star);
 }
 
 createPlayer = (options) => {
-    let playerNode = boatWrapper.cloneNode(true);
-    playerNode.id = '';
-    playerNode.setAttributeNS(null, 'class', 'player1');
-    topLayer.appendChild(playerNode);
-    let v = {
+    let x = 0, y = 0, minDistance;
+    do {
+        minDistance = 9999999;
+        x += Math.random() * 10000 - 5000;
+        y += Math.random() * 10000 - 5000;
+        for (let i = 0; i < planets.length; i++) {
+            let distance = Math.abs(n(x, y, o(planets[i].distance, planets[i].angle), q(planets[i].distance, planets[i].angle)));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+    } while (minDistance < 1000);
+    let w = {
         id: Math.floor(Math.random() * 1000000),
-        c: playerNode,
-        b: playerNode.children[0],
-        z: 67/2,
-        aa: 53/2,
+        type: 'human',
+        node: nodeCreate('boatWrapper', '.topLayer', (element, i) => {
+            if (i !== players.length) {
+                element.children[1].style.display = 'none';
+            }
+        }),
+        aa: 67/2,
+        ab: 53/2,
         
-        lifeMax: 20,
-
         hud: {},
         
-        shootSound: soundGenerator.generateLaserShoot(),
-        explosionSound: soundGenerator.generateExplosion(),
+        life: split ? 10 : 20,
+        lifeMax: split ? 10 : 20,
+        
+        glitch: false,
+        glitchCharge: 0,
+        glitchMax: 20,
+        glitchLog: [],
+        glitchReloadTime: 30,
+        glitchReloading: 30,
+        glitching: false,
 
-        x: Math.random() * 5000 - 2500,
-        y: Math.random() * 5000 - 2500,
+        shootSound: createSound(soundGenerator.generateLaserShoot()),
+        glitchSound: createSound(soundGenerator.generateJump()),
+        explosionSound: createSound(soundGenerator.generateHitHurt()),
+
+        x: x,
+        y: y,
         d: 0,
         facing: 0,
         e: 0,
@@ -1218,96 +1561,172 @@ createPlayer = (options) => {
         currentAcceleration: 0,
 
         shoot: false,
-        af: 0,
-        ag: 10,
+        ag: 0,
+        ah: 10,
         gunMount: 0,
         gunMounts: [20, -20],
-        
-        glitch: 0,
-        glitchMax: 20,
-        glitchLog: [],
-        glitchTime: 30,
 
-        ad: {
-            ae: bubbleParticle,
-            af: 0,
-            ag: 1,
-            ah: 1,
-        },
+        points: 0,
     };
-    
+
     for (let key in options) {
-        v[key] = options[key];
+        w[key] = options[key];
     }
-    
-    v.life = v.lifeMax;
-    players.push(v);
+
+    w.life = w.lifeMax;
+    players.push(w);
 };
 
 createCpu = (options) => {
     createPlayer(options);
     cpuPlayer = players.pop();
-    cpuPlayer.c.setAttributeNS(null, 'class', 'player2');
+    cpuPlayer.type = 'cpu';
+    cpuPlayer.node.elements[0].classList = 'player2';
     cpus.push(cpuPlayer);
 };
 
-updatePlayer = (v) => {
-    v.facing += v.g;
+spawnPlayer = (w) => {
+    let x = 0, y = 0, minDistance;
+    do {
+        minDistance = 9999999;
+        x += Math.random() * 200 - 100;
+        y += Math.random() * 200 - 100;
+        for (let i = 0; i < planets.length; i++) {
+            let distance = Math.abs(n(x, y, o(planets[i].distance, planets[i].angle), q(planets[i].distance, planets[i].angle)));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < players.length; i++) {
+            let distance = Math.abs(n(x, y, players[i].x, players[i].y));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < cpus.length; i++) {
+            let distance = Math.abs(n(x, y, cpus[i].x, cpus[i].y));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < glitches.length; i++) {
+            let distance = Math.abs(n(x, y, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+    } while (minDistance < 700);
+    w.x = x;
+    w.y = y;
+};
 
-    while (v.facing > 360) {
-        v.facing -= 360;
+updatePlayer = (w) => {
+    w.facing += w.g;
+
+    while (w.facing > 360) {
+        w.facing -= 360;
     }
-    while (v.facing < 0) {
-        v.facing += 360;
+    while (w.facing < 0) {
+        w.facing += 360;
     }
 
-    v.ad.af--;
-    if (v.currentAcceleration > 0.1) {
-        emit(v.ad, v.x, v.y, 25, v.facing);
+    if (w.currentAcceleration > 0.1 && !w.glitching) {
+        emit(w.x, w.y, 25, w.facing);
     }
     
-    v.af--;
-    if (v.shoot && v.af < 0 && nodeBullets.length) {
-        playSound(v.shootSound, v.x, v.y);
-        v.af = v.ag;
-        am = nodeBullets.pop();
-        am.style.display = '';
+    if (w.glitch && w.glitchReloading < 0 && w.glitchCharge >= w.glitchMax) {
+        // Emit glitch ad
+        for (let i = 0; i < 30; i++) {
+            ad.push({
+                x: w.x + o((Math.random() * 50) - 25, w.facing),
+                y: w.y + q((Math.random() * 50) - 25, w.facing),
+                node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                    element.children[0].style.fill = glitchColors[w.type][Math.floor(Math.random() * 4)];
+                    element.children[0].style.opacity = Math.random();
+                    element.children[0].transform.baseVal[0].setRotate(w.facing, 0, 0);
+                    element.children[0].transform.baseVal[1].setScale(1, 1);
+                }),
+                life: 100,
+                e: Math.random() * 2,
+                d: i % 2 == 0 ? w.facing + 90 : w.facing - 90,
+                animate: (af, element) => {
+                    element.children[0].transform.baseVal[1].setScale(1 / 50 * af.life, 1 / 50 * af.life);
+                    element.children[0].style.opacity = 1 / 50 * af.life;
+                },
+            });
+        }
+        
+        // Glitch w
+        playSound(w.glitchSound, w.x, w.y);
+        w.glitchCharge = 0;
+        w.glitching = true;
+        w.glitchReloading = w.glitchReloadTime;
+        for (let e = 0; e < w.node.elements.length; e++) {
+            w.node.elements[e].style.display = 'none';
+        }
+        w.e = 0;
+    }
+    
+    if (w.glitching && w.glitchReloading  < 0) {
+        w.glitching = false;
+        for (let e = 0; e < w.node.elements.length; e++) {
+            w.node.elements[e].style.display = '';
+        }
+        glitches.push({
+            owner: w,
+            node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+                element.style.display = 'none';
+                element.children[1].children[0].style.display = 'none';
+                if (w.type === 'cpu') {
+                    element.classList = 'player2';
+                }
+            }),
+            aa: 67/2,
+            ab: 53/2,
+            delay: Math.random() * 100,
+            glitchLog: w.glitchLog,
+        });
+        
+        w.glitchLog = [];
+        spawnPlayer(w);
+    }
+    
+    if (!w.glitching) {
+        w.glitchLog.push([w.x, w.y, w.facing, w.currentAcceleration, w.shoot && w.ag < 0 && !w.glitching, w.gunMount]);
+    }
+    
+    if (w.shoot && w.ag < 0 && !w.glitching) {
+        playSound(w.shootSound, w.x, w.y);
+        w.ag = w.ah;
         bullets.push({
-            owner: v,
-            c: am,
-            b: am,
-            z: 0,
+            owner: w,
+            node: nodeCreate('bullet', '.bottomLayer'),
             aa: 0,
-            x: v.x + o(v.gunMounts[v.gunMount], v.facing + 90),
-            y: v.y + p(v.gunMounts[v.gunMount], v.facing + 90),
-            d: v.facing,
+            ab: 0,
+            x: w.x + o(w.gunMounts[w.gunMount], w.facing + 90),
+            y: w.y + q(w.gunMounts[w.gunMount], w.facing + 90),
+            d: w.facing,
             e: 30,
-            life: 200,
+            life: 60,
             mass: 0.8,
             collisionRadius: 10,
             damage: 1,
-            ad: {
-                ae: bubbleParticle,
-                af: 0,
-                ag: 1,
-                ah: 1,
-            },
-            destroy: (node) => {
-                node.style.display = 'none';
-                nodeBullets.push(node);
-            },
         });
         
-        v.gunMount++;
-        if (v.gunMount >= v.gunMounts.length) {
-            v.gunMount = 0;
+        w.gunMount++;
+        if (w.gunMount >= w.gunMounts.length) {
+            w.gunMount = 0;
         }
     }
-    v.shoot = false;
+    
+    w.glitchReloading--;
+    w.glitch = false;
+    w.ag--;
+    w.shoot = false;
 };
 
 // HUD
-createHud = (data, v) => {
+createHud = (data, w) => {
     for (let j = 0; j < data.length; j++) {
         let h = hud.cloneNode(true);
         h.id = 'hud' + data[j].id.charAt(0).toUpperCase() + data[j].id.substr(1).toLowerCase();
@@ -1322,17 +1741,17 @@ createHud = (data, v) => {
             let base = h.children[0].children[0];
             let baseW = 436; // Magic
             base.transform.baseVal[1].setScale(-1, 1);
-            a(base, baseW, 0);
-            a(h.children[0].children[1], baseW - 112, 76);
+            a({elements:[base]}, baseW, 0);
+            a({elements:[h.children[0].children[1]]}, baseW - 112, 76);
         }
 
         // Append bars
         let bars = h.children[1];
         h.children[0].children[1].innerHTML = data[j].text;
-        for (let i = 0; i < v.lifeMax; i++) {
+        for (let i = 0; i < w.lifeMax; i++) {
             let bar = i == 0 ? bars.children[0] : bars.children[0].cloneNode(true);
             bar.setAttributeNS(null, 'x', i * data[j].bars.offset);
-            if (i >= v[data[j].id]) {
+            if (i >= w[data[j].id]) {
                 bar.setAttributeNS(null, 'class', 'hudBar hudBarE');
             }
             bars.appendChild(bar);
@@ -1340,13 +1759,23 @@ createHud = (data, v) => {
 
         h.style.display = '';
         hudLayer.appendChild(h);
-        v.hud[data[j].id] = hudLayer.children[hudLayer.children.length - 1];
+        w.hud[data[j].id] = {
+            data: data[j],
+            element: hudLayer.children[hudLayer.children.length - 1],
+        };
     }
 };
 
-updateHud = (v, id) => {
-    if (v[id] >= 0 && v.hud.hasOwnProperty(id)) {
-        v.hud[id].children[1].children[v[id]].setAttributeNS(null, 'class', 'hudBar hudBarE');
+updateHud = (w, current, max, stat) => {
+    if (current >= 0 && current <= max) {
+        let bClass = 'hudBar';
+        for (let i = 0; i < w.hud[stat].element.children[1].children.length; i++) {
+            if (i >= current) {
+                bClass += ' hudBarE';
+            }
+            let index = (w.hud[stat].data.hAlign === 'right') ? (w.hud[stat].element.children[1].children.length - (i + 1)) : i;
+            w.hud[stat].element.children[1].children[index].classList = bClass;
+        }
     }
 };
 
@@ -1370,15 +1799,18 @@ hudData = [
     },
 ];
 
-s = (init) => {
-    
-
+t = (time, init) => {
     state();
 
     if (init !== true) {
-        requestAnimationFrame(s);
+        requestAnimationFrame(t);
     }
 };
 
 stateStartInit();
-s();
+updateButtons();
+t();
+
+//setInterval(() => {
+//    state();
+//}, 1000 / 60);

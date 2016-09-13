@@ -88,12 +88,6 @@ svg text.absCenter {
 .player2 .playerBoat2{fill:#802B2B;}
 .player2 .playerBoat3{fill:#AC3939;}
 
-.player2.ghost .playerBoat4,
-.player2.ghost .playerBoat0{fill:#FFCC00;}
-.player2.ghost .playerBoat1,
-.player2.ghost .playerBoat8{fill:#802B2B;}
-.player2.ghost .playerBoat5{fill:#AC3939;}
-
 .sunMain{stroke:#F78118;stroke-width:8;}
 .sunRing{fill:none;stroke:#F78118;enable-background:new;}
 .sunRing1{opacity:0.15;stroke-width:8;stroke-miterlimit:10;}

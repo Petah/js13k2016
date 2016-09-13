@@ -28,9 +28,17 @@ stateDeadInit = () => {
     while (hudLayer.firstChild) {
         hudLayer.removeChild(hudLayer.firstChild);
     }
+    canRestart = false;
+    setTimeout(() => {
+        canRestart = true;
+    }, 2000);
 };
 
 stateDead = () => {
+    if (!canRestart) {
+        return;
+    }
+
     if (buttonShootDown) {
         location.reload();
     }
