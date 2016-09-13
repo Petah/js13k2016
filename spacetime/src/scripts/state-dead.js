@@ -25,10 +25,7 @@ stateDeadInit = () => {
     while (planets.length) {
         destroy(planets, 0);
     }
-    while (stars.length) {
-        destroy(planets, 0);
-    }
-    while(hudLayer.firstChild) {
+    while (hudLayer.firstChild) {
         hudLayer.removeChild(hudLayer.firstChild);
     }
 };

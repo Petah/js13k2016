@@ -1,73 +1,57 @@
-move = (element, x, y) => {
-    element.transform.baseVal[0].matrix.e = x;
-    element.transform.baseVal[0].matrix.f = y;
+move = (node, x, y) => {
+    for (let i = 0; i < node.elements.length; i++) {
+        node.elements[i].transform.baseVal[0].matrix.e = x;
+        node.elements[i].transform.baseVal[0].matrix.f = y;
+    }
 };
 
-rotate = (element, angle, rotationPointX, rotationPointY) => {
-    element.transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY);
+rotate = (node, angle, rotationPointX, rotationPointY) => {
+    for (let i = 0; i < node.elements.length; i++) {
+        node.elements[i].children[0].transform.baseVal[1].setRotate(angle, rotationPointX, rotationPointY);
+    }
 };
 
 createExplosion = (x, y, sound) => {
     playSound(sound, x, y);
-    for (let i = 0; i < 16; i++) {
-        if (!nodeExplosions.length) {
-            return;
-        }
-        explosionClone = nodeExplosions.pop();
-        explosionClone.style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 4)];
-        explosionClone.r.baseVal.value = 10;
-        explosionClone.style.opacity = 1;
-        explosionClone.style.display = '';
+    for (let i = 0; i < 8 * quality; i++) {
         particles.push({
-            x: x + ((Math.random() * 10) - 5),
-            y: y + ((Math.random() * 10) - 5),
-            translate: explosionClone,
-            life: 5000,
-            speed: Math.random() / 2,
+            x: x + ((Math.random() * 20) - 10),
+            y: y + ((Math.random() * 20) - 10),
+            node: nodeCreate('explosion', '.topLayer', (element) => {
+                element.children[0].style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 2)];
+            }),
+            life: 50,
+            speed: Math.random() / 4,
             direction: Math.random() * 360,
-            animationState: 0,
-            animationSpeed: Math.random() * 2 + 5,
             animate: (particle) => {
-                particle.animationState += particle.animationSpeed;
-                particle.translate.r.baseVal.value = -(Math.cos(particle.animationState * (Math.PI / 100)) - 1) * 5;
-                particle.translate.style.opacity -= 0.02;
-                if (particle.animationState > 200) {
-                    particle.life = 0;
-                }
-            },
-            destroy: (node) => {
-                node.style.display = 'none';
-                nodeExplosions.push(node);
+                particle.node.elements.forEach((element) => {
+                    element.children[0].r.baseVal.value = particle.life / 2 + 20;
+                    element.children[0].style.opacity = 1 / 50 * particle.life;
+                });
             },
         });
     }
 };
     
 emit = (emitter, x, y, speed, direction) => {
+    if (Math.random() > quality) {
+        return;
+    }
     emitter.reloading--;
     if (emitter.reloading < 0) {
         emitter.reloading = emitter.reloadTime;
-
         for (let i = 0; i < emitter.amount; i++) {
-            if (!nodeBubbles.length) {
-                return;
-            }
-            particleClone = nodeBubbles.pop();
-            particleClone.style.opacity = 1;
-            particleClone.style.display = '';
             particles.push({
                 x: x + lengthDirX(-speed, direction),
                 y: y + lengthDirY(-speed, direction),
-                translate: particleClone,
-                life: 30,
+                node: nodeCreate('bubbleParticle', '.bottomLayer'),
+                life: 120,
                 speed: speed / 10,
                 direction: (direction - 180) + ((Math.random() * 30) - 15),
                 animate: (particle) => {
-                    particle.translate.style.opacity -= 0.04;
-                },
-                destroy: (node) => {
-                    node.style.display = 'none';
-                    nodeBubbles.push(node);
+                    particle.node.elements.forEach((element) => {
+                        element.children[0].style.opacity = 1 / 30 * particle.life;
+                    });
                 },
             });
         }
@@ -87,8 +71,8 @@ moveGameObjects = (gameObjects) => {
         gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
         gameObjects[i].y += lengthDirY(gameObjects[i].speed, gameObjects[i].direction);
 
-        move(gameObjects[i].translate, gameObjects[i].x, gameObjects[i].y);
-        rotate(gameObjects[i].rotate, gameObjects[i].direction, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
+        move(gameObjects[i].node, gameObjects[i].x, gameObjects[i].y);
+        rotate(gameObjects[i].node, gameObjects[i].direction, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
     }
 };
 
@@ -99,16 +83,19 @@ moveGameObjects2 = (gameObjects) => {
         gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
         gameObjects[i].y += lengthDirY(gameObjects[i].speed, gameObjects[i].direction);
 
-        move(gameObjects[i].translate, gameObjects[i].x, gameObjects[i].y);
-        rotate(gameObjects[i].rotate, gameObjects[i].facing, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
+        move(gameObjects[i].node, gameObjects[i].x, gameObjects[i].y);
+        rotate(gameObjects[i].node, gameObjects[i].facing, gameObjects[i].rotationPointX, gameObjects[i].rotationPointY);
     }
 };
 
 destroy = (gameObjects, i) => {
-    if (gameObjects[i].destroy) {
-        gameObjects[i].destroy(gameObjects[i].translate);
-    } else {
-        gameObjects[i].translate.remove();
-    }
+    nodeDestroy(gameObjects[i].node);
+//    if (gameObjects[i].destroy) {
+//        gameObjects[i].destroy(gameObjects[i].translate);
+//    } else {
+//        for (let j = 0; j < gameObjects[j].translate.length; j++) {
+//            gameObjects[i].translate[j].remove();
+//        }
+//    }
     gameObjects.splice(i, 1);
 };

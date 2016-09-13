@@ -33,7 +33,7 @@ document.body.onkeyup = (e) => {
     }
 };
 
-controlUpdate = (playerIndex) => {
+controlKeyboardUpdate = (playerIndex) => {
     if (buttonMoveDown) {
         players[playerIndex].currentAcceleration = players[playerIndex].acceleration;
     } else {
@@ -51,6 +51,4 @@ controlUpdate = (playerIndex) => {
     if (buttonShootDown) {
         players[playerIndex].shoot = true;
     }
-
-
 };

@@ -356,12 +356,18 @@ let jsfxr = function(settings) {
 }
 
 playSound = (params, x, y) => {
-    let distance = pointDistance(svgNode.viewBox.baseVal.x + (window.innerWidth * zoom) / 2, svgNode.viewBox.baseVal.y + (window.innerHeight * zoom) / 2, x, y);
-    if (distance < 2000) {
+    let minDistance = 2000;
+    for (let p = 0; p < panes.length; p++) {
+        let distance = pointDistance(panes[p].viewBox.baseVal.x + (window.innerWidth * zoom) / 2, panes[p].viewBox.baseVal.y + (window.innerHeight * zoom) / 2, x, y);
+        if (distance < minDistance) {
+            minDistance = distance;
+        }
+    }
+    if (minDistance < 2000) {
         let soundURL = jsfxr(params);
         let player = new Audio();
         player.src = soundURL;
-        player.volume = -(1 / 2000 * distance) + 1;
+        player.volume = -(1 / 2000 * minDistance) + 1;
         player.play();
     }
 };

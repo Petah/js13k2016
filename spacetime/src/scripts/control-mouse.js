@@ -3,12 +3,12 @@ mouseY = 0;
 mouseMoveDown = false;
 mouseShootDown = false;
 
-svgNode.onmousemove = (e) => {
+document.body.onmousemove = (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 };
 
-svgNode.onmousedown = (e) => {
+document.body.onmousedown = (e) => {
     if (e.which == 1) {
         mouseMoveDown = true;
     }
@@ -18,7 +18,7 @@ svgNode.onmousedown = (e) => {
     e.preventDefault();
 };
 
-svgNode.onmouseup = (e) => {
+document.body.onmouseup = (e) => {
     if (e.which == 1) {
         mouseMoveDown = false;
     }
@@ -28,11 +28,11 @@ svgNode.onmouseup = (e) => {
     e.preventDefault();
 };
 
-svgNode.oncontextmenu = (e) => {
+document.body.oncontextmenu = (e) => {
     e.preventDefault();
 };
 
-controlUpdate = () => {   
+controlMouseUpdate = () => {   
     if (mouseMoveDown) {
         player.speed = Math.min(player.speed + player.acceleration, player.maxSpeed);
         directionDelta = (player.direction - pointDirection(player.x, player.y, mouseX, mouseY) + 360) % 360;
