@@ -17,6 +17,10 @@ split = location.search.indexOf('split') !== -1;
 timeElapsed = 0;
 timeElapsedID = false;
 zoom = 2;
+glitchColors = {
+    human: ['#9417FF', '#5A30CC', '#9417FF', '#fff'],
+    cpu: ['#e0421d', '#ed4559', '#e0421d', '#fff']
+};
 
 setGameState = (s, l) => {
     split = s;
@@ -241,7 +245,7 @@ updatePlayer = (player) => {
                 x: player.x + lengthDirX((Math.random() * 50) - 25, player.facing),
                 y: player.y + lengthDirY((Math.random() * 50) - 25, player.facing),
                 node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
-                    element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                    element.children[0].style.fill = glitchColors[player.type][Math.floor(Math.random() * 4)];
                     element.children[0].style.opacity = Math.random();
                     element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
                     element.children[0].transform.baseVal[1].setScale(1, 1);
