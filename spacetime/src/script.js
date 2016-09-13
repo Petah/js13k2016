@@ -182,13 +182,6 @@ createPlayer = (options) => {
     players.push(player);
 };
 
-playerEmitter = {
-    particle: bubbleParticle,
-    reloading: 0,
-    reloadTime: 1,
-    amount: 1,
-};
-
 createCpu = (options) => {
     createPlayer(options);
     cpuPlayer = players.pop();
@@ -208,7 +201,7 @@ updatePlayer = (player) => {
     }
 
     if (player.currentAcceleration > 0.1 && !player.glitching) {
-        emit(playerEmitter, player.x, player.y, 25, player.facing);
+        emit(player.x, player.y, 25, player.facing);
     }
     
     player.glitchReload--;
@@ -240,10 +233,6 @@ updatePlayer = (player) => {
         for (let e = 0; e < player.node.elements.length; e++) {
             player.node.elements[e].style.display = 'none';
         }
-//        player.x += Math.random() * 2000 - 1000;
-//        player.y += Math.random() * 2000 - 1000;
-//        player.x += Math.random() * 200 - 100;
-//        player.y += Math.random() * 200 - 100;
         player.speed = 0;
     }
     
@@ -254,15 +243,42 @@ updatePlayer = (player) => {
         }
         glitches.push({
             node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+                element.style.display = 'none';
                 element.children[1].children[0].style.display = 'none';
             }),
             rotationPointX: 67/2,
             rotationPointY: 53/2,
+            delay: Math.random() * 100,
             glitchLog: player.glitchLog,
         });
+        
         player.glitchLog = [];
-        player.x += Math.random() * 200 - 100;
-        player.y += Math.random() * 200 - 100;
+        let x = 0, y = 0, minDistance;
+        do {
+            minDistance = 9999999;
+            x += Math.random() * 200 - 100;
+            y += Math.random() * 200 - 100;
+            for (let i = 0; i < players.length; i++) {
+                let distance = Math.abs(pointDistance(x, y, players[i].x, players[i].y));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
+            for (let i = 0; i < cpus.length; i++) {
+                let distance = Math.abs(pointDistance(x, y, cpus[i].x, cpus[i].y));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
+            for (let i = 0; i < glitches.length; i++) {
+                let distance = Math.abs(pointDistance(x, y, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
+        } while (minDistance < 500);
+        player.x = x;
+        player.y = y;
     }
     
     if (!player.glitching) {

@@ -30,27 +30,21 @@ createExplosion = (x, y, sound) => {
     }
 };
     
-emit = (emitter, x, y, speed, direction) => {
+emit = (x, y, speed, direction) => {
     if (Math.random() > quality) {
         return;
     }
-    emitter.reloading--;
-    if (emitter.reloading < 0) {
-        emitter.reloading = emitter.reloadTime;
-        for (let i = 0; i < emitter.amount; i++) {
-            particles.push({
-                x: x + lengthDirX(-speed, direction),
-                y: y + lengthDirY(-speed, direction),
-                node: nodeCreate('bubbleParticle', '.bottomLayer'),
-                life: 120,
-                speed: speed / 10,
-                direction: (direction - 180) + ((Math.random() * 30) - 15),
-                animate: (particle, element) => {
-                    element.children[0].style.opacity = 1 / 30 * particle.life;
-                },
-            });
-        }
-    }
+    particles.push({
+        x: x + lengthDirX(-speed, direction),
+        y: y + lengthDirY(-speed, direction),
+        node: nodeCreate('bubbleParticle', '.bottomLayer'),
+        life: 120,
+        speed: speed / 10,
+        direction: (direction - 180) + ((Math.random() * 30) - 15),
+        animate: (particle, element) => {
+            element.children[0].style.opacity = 1 / 30 * particle.life;
+        },
+    });
 };
 
 applyGravity = (self) => {
