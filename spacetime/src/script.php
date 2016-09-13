@@ -6,8 +6,8 @@ if (isDebug()) {
     require __DIR__ . '/scripts/game.js';
     require __DIR__ . '/scripts/node.js';
     require __DIR__ . '/scripts/collision.js';
-    require __DIR__ . '/scripts/control-keyboard.js';
     require __DIR__ . '/scripts/control-gamepad.js';
+    require __DIR__ . '/scripts/control-keyboard.js';
     // require __DIR__ . '/scripts/control-mouse.js';
     require __DIR__ . '/scripts/ai.js';
     require __DIR__ . '/scripts/state-start.js';

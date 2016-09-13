@@ -1,4 +1,4 @@
-controlGamepadUpdate = (playerIndex, gamepadIndex) => {   
+controlGamepadUpdate = (playerIndex, gamepadIndex) => {
     let gamepads = navigator.getGamepads();
     if (!gamepads[gamepadIndex]) {
         return;

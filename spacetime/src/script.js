@@ -3,17 +3,47 @@ updatedPerSecond = 0;
 updatedPerSecondTimer = performance.now();
 ///debug
 
-split = location.search.indexOf('split') !== -1;
-low = location.search.indexOf('low') !== -1;
-zoom = 2;
-gravityPower = 2500;
+bullets = [];
 cpus = [];
 glitches = [];
-players = [];
+gravityPower = 2500;
+low = location.search.indexOf('low') !== -1;
 planets = [];
-bullets = [];
+players = [];
+playerInputs = [];
 particles = [];
 quality = low ? 0.1 : 1;
+split = location.search.indexOf('split') !== -1;
+timeElapsed = 0;
+timeElapsedID = false;
+zoom = 2;
+
+setGameState = (s, l) => {
+    split = s;
+    low = l;
+    location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high');
+};
+
+updateLinkClass = (c, a) => {
+    els = document.getElementsByClassName(c);
+    for (var i = 0; i < els.length; i++) {
+        els[i].className += a;
+    }
+};
+
+updateButtons = () => {
+    c = location.search.substr(1).split(',');
+    for(var i = 0; i < c.length; ++i) {
+        updateLinkClass(c[i], ' active');
+    }
+};
+
+updateTimeElapsed = () => {
+    timeElapsedID = setInterval(() => {
+        elapsedTime.innerText = ++timeElapsed;
+    }, 1000);
+};
+
 if (split) {
     panes = [
         document.querySelector('.splitLeft'),
@@ -25,7 +55,6 @@ if (split) {
     ];
     panes[0].style.width = '100vw';
 }
-playerInputs = [];
 
 createNodes = (nodeArray, node, layer) => {
     for (let p = 0; p < panes.length; p++) {
@@ -129,12 +158,19 @@ createPlayer = (options) => {
         }),
         rotationPointX: 67/2,
         rotationPointY: 53/2,
-
-        lifeMax: 20,
-        lifeRegenRate: 5,
-        lifeRegenTime: 0,
-
+        
         hud: {},
+        
+        life: 20,
+        lifeMax: 20,
+        
+        glitch: false,
+        glitchCharge: 0,
+        glitchMax: 20,
+        glitchLog: [],
+        glitchReloadTime: 30,
+        glitchReloading: 30,
+        glitching: false,
 
         shootSound: createSound(soundGenerator.generateLaserShoot()),
         explosionSound: createSound(soundGenerator.generateHitHurt()),
@@ -165,19 +201,12 @@ createPlayer = (options) => {
         gunMounts: [20, -20],
 
         points: 0,
-
-        glitch: 0,
-        glitchMax: 20,
-        glitchLog: [],
-        glitchTime: 30,
-        glitchReload: 30,
-        glitching: false,
     };
-    
+
     for (let key in options) {
         player[key] = options[key];
     }
-    
+
     player.life = player.lifeMax;
     players.push(player);
 };
@@ -204,7 +233,7 @@ updatePlayer = (player) => {
         emit(player.x, player.y, 25, player.facing);
     }
     
-    if (player.glitch && player.glitchReload < 0) {
+    if (player.glitch && player.glitchReloading < 0 && player.glitchCharge >= player.glitchMax) {
         // Emit glitch particles
         for (let i = 0; i < 30; i++) {
             particles.push({
@@ -227,15 +256,16 @@ updatePlayer = (player) => {
         }
         
         // Glitch player
+        player.glitchCharge = 0;
         player.glitching = true;
-        player.glitchReload = player.glitchTime;
+        player.glitchReloading = player.glitchReloadTime;
         for (let e = 0; e < player.node.elements.length; e++) {
             player.node.elements[e].style.display = 'none';
         }
         player.speed = 0;
     }
     
-    if (player.glitching && player.glitchReload  < 0) {
+    if (player.glitching && player.glitchReloading  < 0) {
         player.glitching = false;
         for (let e = 0; e < player.node.elements.length; e++) {
             player.node.elements[e].style.display = '';
@@ -315,7 +345,7 @@ updatePlayer = (player) => {
         }
     }
     
-    player.glitchReload--;
+    player.glitchReloading--;
     player.glitch = false;
     player.reloading--;
     player.shoot = false;
@@ -337,8 +367,8 @@ createHud = (data, player) => {
             let base = h.children[0].children[0];
             let baseW = 436; // Magic
             base.transform.baseVal[1].setScale(-1, 1);
-//            move(base, baseW, 0);
-//            move(h.children[0].children[1], baseW - 112, 76);
+            move({elements:[base]}, baseW, 0);
+            move({elements:[h.children[0].children[1]]}, baseW - 112, 76);
         }
 
         // Append bars
@@ -355,16 +385,22 @@ createHud = (data, player) => {
 
         h.style.display = '';
         hudLayer.appendChild(h);
-        player.hud[data[j].id] = hudLayer.children[hudLayer.children.length - 1];
+        player.hud[data[j].id] = {
+            data: data[j],
+            element: hudLayer.children[hudLayer.children.length - 1],
+        };
     }
 };
 
-updateHud = (player, id) => {
-    if (player[id] >= 0 && player[id] <= player.lifeMax && player.hud.hasOwnProperty(id)) {
+updateHud = (player, current, max, stat) => {
+    if (current >= 0 && current <= max) {
         let bClass = 'hudBar';
-        for (let i = 0; i < player.hud[id].children[1].children.length; i++) {
-            if (i >= player[id]) bClass += ' hudBarE';
-            player.hud[id].children[1].children[i].setAttributeNS(null, 'class', bClass);
+        for (let i = 0; i < player.hud[stat].element.children[1].children.length; i++) {
+            if (i >= current) {
+                bClass += ' hudBarE';
+            }
+            let index = (player.hud[stat].data.hAlign === 'right') ? (player.hud[stat].element.children[1].children.length - (i + 1)) : i;
+            player.hud[stat].element.children[1].children[index].classList = bClass;
         }
     }
 };
@@ -398,6 +434,7 @@ main = (time, init) => {
 };
 
 stateStartInit();
+updateButtons();
 main();
 
 //setInterval(() => {

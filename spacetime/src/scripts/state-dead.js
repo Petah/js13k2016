@@ -2,6 +2,11 @@ stateDeadInit = () => {
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'block';
     state = stateDead;
+    if (timeElapsedID) {
+        clearInterval(timeElapsedID);
+        timeElapsedID = false;
+        timeElapsed = 0;
+    }
     while (players.length) {
         destroy(players, 0);
     }

@@ -23,15 +23,21 @@
     <g class="topLayer"></g>
     <g class="glitchLayer"></g>
 </svg>
-<svg id="svgStartNode">
-    <text x="50vw" y="10vh" id="title">SPACETIME</text>
-    <text x="50vw" y="50vh" id="startText">Press Button to Join!</text>
-    <text x="25vw" y="70vh" class="link" onclick="split = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs CPU</text>
-    <text x="75vw" y="70vh" class="link" onclick="split = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Player vs Player (Split Screen)</text>
-    <text x="50vw" y="80vh">Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</text>
-    <text x="25vw" y="90vh" class="link" onclick="low = false; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">High Quality</text>
-    <text x="75vw" y="90vh" class="link" onclick="low = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Low Quality</text>
-</svg>
+<div id="svgStartNode" class="absCenter">
+    <h1 id="title">SPACETIME</h1>
+    <div id="gameType">
+        <div class="link cpu" onclick="setGameState(false, low)">Player vs CPU</div>
+        <div class="link split" onclick="setGameState(true, low)">Player vs Player (Split Screen)</div>
+    </div>
+    <div id="gameQuality">
+        <div class="link high" onclick="setGameState(split, false)">High Quality</div>
+        <div class="link low" onclick="setGameState(split, true)">Low Quality</div>
+    </div>
+    <div id="helperText">
+        <h3 id="startText">Press Button to Join!</h3>
+        <h3>Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</h3>
+    </div>
+</div>
 <svg id="svgDeadNode" style="display: none">
     <text x="50vw" y="50vh">YOU DIED!</text>
     <text x="50vw" y="55vh">Coding https://github.com/petah and https://github.com/reybenher</text>
@@ -39,7 +45,11 @@
     <text x="50vw" y="65vh">Ships http://kenney.nl/assets</text>
     <text x="50vw" y="70vh">Sound https://github.com/grumdrig/jsfxr and http://humphd.github.io/sfxr.js/</text>
 </svg>
-<div id="hudLayer"></div>
+<div id="hudLayer" class="hud"></div>
+<div id="hudLayerBottom" class="hud">
+    <div>KILLS: <span id="killCount">0</span></div>
+    <div>LAPSE: <span id="elapsedTime">0</span>s</div>
+</div>
 <svg style="display: none">
     <g id="boatWrapper" class="player1" transform="translate(0 0) rotate(90)">
         <g id="boat" transform="translate(-33.5 -26.5) rotate(0) scale(0.7)">
@@ -105,7 +115,7 @@
 </svg>
 <svg id="hud" transform="translate(0 0) scale(1 1)" width="436" height="86" style="display: none">
     <g id="hudBase">
-        <polygon class="hudBase" points="436,48 136,48 120,86 0,86 0,46 436,46" transform="translate(0, 0) scale(1, 1)"/>
+        <polygon class="hudBase" points="436,48 136,48 120,86 0,86 0,46 436,46" transform="translate(0 0) scale(1 1)"/>
         <text class="hudText" transform="translate(10 76)"></text>
     </g>
     <g id="hudBars">

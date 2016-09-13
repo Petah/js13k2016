@@ -1,17 +1,20 @@
 stateGameInit = () => {
+    updateTimeElapsed();
+
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'none';
     state = stateGame;
-    
-//    createSolarSystem(solarSystemData);
-    
+
+    createSolarSystem(solarSystemData);
+
     playerInputs.forEach(() => {
         createPlayer({
             reloadTime: 5,
         });
     });
-    
+
     createHud(hudData, players[0]);
+    killCount.innerText = elapsedTime.innetText = '0';
 
     main(0, true);
 }
@@ -37,6 +40,10 @@ stateGame = () => {
             players[i].life += 0.005;
             if (players[i].life > players[i].lifeMax) {
                 players[i].life = players[i].lifeMax;
+            }
+            players[i].glitchCharge += 0.2;
+            if (players[i].glitchCharge > players[i].glitchMax) {
+                players[i].glitchCharge = players[i].glitchMax;
             }
             let minDistance = 9999999;
             let closest = null;
@@ -73,12 +80,13 @@ stateGame = () => {
             } else {
                 pointer.style.display = 'none';
             }
+        
+            updateHud(players[i], players[i].life, players[i].lifeMax, 'life');
+            updateHud(players[i], players[i].glitchCharge, players[i].glitchMax, 'glitch');
         } else {
             createExplosion(players[i].x, players[i].y, players[i].explosionSound);
             destroy(players, i);
         }
-        
-        updateHud(players[i], 'life');
     }
     for (let i = 0; i < cpus.length; i++) {
         checkCollisions(cpus[i], planets);
@@ -86,12 +94,16 @@ stateGame = () => {
             applyGravity(cpus[i]);
             ai(cpus[i]);
             updatePlayer(cpus[i]);
+            cpus[i].glitchCharge += 0.2;
+            if (cpus[i].glitchCharge > cpus[i].glitchMax) {
+                cpus[i].glitchCharge = cpus[i].glitchMax;
+            }
         } else {
             createExplosion(cpus[i].x, cpus[i].y, cpus[i].explosionSound);
             destroy(cpus, i);
         }
     }
-    
+
 
     for (let i = 0; i < glitches.length; i++) {
         if (glitches[i].delay !== null && glitches[i].delay-- < 0) {
@@ -189,7 +201,7 @@ stateGame = () => {
         if (bullets[i].life <= 0) {
             bullets[i].explode = true;
         }
-        
+
         // Bullet life
         bullets[i].life--;
         if (bullets[i].life <= 0) {
@@ -214,7 +226,7 @@ stateGame = () => {
         }
     }
 
-    
+
     for (let p = 0; p < panes.length; p++) {
         if (players[p]) {
             panes[p].viewBox.baseVal.x = players[p].x - (window.innerWidth * zoom) / 2;
@@ -225,7 +237,7 @@ stateGame = () => {
     }
 
     if (playerInputs.length === 1 && players[0]) {
-        while (cpus.length < cpuCount(players[0].points)) {
+        while (cpus.length < (players[0].points / 3) + 1) {
             createCpu({
                 lifeMax: 1,
             });
