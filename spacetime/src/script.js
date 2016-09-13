@@ -308,6 +308,9 @@ updatePlayer = (player) => {
     
     if (player.glitching && player.glitchReloading  < 0) {
         player.glitching = false;
+        if (player.type === 'cpu') {
+            player.node.elements[0].setAttributeNS(null, 'class', 'player2 ghost');
+        }
         for (let e = 0; e < player.node.elements.length; e++) {
             player.node.elements[e].style.display = '';
         }
