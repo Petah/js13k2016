@@ -25,6 +25,7 @@ stateStart = () => {
         if (startTimer) {
             clearTimeout(startTimer);
         }
+        startText.classList.remove('blink');
         startCountDown = 3;
         startText.textContent = startCountDown;
         startTimer = setTimeout(countDown, 700)
@@ -41,6 +42,7 @@ stateStart = () => {
                 if (startTimer) {
                     clearTimeout(startTimer);
                 }
+                startText.classList.remove('blink');
                 startCountDown = 3;
                 startText.textContent = startCountDown;
                 startTimer = setTimeout(countDown, 700)

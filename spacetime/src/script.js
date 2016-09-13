@@ -139,8 +139,8 @@ createPlayer = (options) => {
     let x = 0, y = 0, minDistance;
     do {
         minDistance = 9999999;
-        x += Math.random() * 5000 - 2500;
-        y += Math.random() * 5000 - 2500;
+        x += Math.random() * 10000 - 5000;
+        y += Math.random() * 10000 - 5000;
         for (let i = 0; i < planets.length; i++) {
             let distance = Math.abs(pointDistance(x, y, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle)));
             if (distance < minDistance) {
@@ -173,6 +173,7 @@ createPlayer = (options) => {
         glitching: false,
 
         shootSound: createSound(soundGenerator.generateLaserShoot()),
+        glitchSound: createSound(soundGenerator.generateJump()),
         explosionSound: createSound(soundGenerator.generateHitHurt()),
 
         x: x,
@@ -256,6 +257,7 @@ updatePlayer = (player) => {
         }
         
         // Glitch player
+        playSound(player.glitchSound, player.x, player.y);
         player.glitchCharge = 0;
         player.glitching = true;
         player.glitchReloading = player.glitchReloadTime;
