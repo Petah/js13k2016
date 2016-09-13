@@ -169,8 +169,9 @@ createPlayer = (options) => {
         glitch: 0,
         glitchMax: 20,
         glitchLog: [],
-        glitchTime: 30,
+        glitchTime: 50,
         glitchReload: 30,
+        glitching: false,
 
         emitter: {
             particle: bubbleParticle,
@@ -236,7 +237,11 @@ updatePlayer = (player) => {
         }
         
         // Glitch player
+        player.glitching = true;
         player.glitchReload = player.glitchTime;
+        for (let e = 0; e < player.node.elements.length; e++) {
+            player.node.elements[e].style.display = 'none';
+        }
 //        player.x += Math.random() * 2000 - 1000;
 //        player.y += Math.random() * 2000 - 1000;
 //        player.x += Math.random() * 200 - 100;
@@ -252,6 +257,14 @@ updatePlayer = (player) => {
         player.speed = 0;
         player.glitchLog = [];
     }
+    
+    if (player.glitching && player.glitchReload < 0) {
+        player.glitching = false;
+        for (let e = 0; e < player.node.elements.length; e++) {
+            player.node.elements[e].style.display = '';
+        }
+    }
+    
     player.glitch = false;
     
     player.glitchLog.push([player.x, player.y, player.facing]);

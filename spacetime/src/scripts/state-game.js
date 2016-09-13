@@ -130,7 +130,7 @@ stateGame = () => {
         particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
         particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
         for (let j = 0; j < particles[i].node.elements.length; j++) {
-            particles[i].animate(particles[i], particles[j].node.elements[j]);
+            particles[i].animate(particles[i], particles[i].node.elements[j]);
         }
 
         move(particles[i].node, particles[i].x, particles[i].y);
