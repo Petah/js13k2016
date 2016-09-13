@@ -6,16 +6,23 @@ exec('node_modules\.bin\cleancss -o build/style.min.css src/style.css');
 
 echo 'Replacing tokens in script.js' . PHP_EOL . PHP_EOL;
 $script = PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/sound.js');
-$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/ai.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/sound-gen.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/math.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/game.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/node.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/collision.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/control-keyboard.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/control-gamepad.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/ai.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/state-start.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/state-game.js');
+$script .= PHP_EOL . file_get_contents(__DIR__ . '/src/scripts/state-dead.js');
 $script .= PHP_EOL . file_get_contents(__DIR__ . '/src/script.js');
 $script = preg_replace('~//debug.*?///debug~s', '', $script);
 
 $token = 'a';
 $getToken = function() use(&$token) {
-    while ($token == 'i' || $token == 'j' || $token == 'x' || $token == 'y') {
+    while ($token == 'i' || $token == 'j' || $token == 'p' || $token == 'x' || $token == 'y') {
         $token++;
     }
     return $token++;

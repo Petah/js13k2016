@@ -90,8 +90,8 @@ stateGame = () => {
 
     for (let i = 0; i < glitches.length; i++) {
         if (glitches[i].glitchLog[0]) {
-            move(glitches[i].translate, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
-            rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
+            move(glitches[i].node, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
+            rotate(glitches[i].node, glitches[i].glitchLog[0][2], 16, 4);
         }
         if (!glitches[i].glitchLog.shift()) {
             destroy(glitches, i);

@@ -27,7 +27,8 @@ svg {
     left: auto;
 }
 
-#svgStartNode  text {
+#svgStartNode text,
+#svgDeadNode text {
     text-anchor: middle;
     fill: white;
     font-family: monospace;

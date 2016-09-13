@@ -31,7 +31,11 @@
     <text x="75vw" y="90vh" class="link" onclick="low = true; location = '?' + (split ? 'split' : 'cpu') + ',' + (low ? 'low' : 'high')">Low Quality</text>
 </svg>
 <svg id="svgDeadNode" style="display: none">
-    <text class="absCenter">YOU DIED!</text>
+    <text x="50vw" y="50vh">YOU DIED!</text>
+    <text x="50vw" y="55vh">Coding https://github.com/petah and https://github.com/reybenher</text>
+    <text x="50vw" y="60vh">Graphics https://github.com/reybenher</text>
+    <text x="50vw" y="65vh">Ships http://kenney.nl/assets</text>
+    <text x="50vw" y="70vh">Sound https://github.com/grumdrig/jsfxr and http://humphd.github.io/sfxr.js/</text>
 </svg>
 <div id="hudLayer"></div>
 <svg style="display: none">

@@ -2,6 +2,7 @@ buttonMoveDown = false;
 buttonShootDown = false;
 buttonTurnLeftDown = false;
 buttonTurnRightDown = false;
+buttonGlitchDown = false;
 
 document.body.onkeydown = (e) => {
     if (e.which == 38) {
@@ -13,8 +14,11 @@ document.body.onkeydown = (e) => {
     if (e.which == 39) {
         buttonTurnRightDown = true;
     }
-    if (e.which == 32) {
+    if (e.which == 17) {
         buttonShootDown = true;
+    }
+    if (e.which == 16) {
+        buttonGlitchDown = true;
     }
 };
 
@@ -28,8 +32,11 @@ document.body.onkeyup = (e) => {
     if (e.which == 39) {
         buttonTurnRightDown = false;
     }
-    if (e.which == 32) {
+    if (e.which == 17) {
         buttonShootDown = false;
+    }
+    if (e.which == 16) {
+        buttonGlitchDown = false;
     }
 };
 
@@ -46,6 +53,10 @@ controlKeyboardUpdate = (playerIndex) => {
         players[playerIndex].turnSpeed = Math.min(players[playerIndex].turnSpeed + players[playerIndex].turnAcceleration, players[playerIndex].maxTurnSpeed);
     } else {
         players[playerIndex].turnSpeed /= players[playerIndex].turnFriction;
+    }
+
+    if (buttonGlitchDown) {
+        players[playerIndex].glitch = true;
     }
 
     if (buttonShootDown) {

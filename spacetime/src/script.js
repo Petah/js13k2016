@@ -136,8 +136,8 @@ createPlayer = (options) => {
 
         hud: {},
 
-        shootSound: soundGenerator.generateLaserShoot(),
-        explosionSound: soundGenerator.generateExplosion(),
+        shootSound: createSound(soundGenerator.generateLaserShoot()),
+        explosionSound: createSound(soundGenerator.generateExplosion()),
 
         x: x,
         y: y,
@@ -170,6 +170,7 @@ createPlayer = (options) => {
         glitchMax: 20,
         glitchLog: [],
         glitchTime: 30,
+        glitchReload: 30,
 
         emitter: {
             particle: bubbleParticle,
@@ -209,6 +210,21 @@ updatePlayer = (player) => {
     if (player.currentAcceleration > 0.1) {
         emit(player.emitter, player.x, player.y, 25, player.facing);
     }
+    
+    player.glitchReload--;
+    if (player.glitch && player.glitchReload < 0) {
+        player.glitchReload = player.glitchTime;
+        player.x += Math.random() * 2000 - 1000;
+        player.y += Math.random() * 2000 - 1000;
+        glitches.push({
+            node: nodeCreate('boatWrapper', '.topLayer'),
+            glitchLog: player.glitchLog,
+        });
+        player.glitchLog = [];
+    }
+    player.glitch = false;
+    
+    player.glitchLog.push([player.x, player.y, player.facing]);
     
     player.reloading--;
     if (player.shoot && player.reloading < 0) {
