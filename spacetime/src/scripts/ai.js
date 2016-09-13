@@ -11,8 +11,11 @@ ai = (cpu) => {
     if (Math.random() < 0.8) {
         cpu.currentAcceleration = cpu.acceleration;
         directionDelta = (cpu.facing - pointDirection(cpu.x, cpu.y, closestPlayer.x, closestPlayer.y) + 360) % 360;
-        if (closestPlayerDistance < 200) {
+        if (closestPlayerDistance < 800) {
             directionDelta = -directionDelta + 360;
+        }
+        if (closestPlayerDistance < 400 && Math.random() < 0.2) {
+            cpu.glitch = true;
         }
         if (directionDelta < 180) {
             if (directionDelta > 3) {

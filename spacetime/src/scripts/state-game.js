@@ -13,7 +13,7 @@ stateGameInit = () => {
     
     createHud(hudData, players[0]);
 
-    main(true);
+    main(0, true);
 }
 
 stateGame = () => {
@@ -34,7 +34,7 @@ stateGame = () => {
             applyGravity(players[i]);
             playerInputs[i][0](i, playerInputs[i][1]);
             updatePlayer(players[i]);
-            players[i].life += players[i].life + 0.01;
+            players[i].life += 0.005;
             if (players[i].life > players[i].lifeMax) {
                 players[i].life = players[i].lifeMax;
             }
@@ -77,6 +77,8 @@ stateGame = () => {
             createExplosion(players[i].x, players[i].y, players[i].explosionSound);
             destroy(players, i);
         }
+        
+        updateHud(players[i], 'life');
     }
     for (let i = 0; i < cpus.length; i++) {
         checkCollisions(cpus[i], planets);
@@ -176,7 +178,8 @@ stateGame = () => {
     moveGameObjects2(players);
     moveGameObjects2(cpus);
     moveGameObjects(bullets);
-    bulletLoop: for (let i = 0; i < bullets.length; i++) {
+    
+    for (let i = 0; i < bullets.length; i++) {
         applyGravity(bullets[i]);
 
         // Collide with ships
@@ -222,13 +225,12 @@ stateGame = () => {
     }
 
     if (playerInputs.length === 1 && players[0]) {
-//        while (cpus.length < cpuCount(players[0].points)) {
-//            createCpu({
-//                lifeMax: 1,
-//            });
-//        }
+        while (cpus.length < cpuCount(players[0].points)) {
+            createCpu({
+                lifeMax: 1,
+            });
+        }
     }
-
 
     if (!players.length) {
         stateDeadInit();

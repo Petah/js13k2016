@@ -13,17 +13,18 @@ rotate = (node, angle, rotationPointX, rotationPointY) => {
 
 createExplosion = (x, y, sound) => {
     playSound(sound, x, y);
-    for (let i = 0; i < 8 * quality; i++) {
+    for (let i = 0; i < 4; i++) {
         particles.push({
             x: x + ((Math.random() * 20) - 10),
             y: y + ((Math.random() * 20) - 10),
             node: nodeCreate('explosion', '.topLayer', (element) => {
-                element.children[0].style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i / 2)];
+                element.children[0].style.fill = ['#FD6D0A', '#FE9923', '#FFDE03', '#fff'][Math.floor(i)];
             }),
             life: 50,
             speed: Math.random() / 4,
             direction: Math.random() * 360,
             animate: (particle, element) => {
+                element.children[0].r.baseVal.value = particle.life / 2 + 20;
                 element.children[0].style.opacity = 1 / 50 * particle.life;
             },
         });

@@ -137,7 +137,7 @@ createPlayer = (options) => {
         hud: {},
 
         shootSound: createSound(soundGenerator.generateLaserShoot()),
-        explosionSound: createSound(soundGenerator.generateExplosion()),
+        explosionSound: createSound(soundGenerator.generateHitHurt()),
 
         x: x,
         y: y,
@@ -258,6 +258,12 @@ updatePlayer = (player) => {
             minDistance = 9999999;
             x += Math.random() * 200 - 100;
             y += Math.random() * 200 - 100;
+            for (let i = 0; i < planets.length; i++) {
+                let distance = Math.abs(pointDistance(x, y, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle)));
+                if (distance < minDistance) {
+                    minDistance = distance;
+                }
+            }
             for (let i = 0; i < players.length; i++) {
                 let distance = Math.abs(pointDistance(x, y, players[i].x, players[i].y));
                 if (distance < minDistance) {
@@ -276,7 +282,7 @@ updatePlayer = (player) => {
                     minDistance = distance;
                 }
             }
-        } while (minDistance < 500);
+        } while (minDistance < 700);
         player.x = x;
         player.y = y;
     }
@@ -383,36 +389,7 @@ hudData = [
     },
 ];
 
-main = (init) => {
-    //debug
-//    updatedPerSecond++;
-//    if (updatedPerSecondTimer < performance.now()) {
-//        ups.innerHTML = 'UPS: ' + updatedPerSecond;
-//        updatedPerSecondTimer = performance.now() + 1000;
-//        updatedPerSecond = 0;
-//    }
-//    pos.innerHTML = '';
-//    if (players[0]) {
-//        pos.innerHTML = `
-//            POS: ${parseInt(players[0].x)}, ${parseInt(players[0].y)} 
-//            SPEED: ${parseInt(players[0].speed)} 
-//            DIR: ${parseInt(players[0].direction)} 
-//            FACE: ${parseInt(players[0].facing)}
-//            ACEL: ${players[0].currentAcceleration.toFixed(3)}
-//        `;
-//    }
-//    if (cpus[0]) {
-//        pos.innerHTML += `
-//            <br/>
-//            POS: ${parseInt(cpus[0].x)}, ${parseInt(cpus[0].y)} 
-//            SPEED: ${parseInt(cpus[0].speed)} 
-//            DIR: ${parseInt(cpus[0].direction)} 
-//            FACE: ${parseInt(cpus[0].facing)}
-//            ACEL: ${cpus[0].currentAcceleration.toFixed(3)}
-//        `;
-//    }
-    ///debug
-
+main = (time, init) => {
     state();
 
     if (init !== true) {
@@ -422,3 +399,7 @@ main = (init) => {
 
 stateStartInit();
 main();
+
+//setInterval(() => {
+//    state();
+//}, 1000 / 60);
