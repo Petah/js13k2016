@@ -125,6 +125,7 @@ svg text.absCenter {
 
 #svgStartNode{height:500px}
 #svgDeadNode{height:400px}
+#svgDeadNode span{display:block;color:#ac5eef;}
 .link {
     border: 3px solid #841cdc;
     display: inline-block;

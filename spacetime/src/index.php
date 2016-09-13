@@ -40,10 +40,9 @@
 </div>
 <div id="svgDeadNode" class="absCenter" style="display: none">
     <h1>YOU DIED!</h1>
-    <h4>Coding<br>https://github.com/petah<br>https://github.com/reybenher</h4>
-    <h4>Graphics<br>https://github.com/reybenher</h4>
-    <h4>Ships<br>http://kenney.nl/assets</h4>
-    <h4>Sound<br>https://github.com/grumdrig/jsfxr<br>http://humphd.github.io/sfxr.js/</h4>
+    <h4><span>Coding & Graphics</span>https://github.com/petah<br>https://github.com/reybenher</h4>
+    <h4><span>Ships</span>http://kenney.nl/assets</h4>
+    <h4><span>Sound</span>https://github.com/grumdrig/jsfxr<br>http://humphd.github.io/sfxr.js/</h4>
 </div>
 <div id="hudLayer" class="hud"></div>
 <div id="hudLayerBottom" class="hud" style="display: none;">
