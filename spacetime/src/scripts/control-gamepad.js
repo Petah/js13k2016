@@ -13,8 +13,6 @@ controlGamepadUpdate = (playerIndex, gamepadIndex) => {
 
     if (gamepads[gamepadIndex].buttons[7].value > 0.2) {
         players[playerIndex].currentAcceleration = gamepads[gamepadIndex].buttons[7].value * players[playerIndex].acceleration;
-    } else {
-        players[playerIndex].currentAcceleration = 0;
     }
 
     if (gamepads[gamepadIndex].axes[0] > 0.3 || gamepads[gamepadIndex].axes[0] < -0.3) {

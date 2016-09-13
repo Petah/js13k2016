@@ -73,7 +73,11 @@ moveGameObjects = (gameObjects) => {
 
 moveGameObjects2 = (gameObjects) => {
     for (let i = 0; i < gameObjects.length; i++) {
+        if (gameObjects[i].glitching) {
+            continue;
+        }
         motionAdd(gameObjects[i], gameObjects[i].currentAcceleration, gameObjects[i].facing);
+        gameObjects[i].currentAcceleration = 0;
         gameObjects[i].speed = Math.min(gameObjects[i].speed, gameObjects[i].maxSpeed);
         gameObjects[i].x += lengthDirX(gameObjects[i].speed, gameObjects[i].direction);
         gameObjects[i].y += lengthDirY(gameObjects[i].speed, gameObjects[i].direction);

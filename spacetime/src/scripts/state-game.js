@@ -92,11 +92,33 @@ stateGame = () => {
     
 
     for (let i = 0; i < glitches.length; i++) {
-        if (glitches[i].glitchLog[0]) {
-            move(glitches[i].node, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
-            rotate(glitches[i].node, glitches[i].glitchLog[0][2], glitches[i].rotationPointX, glitches[i].rotationPointY);
+        let glitch = glitches[i].glitchLog.shift();
+        move(glitches[i].node, glitch[0], glitch[1]);
+        rotate(glitches[i].node, glitch[2], glitches[i].rotationPointX, glitches[i].rotationPointY);
+        if (glitch[3] > 0.1) {
+            emit(playerEmitter, glitch[0], glitch[1], 25, glitch[2]);
         }
-        if (!glitches[i].glitchLog.shift()) {
+        if (!glitches[i].glitchLog.length) {
+            // Emit glitch particles
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: glitch[0] + lengthDirX((Math.random() * 50) - 25, glitch[2]),
+                    y: glitch[1] + lengthDirY((Math.random() * 50) - 25, glitch[2]),
+                    node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                        element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                        element.children[0].style.opacity = Math.random();
+                        element.children[0].transform.baseVal[0].setRotate(glitch[2], 0, 0);
+                        element.children[0].transform.baseVal[1].setScale(1, 1);
+                    }),
+                    life: 100,
+                    speed: Math.random() * 2,
+                    direction: i % 2 == 0 ? glitch[2] + 90 : glitch[2] - 90,
+                    animate: (particle, element) => {
+                        element.children[0].transform.baseVal[1].setScale(1 / 50 * particle.life, 1 / 50 * particle.life);
+                        element.children[0].style.opacity = 1 / 50 * particle.life;
+                    },
+                });
+            }
             destroy(glitches, i);
         }
     }

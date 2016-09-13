@@ -169,16 +169,9 @@ createPlayer = (options) => {
         glitch: 0,
         glitchMax: 20,
         glitchLog: [],
-        glitchTime: 50,
+        glitchTime: 30,
         glitchReload: 30,
         glitching: false,
-
-        emitter: {
-            particle: bubbleParticle,
-            reloading: 0,
-            reloadTime: 1,
-            amount: 1,
-        },
     };
     
     for (let key in options) {
@@ -187,6 +180,13 @@ createPlayer = (options) => {
     
     player.life = player.lifeMax;
     players.push(player);
+};
+
+playerEmitter = {
+    particle: bubbleParticle,
+    reloading: 0,
+    reloadTime: 1,
+    amount: 1,
 };
 
 createCpu = (options) => {
@@ -207,9 +207,8 @@ updatePlayer = (player) => {
         player.facing += 360;
     }
 
-    player.emitter.reloading--;
-    if (player.currentAcceleration > 0.1) {
-        emit(player.emitter, player.x, player.y, 25, player.facing);
+    if (player.currentAcceleration > 0.1 && !player.glitching) {
+        emit(playerEmitter, player.x, player.y, 25, player.facing);
     }
     
     player.glitchReload--;
@@ -225,11 +224,10 @@ updatePlayer = (player) => {
                     element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
                     element.children[0].transform.baseVal[1].setScale(1, 1);
                 }),
-                life: 50,
+                life: 100,
                 speed: Math.random() * 2,
                 direction: i % 2 == 0 ? player.facing + 90 : player.facing - 90,
                 animate: (particle, element) => {
-                    console.log(element.children[0]);
                     element.children[0].transform.baseVal[1].setScale(1 / 50 * particle.life, 1 / 50 * particle.life);
                     element.children[0].style.opacity = 1 / 50 * particle.life;
                 },
@@ -246,31 +244,35 @@ updatePlayer = (player) => {
 //        player.y += Math.random() * 2000 - 1000;
 //        player.x += Math.random() * 200 - 100;
 //        player.y += Math.random() * 200 - 100;
-//        glitches.push({
-//            node: nodeCreate('boatWrapper', '.topLayer', (element) => {
-//                element.children[1].children[0].style.display = 'none';
-//            }),
-//            rotationPointX: 67/2,
-//            rotationPointY: 53/2,
-//            glitchLog: player.glitchLog,
-//        });
         player.speed = 0;
-        player.glitchLog = [];
     }
     
-    if (player.glitching && player.glitchReload < 0) {
+    if (player.glitching && player.glitchReload  < 0) {
         player.glitching = false;
         for (let e = 0; e < player.node.elements.length; e++) {
             player.node.elements[e].style.display = '';
         }
+        glitches.push({
+            node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+                element.children[1].children[0].style.display = 'none';
+            }),
+            rotationPointX: 67/2,
+            rotationPointY: 53/2,
+            glitchLog: player.glitchLog,
+        });
+        player.glitchLog = [];
+        player.x += Math.random() * 200 - 100;
+        player.y += Math.random() * 200 - 100;
+    }
+    
+    if (!player.glitching) {
+        player.glitchLog.push([player.x, player.y, player.facing, player.currentAcceleration]);
     }
     
     player.glitch = false;
     
-    player.glitchLog.push([player.x, player.y, player.facing]);
-    
     player.reloading--;
-    if (player.shoot && player.reloading < 0) {
+    if (player.shoot && player.reloading < 0 && !player.glitching) {
         playSound(player.shootSound, player.x, player.y);
         player.reloading = player.reloadTime;
         bullets.push({
