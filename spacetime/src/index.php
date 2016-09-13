@@ -34,19 +34,18 @@
         <div class="link low" onclick="setGameState(split, true)">Low Quality</div>
     </div>
     <div id="helperText">
-        <h3 id="startText">Press Button to Join!</h3>
-        <h3>Arrows [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</h3>
+        <h3 id="startText" class="blink">Press Button to Join!</h3>
+        <h3>PC [Arrows] [CTRL] [SHIFT] / XBox Controller [RT] [A] [B]</h3>
     </div>
 </div>
-<svg id="svgDeadNode" style="display: none">
-    <text x="50vw" y="50vh">YOU DIED!</text>
-    <text x="50vw" y="55vh">Coding https://github.com/petah and https://github.com/reybenher</text>
-    <text x="50vw" y="60vh">Graphics https://github.com/reybenher</text>
-    <text x="50vw" y="65vh">Ships http://kenney.nl/assets</text>
-    <text x="50vw" y="70vh">Sound https://github.com/grumdrig/jsfxr and http://humphd.github.io/sfxr.js/</text>
-</svg>
+<div id="svgDeadNode" class="absCenter" style="display: none">
+    <h1>YOU DIED!</h1>
+    <h4><span>Coding & Graphics</span>https://github.com/petah<br>https://github.com/reybenher</h4>
+    <h4><span>Ships</span>http://kenney.nl/assets</h4>
+    <h4><span>Sound</span>https://github.com/grumdrig/jsfxr<br>http://humphd.github.io/sfxr.js/</h4>
+</div>
 <div id="hudLayer" class="hud"></div>
-<div id="hudLayerBottom" class="hud">
+<div id="hudLayerBottom" class="hud" style="display: none;">
     <div>KILLS: <span id="killCount">0</span></div>
     <div>LAPSE: <span id="elapsedTime">0</span>s</div>
 </div>

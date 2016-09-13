@@ -124,6 +124,8 @@ svg text.absCenter {
 #hudLayerBottom>div{display:inline-block;margin:0 1em;}
 
 #svgStartNode{height:500px}
+#svgDeadNode{height:400px}
+#svgDeadNode span{display:block;color:#ac5eef;}
 .link {
     border: 3px solid #841cdc;
     display: inline-block;
@@ -138,4 +140,20 @@ svg text.absCenter {
 
 .link.active {
     background-color: rgba(138, 28, 220, 0.15);
+}
+
+.blink {
+    animation: blink 1s step-start 0s infinite;
+    -webkit-animation: blink 1s step-start 0s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+@-webkit-keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
 }

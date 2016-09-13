@@ -11,7 +11,9 @@ checkCollisions = (self, others) => {
                 for (let j = 0; j < players.length; j++) {
                     if (players[j].id === self.owner.id) {
                         players[j].points++;
-                        killCount.innerText = players[j].points;
+                        if (!split) {
+                        	killCount.innerText = players[j].points;
+                        }
                     }
                 }
             }
