@@ -9,6 +9,7 @@
         </g>
     </g>
     <g class="topLayer"></g>
+    <g class="glitchLayer"></g>
 </svg>
 <svg class="splitRight" viewBox="0 0 100 100">
     <?php require __DIR__ . '/filters.php'; ?>
@@ -20,6 +21,7 @@
         </g>
     </g>
     <g class="topLayer"></g>
+    <g class="glitchLayer"></g>
 </svg>
 <svg id="svgStartNode">
     <text x="50vw" y="10vh" id="title">SPACETIME</text>
@@ -59,6 +61,7 @@
         </g>
     </g>
     <circle id="starNode"/>
+    <g id="glitchParticle" transform="translate(0 0)"><rect x="-5" y="-15" width="10" height="30" rx="5" ry="5" class="planetOrange3" transform="rotate(0) scale(1)" /></g>
     <g id="bubbleParticle" transform="translate(0 0)"><circle class="bubbleParticle" r="2" style="opacity:.4"/></g>
     <g id="explosion" transform="translate(0 0)"><circle class="explosion" /></g>
     <g id="bullet" transform="translate(0 0)"><polygon class="bullet" transform="translate(0 0) rotate(0)" points="-25 0 0 3 3 0 0 -3"/></g>

@@ -213,13 +213,43 @@ updatePlayer = (player) => {
     
     player.glitchReload--;
     if (player.glitch && player.glitchReload < 0) {
+        // Emit glitch particles
+        for (let i = 0; i < 30; i++) {
+            particles.push({
+                x: player.x + lengthDirX((Math.random() * 50) - 25, player.facing),
+                y: player.y + lengthDirY((Math.random() * 50) - 25, player.facing),
+                node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                    element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                    element.children[0].style.opacity = Math.random();
+                    element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
+                    element.children[0].transform.baseVal[1].setScale(1, 1);
+                }),
+                life: 50,
+                speed: Math.random() * 2,
+                direction: i % 2 == 0 ? player.facing + 90 : player.facing - 90,
+                animate: (particle, element) => {
+                    console.log(element.children[0]);
+                    element.children[0].transform.baseVal[1].setScale(1 / 50 * particle.life, 1 / 50 * particle.life);
+                    element.children[0].style.opacity = 1 / 50 * particle.life;
+                },
+            });
+        }
+        
+        // Glitch player
         player.glitchReload = player.glitchTime;
-        player.x += Math.random() * 2000 - 1000;
-        player.y += Math.random() * 2000 - 1000;
-        glitches.push({
-            node: nodeCreate('boatWrapper', '.topLayer'),
-            glitchLog: player.glitchLog,
-        });
+//        player.x += Math.random() * 2000 - 1000;
+//        player.y += Math.random() * 2000 - 1000;
+//        player.x += Math.random() * 200 - 100;
+//        player.y += Math.random() * 200 - 100;
+//        glitches.push({
+//            node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+//                element.children[1].children[0].style.display = 'none';
+//            }),
+//            rotationPointX: 67/2,
+//            rotationPointY: 53/2,
+//            glitchLog: player.glitchLog,
+//        });
+        player.speed = 0;
         player.glitchLog = [];
     }
     player.glitch = false;
