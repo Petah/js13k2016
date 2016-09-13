@@ -357,7 +357,7 @@ let jsfxr = function(settings) {
 
 createSound = (params) => {
     let players = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 10; i++) {
         let soundURL = jsfxr(params);
         let player = new Audio();
         player.src = soundURL;

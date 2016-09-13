@@ -128,6 +128,25 @@ stateGame = () => {
             if (glitch[3] > 0.1) {
                 emit(glitch[0], glitch[1], 25, glitch[2]);
             }
+            
+            if (glitch[4]) {
+                playSound(glitches[i].owner.shootSound, glitch[0], glitch[1]);
+                bullets.push({
+                    owner: glitches[i].owner,
+                    node: nodeCreate('bullet', '.bottomLayer'),
+                    rotationPointX: 0,
+                    rotationPointY: 0,
+                    x: glitch[0] + lengthDirX(glitches[i].owner.gunMounts[glitch[5]], glitch[2] + 90),
+                    y: glitch[1] + lengthDirY(glitches[i].owner.gunMounts[glitch[5]], glitch[2] + 90),
+                    direction: glitch[2],
+                    speed: 30,
+                    life: 60,
+                    mass: 0.8,
+                    collisionRadius: 10,
+                    damage: 1,
+                });
+            }
+            
             if (!glitches[i].glitchLog.length) {
                 // Emit glitch particles
                 for (let i = 0; i < 30; i++) {

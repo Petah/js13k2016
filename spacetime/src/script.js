@@ -204,7 +204,6 @@ updatePlayer = (player) => {
         emit(player.x, player.y, 25, player.facing);
     }
     
-    player.glitchReload--;
     if (player.glitch && player.glitchReload < 0) {
         // Emit glitch particles
         for (let i = 0; i < 30; i++) {
@@ -242,6 +241,7 @@ updatePlayer = (player) => {
             player.node.elements[e].style.display = '';
         }
         glitches.push({
+            owner: player,
             node: nodeCreate('boatWrapper', '.topLayer', (element) => {
                 element.style.display = 'none';
                 element.children[1].children[0].style.display = 'none';
@@ -282,12 +282,9 @@ updatePlayer = (player) => {
     }
     
     if (!player.glitching) {
-        player.glitchLog.push([player.x, player.y, player.facing, player.currentAcceleration]);
+        player.glitchLog.push([player.x, player.y, player.facing, player.currentAcceleration, player.shoot && player.reloading < 0 && !player.glitching, player.gunMount]);
     }
     
-    player.glitch = false;
-    
-    player.reloading--;
     if (player.shoot && player.reloading < 0 && !player.glitching) {
         playSound(player.shootSound, player.x, player.y);
         player.reloading = player.reloadTime;
@@ -304,12 +301,6 @@ updatePlayer = (player) => {
             mass: 0.8,
             collisionRadius: 10,
             damage: 1,
-            emitter: {
-                particle: bubbleParticle,
-                reloading: 0,
-                reloadTime: 1,
-                amount: 1,
-            },
         });
         
         player.gunMount++;
@@ -317,6 +308,10 @@ updatePlayer = (player) => {
             player.gunMount = 0;
         }
     }
+    
+    player.glitchReload--;
+    player.glitch = false;
+    player.reloading--;
     player.shoot = false;
 };
 
