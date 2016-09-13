@@ -17,7 +17,9 @@ stateGameInit = () => {
         });
     });
 
-    createHud(hudData, players[0]);
+    if (!split) {
+        createHud(hudData, players[0]);
+    }
 
     main(0, true);
 }
@@ -40,13 +42,15 @@ stateGame = () => {
             applyGravity(players[i]);
             playerInputs[i][0](i, playerInputs[i][1]);
             updatePlayer(players[i]);
-            players[i].life += 0.005;
-            if (players[i].life > players[i].lifeMax) {
-                players[i].life = players[i].lifeMax;
-            }
-            players[i].glitchCharge += 0.2;
-            if (players[i].glitchCharge > players[i].glitchMax) {
-                players[i].glitchCharge = players[i].glitchMax;
+            if (players[i].life > 0) {
+                players[i].life += 0.005;
+                if (players[i].life > players[i].lifeMax) {
+                    players[i].life = players[i].lifeMax;
+                }
+                players[i].glitchCharge += 0.2;
+                if (players[i].glitchCharge > players[i].glitchMax) {
+                    players[i].glitchCharge = players[i].glitchMax;
+                }
             }
             let minDistance = 9999999;
             let closest = null;
@@ -84,11 +88,33 @@ stateGame = () => {
                 pointer.style.display = 'none';
             }
         
-            updateHud(players[i], players[i].life, players[i].lifeMax, 'life');
-            updateHud(players[i], players[i].glitchCharge, players[i].glitchMax, 'glitch');
+            if (!split) {
+                updateHud(players[i], players[i].life, players[i].lifeMax, 'life');
+                updateHud(players[i], players[i].glitchCharge, players[i].glitchMax, 'glitch');
+            }
         } else {
-            createExplosion(players[i].x, players[i].y, players[i].explosionSound);
-            destroy(players, i);
+            if (!players[i].dead) {
+                createExplosion(players[i].x, players[i].y, players[i].explosionSound);
+                players[i].dead = true;
+                for (let e = 0; e < players[i].node.elements.length; e++) {
+                    players[i].node.elements[e].style.display = 'none';
+                }
+            }
+            if (!split) {
+                destroy(players, i);
+            }
+        } 
+        if (split && players[i].dead) {
+            players[i].life--;
+            if (players[i].life < -100) {
+                players[i].dead = false;
+                for (let e = 0; e < players[i].node.elements.length; e++) {
+                    players[i].node.elements[e].style.display = '';
+                }
+                players[i].life = players[i].lifeMax;
+                players[i].speed = 0;
+                spawnPlayer(players[i]);
+            }
         }
     }
     for (let i = 0; i < cpus.length; i++) {
@@ -247,7 +273,7 @@ stateGame = () => {
         }
     }
 
-    if (!players.length) {
+    if (!split && !players.length) {
         stateDeadInit();
     }
 }

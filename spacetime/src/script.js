@@ -165,8 +165,8 @@ createPlayer = (options) => {
         
         hud: {},
         
-        life: 20,
-        lifeMax: 20,
+        life: split ? 10 : 20,
+        lifeMax: split ? 10 : 20,
         
         glitch: false,
         glitchCharge: 0,
@@ -222,6 +222,41 @@ createCpu = (options) => {
     cpuPlayer.type = 'cpu';
     cpuPlayer.node.elements[0].classList = 'player2';
     cpus.push(cpuPlayer);
+};
+
+spawnPlayer = (player) => {
+    let x = 0, y = 0, minDistance;
+    do {
+        minDistance = 9999999;
+        x += Math.random() * 200 - 100;
+        y += Math.random() * 200 - 100;
+        for (let i = 0; i < planets.length; i++) {
+            let distance = Math.abs(pointDistance(x, y, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle)));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < players.length; i++) {
+            let distance = Math.abs(pointDistance(x, y, players[i].x, players[i].y));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < cpus.length; i++) {
+            let distance = Math.abs(pointDistance(x, y, cpus[i].x, cpus[i].y));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+        for (let i = 0; i < glitches.length; i++) {
+            let distance = Math.abs(pointDistance(x, y, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]));
+            if (distance < minDistance) {
+                minDistance = distance;
+            }
+        }
+    } while (minDistance < 700);
+    player.x = x;
+    player.y = y;
 };
 
 updatePlayer = (player) => {
@@ -289,38 +324,7 @@ updatePlayer = (player) => {
         });
         
         player.glitchLog = [];
-        let x = 0, y = 0, minDistance;
-        do {
-            minDistance = 9999999;
-            x += Math.random() * 200 - 100;
-            y += Math.random() * 200 - 100;
-            for (let i = 0; i < planets.length; i++) {
-                let distance = Math.abs(pointDistance(x, y, lengthDirX(planets[i].distance, planets[i].angle), lengthDirY(planets[i].distance, planets[i].angle)));
-                if (distance < minDistance) {
-                    minDistance = distance;
-                }
-            }
-            for (let i = 0; i < players.length; i++) {
-                let distance = Math.abs(pointDistance(x, y, players[i].x, players[i].y));
-                if (distance < minDistance) {
-                    minDistance = distance;
-                }
-            }
-            for (let i = 0; i < cpus.length; i++) {
-                let distance = Math.abs(pointDistance(x, y, cpus[i].x, cpus[i].y));
-                if (distance < minDistance) {
-                    minDistance = distance;
-                }
-            }
-            for (let i = 0; i < glitches.length; i++) {
-                let distance = Math.abs(pointDistance(x, y, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]));
-                if (distance < minDistance) {
-                    minDistance = distance;
-                }
-            }
-        } while (minDistance < 700);
-        player.x = x;
-        player.y = y;
+        spawnPlayer(player);
     }
     
     if (!player.glitching) {

@@ -68,7 +68,7 @@ moveGameObjects = (gameObjects) => {
 
 moveGameObjects2 = (gameObjects) => {
     for (let i = 0; i < gameObjects.length; i++) {
-        if (gameObjects[i].glitching) {
+        if (gameObjects[i].glitching || gameObjects[i].dead) {
             continue;
         }
         motionAdd(gameObjects[i], gameObjects[i].currentAcceleration, gameObjects[i].facing);

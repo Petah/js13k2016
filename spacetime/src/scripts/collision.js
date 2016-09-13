@@ -1,4 +1,7 @@
 checkCollisions = (self, others) => {
+    if (self.dead) {
+        return;
+    }
     for (let i = 0; i < others.length; i++) {
         if (self.owner && self.owner.id == others[i].id) {
             continue;

@@ -14,7 +14,7 @@ countDown = () => {
         stateGameInit();
     } else {
         startText.textContent = startCountDown;
-        startTimer = setTimeout(countDown, 700)
+        startTimer = setTimeout(countDown, 500)
     }
 };
 
@@ -26,9 +26,13 @@ stateStart = () => {
             clearTimeout(startTimer);
         }
         startText.classList.remove('blink');
-        startCountDown = 3;
-        startText.textContent = startCountDown;
-        startTimer = setTimeout(countDown, 700)
+        if (split && playerInputs.length < 2) {
+            startText.textContent = 'Waiting for player 2';
+        } else {
+            startCountDown = 3;
+            startText.textContent = startCountDown;
+            startTimer = setTimeout(countDown, 500);
+        }
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
@@ -42,10 +46,14 @@ stateStart = () => {
                 if (startTimer) {
                     clearTimeout(startTimer);
                 }
-                startText.classList.remove('blink');
-                startCountDown = 3;
-                startText.textContent = startCountDown;
-                startTimer = setTimeout(countDown, 700)
+                if (split && playerInputs.length < 2) {
+                    startText.textContent = 'Waiting for player 2';
+                } else {
+                    startText.classList.remove('blink');
+                    startCountDown = 3;
+                    startText.textContent = startCountDown;
+                    startTimer = setTimeout(countDown, 500);
+                }
             }
         }
     }
