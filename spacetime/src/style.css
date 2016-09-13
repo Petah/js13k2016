@@ -106,7 +106,7 @@ svg text.absCenter {
 .planetOrange4{opacity:0.5;fill:#71361f;}
 
 .hud{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
-.hudText{font-size:1.6em;letter-spacing:1;}
+.hudText{font-size:1.4em;letter-spacing:1;}
 .hudBase{fill:#66D9EF;}
 .hudBar{stroke-width:3;}
 #hudLayer>svg{position:absolute;top:0;left:0;right:auto;width:auto;height:auto;}

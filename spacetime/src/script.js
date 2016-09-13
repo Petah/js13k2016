@@ -231,62 +231,63 @@ updatePlayer = (player) => {
         emit(player.emitter, player.x, player.y, 25, player.facing);
     }
 
-    player.stats.glitch.reload--;
-    if (player.stats.glitch.value && player.stats.glitch.reload < 0) {
-        // Emit glitch particles
-        for (let i = 0; i < 30; i++) {
-            particles.push({
-                x: player.x + lengthDirX((Math.random() * 50) - 25, player.facing),
-                y: player.y + lengthDirY((Math.random() * 50) - 25, player.facing),
-                node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
-                    element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
-                    element.children[0].style.opacity = Math.random();
-                    element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
-                    element.children[0].transform.baseVal[1].setScale(1, 1);
-                }),
+    if (player.type === 'human') {
+        player.stats.glitch.reload--;
+        if (player.stats.glitch.value && player.stats.glitch.reload < 0) {
+            // Emit glitch particles
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: player.x + lengthDirX((Math.random() * 50) - 25, player.facing),
+                    y: player.y + lengthDirY((Math.random() * 50) - 25, player.facing),
+                    node: nodeCreate('glitchParticle', '.glitchLayer', (element) => {
+                        element.children[0].style.fill = ['#9417FF', '#5A30CC', '#9417FF', '#fff'][Math.floor(Math.random() * 4)];
+                element.children[0].style.opacity = Math.random();
+                element.children[0].transform.baseVal[0].setRotate(player.facing, 0, 0);
+                element.children[0].transform.baseVal[1].setScale(1, 1);
+            }),
                 life: 50,
-                speed: Math.random() * 2,
-                direction: i % 2 == 0 ? player.facing + 90 : player.facing - 90,
-                animate: (particle, element) => {
-                    console.log(element.children[0]);
+                    speed: Math.random() * 2,
+                    direction: i % 2 == 0 ? player.facing + 90 : player.facing - 90,
+                    animate: (particle, element) => {
                     element.children[0].transform.baseVal[1].setScale(1 / 50 * particle.life, 1 / 50 * particle.life);
                     element.children[0].style.opacity = 1 / 50 * particle.life;
                 },
             });
+            }
+
+            // Glitch player
+            // player.stats.glitch.glitching = true;
+            // player.stats.glitch.reload = player.stats.glitch.time;
+            // for (let e = 0; e < player.node.elements.length; e++) {
+            //     player.node.elements[e].style.display = 'none';
+            // }
+            // player.x += Math.random() * 2000 - 1000;
+            // player.y += Math.random() * 2000 - 1000;
+            // player.x += Math.random() * 200 - 100;
+            // player.y += Math.random() * 200 - 100;
+            // glitches.push({
+            //    node: nodeCreate('boatWrapper', '.topLayer', (element) => {
+            //        element.children[1].children[0].style.display = 'none';
+            //    }),
+            //    rotationPointX: 67/2,
+            //    rotationPointY: 53/2,
+            //    glitchLog: player.stats.glitch.log,
+            // });
+            // player.speed = 0;
+            // player.stats.glitch.log = [];
         }
 
-        // Glitch player
-        player.stats.glitch.glitching = true;
-        player.stats.glitch.reload = player.stats.glitch.time;
-        for (let e = 0; e < player.node.elements.length; e++) {
-            player.node.elements[e].style.display = 'none';
+        if (player.stats.glitch.glitching && player.stats.glitch.reload < 0) {
+            player.stats.glitch.glitching = false;
+            for (let e = 0; e < player.node.elements.length; e++) {
+                player.node.elements[e].style.display = '';
+            }
         }
-//        player.x += Math.random() * 2000 - 1000;
-//        player.y += Math.random() * 2000 - 1000;
-//        player.x += Math.random() * 200 - 100;
-//        player.y += Math.random() * 200 - 100;
-//        glitches.push({
-//            node: nodeCreate('boatWrapper', '.topLayer', (element) => {
-//                element.children[1].children[0].style.display = 'none';
-//            }),
-//            rotationPointX: 67/2,
-//            rotationPointY: 53/2,
-//            glitchLog: player.glitchLog,
-//        });
-        player.speed = 0;
-        player.stats.glitch.log = [];
+
+        player.stats.glitch.value = false;
+
+        player.stats.glitch.log.push([player.x, player.y, player.facing]);
     }
-    
-    if (player.stats.glitch.glitching && player.stats.glitch.reload < 0) {
-        player.stats.glitch.glitching = false;
-        for (let e = 0; e < player.node.elements.length; e++) {
-            player.node.elements[e].style.display = '';
-        }
-    }
-    
-    player.stats.glitch.value = false;
-    
-    player.stats.glitch.log.push([player.x, player.y, player.facing]);
 
     player.reloading--;
     if (player.shoot && player.reloading < 0) {
@@ -349,10 +350,11 @@ createHud = (data, player) => {
         if (data[j].hasOwnProperty('hAlign') && data[j].hAlign === 'right') {
             h.setAttributeNS(null, 'class', 'hudRight');
             let base = h.children[0].children[0];
+            console.log(base);
             let baseW = 436; // Magic
             base.transform.baseVal[1].setScale(-1, 1);
-//            move(base, baseW, 0);
-//            move(h.children[0].children[1], baseW - 112, 76);
+            move({elements:[base]}, baseW, 0);
+            move({elements:[h.children[0].children[1]]}, baseW - 112, 76);
         }
 
         // Append bars

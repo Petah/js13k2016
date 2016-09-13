@@ -109,7 +109,7 @@
 </svg>
 <svg id="hud" transform="translate(0 0) scale(1 1)" width="436" height="86" style="display: none">
     <g id="hudBase">
-        <polygon class="hudBase" points="436,48 136,48 120,86 0,86 0,46 436,46" transform="translate(0, 0) scale(1, 1)"/>
+        <polygon class="hudBase" points="436,48 136,48 120,86 0,86 0,46 436,46" transform="translate(0 0) scale(1 1)"/>
         <text class="hudText" transform="translate(10 76)"></text>
     </g>
     <g id="hudBars">
