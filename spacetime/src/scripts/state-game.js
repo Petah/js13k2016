@@ -1,10 +1,4 @@
 stateGameInit = () => {
-    if (!split) {
-        hudLayerBottom.style.display = 'block';
-        updateTimeElapsed();
-        killCount.innerText = elapsedTime.innetText = '0';
-    }
-
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'none';
     state = stateGame;
@@ -18,6 +12,9 @@ stateGameInit = () => {
     });
 
     if (!split) {
+        hudLayerBottom.style.display = 'block';
+        updateTimeElapsed();
+        killCount.innerText = elapsedTime.innetText = '0';
         createHud(hudData, players[0]);
     }
 
