@@ -32,12 +32,17 @@ stateDeadInit = () => {
 
 stateDead = () => {
     if (buttonShootDown) {
-        stateGameInit();
+        location.reload();
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i]  && gamepads[i].mapping === 'standard' && gamepads[i].buttons[9].pressed) {
-            stateGameInit();
+        if (!gamepads[i]) {
+            continue;
+        }
+        for (let b = 0; b < gamepads[i].buttons.length; b++) {
+            if (gamepads[i] && gamepads[i].buttons[b].pressed) {
+                location.reload();
+            }
         }
     }
 };

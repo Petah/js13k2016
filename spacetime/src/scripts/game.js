@@ -23,11 +23,8 @@ createExplosion = (x, y, sound) => {
             life: 50,
             speed: Math.random() / 4,
             direction: Math.random() * 360,
-            animate: (particle) => {
-                particle.node.elements.forEach((element) => {
-                    element.children[0].r.baseVal.value = particle.life / 2 + 20;
-                    element.children[0].style.opacity = 1 / 50 * particle.life;
-                });
+            animate: (particle, element) => {
+                element.children[0].style.opacity = 1 / 50 * particle.life;
             },
         });
     }
@@ -48,10 +45,8 @@ emit = (emitter, x, y, speed, direction) => {
                 life: 120,
                 speed: speed / 10,
                 direction: (direction - 180) + ((Math.random() * 30) - 15),
-                animate: (particle) => {
-                    particle.node.elements.forEach((element) => {
-                        element.children[0].style.opacity = 1 / 30 * particle.life;
-                    });
+                animate: (particle, element) => {
+                    element.children[0].style.opacity = 1 / 30 * particle.life;
                 },
             });
         }

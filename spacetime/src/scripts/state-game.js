@@ -63,6 +63,7 @@ stateGame = () => {
                     closest = cpus[j];
                 }
             }
+            let pointer = players[i].node.elements[i].children[1].children[0];
             if (closest !== null) {
                 let direction = pointDirection(players[i].x, players[i].y, closest.x, closest.y);
                 minDistance /= 20;
@@ -71,10 +72,12 @@ stateGame = () => {
                 } else if (minDistance > 200) {
                     minDistance = 200;
                 }
-                let pointer = players[i].node.elements[i].children[1].children[0];
                 pointer.transform.baseVal[0].matrix.e = lengthDirX(minDistance, direction - 90);
                 pointer.transform.baseVal[0].matrix.f = lengthDirY(minDistance, direction - 90);
                 pointer.children[0].transform.baseVal[0].setRotate(direction - 90, 0, 0);
+                pointer.style.display = '';
+            } else {
+                pointer.style.display = 'none';
             }
         } else {
             createExplosion(players[i].x, players[i].y, players[i].explosionSound);
@@ -96,8 +99,8 @@ stateGame = () => {
 
     for (let i = 0; i < glitches.length; i++) {
         if (glitches[i].glitchLog[0]) {
-            move(glitches[i].translate, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
-            rotate(glitches[i].rotate, glitches[i].glitchLog[0][2], 16, 4);
+            move(glitches[i].node, glitches[i].glitchLog[0][0], glitches[i].glitchLog[0][1]);
+            rotate(glitches[i].node, glitches[i].glitchLog[0][2], glitches[i].rotationPointX, glitches[i].rotationPointY);
         }
         if (!glitches[i].glitchLog.shift()) {
             destroy(glitches, i);
@@ -132,7 +135,9 @@ stateGame = () => {
     for (let i = 0; i < particles.length; i++) {
         particles[i].x += lengthDirX(particles[i].speed, particles[i].direction);
         particles[i].y += lengthDirY(particles[i].speed, particles[i].direction);
-        particles[i].animate(particles[i]);
+        for (let j = 0; j < particles[i].node.elements.length; j++) {
+            particles[i].animate(particles[i], particles[i].node.elements[j]);
+        }
 
         move(particles[i].node, particles[i].x, particles[i].y);
         particles[i].life--;
