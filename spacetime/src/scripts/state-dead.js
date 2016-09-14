@@ -2,6 +2,11 @@ stateDeadInit = () => {
     svgStartNode.style.display = 'none';
     svgDeadNode.style.display = 'block';
     state = stateDead;
+    if (timeElapsedID) {
+        clearInterval(timeElapsedID);
+        timeElapsedID = false;
+        timeElapsed = 0;
+    }
     while (players.length) {
         destroy(players, 0);
     }
@@ -20,22 +25,32 @@ stateDeadInit = () => {
     while (planets.length) {
         destroy(planets, 0);
     }
-    while (stars.length) {
-        destroy(planets, 0);
-    }
-    while(hudLayer.firstChild) {
+    while (hudLayer.firstChild) {
         hudLayer.removeChild(hudLayer.firstChild);
     }
+    canRestart = false;
+    setTimeout(() => {
+        canRestart = true;
+    }, 2000);
 };
 
 stateDead = () => {
+    if (!canRestart) {
+        return;
+    }
+
     if (buttonShootDown) {
-        stateGameInit();
+        location.reload();
     }
     let gamepads = navigator.getGamepads();
     for (let i = 0; i < gamepads.length; i++) {
-        if (gamepads[i] && gamepads[i].buttons[9].pressed) {
-            stateGameInit();
+        if (!gamepads[i]) {
+            continue;
+        }
+        for (let b = 0; b < gamepads[i].buttons.length; b++) {
+            if (gamepads[i] && gamepads[i].buttons[b].pressed) {
+                location.reload();
+            }
         }
     }
 };

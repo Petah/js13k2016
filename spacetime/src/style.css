@@ -3,6 +3,11 @@ body {
     margin: 0;
     overflow: hidden;
     background-image: linear-gradient(135deg, #280023 0%, #111c23 100%);
+    font-family:Helvetica;
+    font-size: 18px;
+    height: 100vh;
+    width: 100vw;
+    color: #fff;
 }
 
 svg {
@@ -11,6 +16,15 @@ svg {
     position: fixed;
     top: 0;
     left: 0;
+    shape-rendering: optimizeSpeed;
+}
+
+.absCenter {
+    position: absolute;
+    margin: auto;
+    left: 0; right: 0;
+    top: 0; bottom: 0;
+    text-align: center;
 }
 
 svg text.absCenter {
@@ -21,12 +35,40 @@ svg text.absCenter {
     font-family: monospace;
 }
 
+.splitLeft {
+    width: 50vw;
+    border-right: 1px dotted rgba(255, 255, 255, 0.3);
+}
+
+.splitRight {
+    width: 50vw;
+    right: 0;
+    left: auto;
+}
+
+#svgStartNode text,
+#svgDeadNode text {
+    text-anchor: middle;
+    fill: white;
+    font-family: monospace;
+    font-size: 30px;
+}
+
+#svgStartNode #title {
+    font-size: 70px;
+    font-weight: bold;
+}
+
 .bullet {
     fill: url(#gradient1);
 }
 
 .bubbleParticle {
     fill: #fff;
+}
+
+.pointer {
+    fill: RGBA(255, 255, 255, 0.7);
 }
 
 .playerBoat0{fill:#CBCBCB;}
@@ -67,13 +109,51 @@ svg text.absCenter {
 .planetOrange3{fill:#F39C12;}
 .planetOrange4{opacity:0.5;fill:#71361f;}
 
-#hudLayer{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
+.hud{position:fixed;left:10px;right:10px;top:10px;bottom:auto;}
+.hudText{font-size:1.4em;letter-spacing:1;}
+.hudBase{fill:#66D9EF;}
+.hudBar{stroke-width:3;}
 #hudLayer>svg{position:absolute;top:0;left:0;right:auto;width:auto;height:auto;}
 #hudLayer>svg.hudRight{left:auto;right:0;}
-.hudText{font-family:Helvetica;font-size:1.6em;letter-spacing:1;}
-.hudBase{fill:#66D9EF;}
 #hudLife .hudBar{fill:#F1C40F;stroke:#F1C40F;}
 #hudLife .hudBarE{fill:none;}
 #hudGlitch .hudBar{fill:#4eba6f;stroke:#4eba6f;}
 #hudGlitch .hudBarE{fill:none;}
-.hudBar{stroke-width:3;}
+
+#hudLayerBottom{top:auto;bottom:10px;text-align:center;font-weight:bold;color: #fff;font-size: 22px;opacity:0.35;}
+#hudLayerBottom>div{display:inline-block;margin:0 1em;}
+
+#svgStartNode{height:500px}
+#svgDeadNode{height:400px}
+#svgDeadNode span{display:block;color:#ac5eef;}
+.link {
+    border: 3px solid #841cdc;
+    display: inline-block;
+    width: 300px;
+    padding: 1em;
+    margin: 0 10px 30px;
+    cursor: pointer;
+}
+.link:hover {
+    border-color: #ac5eef;
+}
+
+.link.active {
+    background-color: rgba(138, 28, 220, 0.15);
+}
+
+.blink {
+    animation: blink 1s step-start 0s infinite;
+    -webkit-animation: blink 1s step-start 0s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
+@-webkit-keyframes blink {
+    50% {
+        opacity: 0.0;
+    }
+}
